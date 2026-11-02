@@ -2,7 +2,7 @@
 
 import argparse
 
-from . import budget, exam, record
+from . import budget, dedupe, exam, record
 
 
 def main():
@@ -11,6 +11,7 @@ def main():
     budget.register(subparsers)
     exam.register(subparsers)
     record.register(subparsers)
+    dedupe.register(subparsers)
     args = parser.parse_args()
     return args.func(args)
 
