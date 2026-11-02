@@ -5,6 +5,19 @@ from evals.brainstorm.prompts import generation_prompt, wrap_data
 
 
 class PromptTests(unittest.TestCase):
+    def test_rewrite_never_requests_ten_ideas_and_pressure_fuel_claim_is_conditional(self):
+        exam = {"question": "Question", "constraints": [], "card_data": []}
+        assignment = {"agent": 1, "model": "m", "method": None, "cards": []}
+        for three_step in (False, True):
+            config = validate_config({"name": "t", "default_model": "m", "three_step": three_step})
+            prompt = generation_prompt(exam, config, assignment, returned_from="old",
+                                       returned_idea={"title": "Old", "text": "Old mechanism"})
+            self.assertNotIn("10 idea", prompt)
+            self.assertIn("exactly one replacement idea", prompt)
+        pressure = generation_prompt(exam, config, assignment, level="pressure2")
+        self.assertNotIn("newly supplied, previously unused", pressure)
+        self.assertIn("reused cards", pressure)
+
     def test_return_requires_original_content_and_later_stage_accepts_supplied_singletons(self):
         exam = {"question": "Question", "constraints": [], "card_data": []}
         config = validate_config({"name": "t", "default_model": "m"})

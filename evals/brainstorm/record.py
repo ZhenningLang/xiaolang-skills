@@ -1,6 +1,7 @@
 """Budgeted single-batch recording and recoverable local materialized outputs."""
 
 from contextlib import ExitStack, contextmanager
+from copy import deepcopy
 from dataclasses import asdict
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -266,8 +267,41 @@ def sync_call(state, key, ledger):
     state["calls"] = [call for call in state["calls"] if call["call_key"] != key] + [row]
 
 
+def checked_assignments(rows, exam, config, level, returned_from):
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("assignments must be a nonempty array")
+    agents = []
+    cards = {card["id"] for card in exam["card_data"]}
+    count = (len(cards) if config["materials_mode"] == "all" else
+             int(len(cards) * config["materials_proportion"]) if config["materials_mode"] == "proportion" else 0)
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"agent", "model", "method", "cards"}:
+            raise ValueError("Invalid assignment fields")
+        if type(row["agent"]) is not int or not 1 <= row["agent"] <= config["agents"]:
+            raise ValueError("Invalid assignment agent")
+        agents.append(row["agent"])
+        if row["model"] not in config["models"]:
+            raise ValueError("Invalid assignment model")
+        method = row["method"]
+        if level == "baseline" or config["method_mode"] == "none":
+            if method is not None:
+                raise ValueError("Assignment method must be null")
+        elif not isinstance(method, str) or method not in config["methods"]:
+            raise ValueError("Invalid assignment method")
+        text_list(row["cards"], "assignment cards")
+        if len(row["cards"]) != count or len(set(row["cards"])) != count or not set(row["cards"]) <= cards:
+            raise ValueError("Invalid assignment cards or material count")
+    if (agents != sorted(set(agents)) or (returned_from is None and agents != list(range(1, config["agents"] + 1)))
+            or (returned_from is not None and len(agents) != 1)):
+        raise ValueError("Assignments require each agent once, or one collision-return agent")
+    if config["method_mode"] == "same" and len({r["method"] for r in rows}) != 1:
+        raise ValueError("Assignments violate same method mode")
+    return deepcopy(rows)
+
+
 def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1, level="round1",
-                 forbidden=None, decompositions=None, previous=None, returned_from=None, returned_idea=None):
+                 forbidden=None, decompositions=None, previous=None, returned_from=None, returned_idea=None,
+                 assignments=None, premises=None, purpose="generate"):
     positive_int(batch, "batch")
     if type(seed) is not int:
         raise ValueError("seed must be an integer")
@@ -275,6 +309,10 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
         raise ValueError("Invalid generation level")
     if returned_from is not None and (not isinstance(returned_from, str) or not returned_from):
         raise ValueError("returned_from must be an original idea id or null")
+    if purpose not in ("generate", "rewrite") or (purpose == "rewrite" and returned_from is None):
+        raise ValueError("purpose must be generate or a collision rewrite")
+    if assignments is not None:
+        assignments = checked_assignments(assignments, exam, config, level, returned_from)
     path = output_dir(run_dir, exam["id"], config["name"], rep)
     effective = {k: v for k, v in config.items() if k != "budget_usd"}
     identity = {"exam": digest(exam), "config": digest(effective), "seed": seed,
@@ -287,16 +325,19 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
         persist = lambda: save_state(path, state)
         batch_key = f"{batch}:{level}"
         allocation_seed = int(digest([seed, rep, batch, level]), 16)
-        assignments = allocate(exam, config, allocation_seed)
+        assignments = assignments if assignments is not None else allocate(exam, config, allocation_seed)
         if level == "baseline":
             assignments = [{**row, "method": None} for row in assignments]
-        batch_identity = digest([forbidden, decompositions, previous, returned_from, returned_idea, assignments])
+        inputs = [forbidden, decompositions, previous, returned_from, returned_idea, assignments]
+        if premises is not None or purpose != "generate":
+            inputs.extend([premises, purpose])
+        batch_identity = digest(inputs)
         current = state["batches"].setdefault(batch_key, {"identity": batch_identity, "assignments": assignments, "complete": False})
         if current["identity"] != batch_identity:
             raise ValueError("Batch identity conflict: generation context changed")
         persist()
         export_outputs(path, state, exam)
-        for assignment in assignments:
+        for position, assignment in enumerate(assignments):
             peers = previous
             if config["serial_visible"]:
                 peers = (previous or []) + [idea for idea in state["ideas"] if idea["batch"] == batch
@@ -306,7 +347,8 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
             agent_key = str(assignment["agent"])
             if agent_key not in prompts:
                 prompts[agent_key] = generation_prompt(exam, config, assignment, level=level, forbidden=forbidden,
-                    decompositions=decompositions, previous=peers, returned_from=returned_from, returned_idea=returned_idea)
+                    decompositions=decompositions, previous=peers, returned_from=returned_from, returned_idea=returned_idea,
+                    premises=premises)
                 persist()
             prompt = prompts[agent_key]
             for attempt in (1, 2):
@@ -320,14 +362,14 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                 if request is None:
                     request = {"call_key": key, "exam_id": exam["id"], "config": config["name"], "rep": rep,
                                **{k: assignment[k] for k in ("agent", "model")}, "batch": batch, "level": level,
-                               "purpose": "generate", "backend": backend.name, "attempt": attempt,
+                               "purpose": purpose, "backend": backend.name, "attempt": attempt,
                                "cards": assignment["cards"],
                                "started_at": None, "duration_ms": None, "status": "pending", "receipt": None}
                     state["requests"][key] = request
                 persist()
                 measured = MeasuredBackend(backend, request, persist)
                 print(f"Recording {exam['id']}/{config['name']} rep={rep} batch={batch} level={level} "
-                      f"agent={assignment['agent']}/{len(assignments)} attempt={attempt}", file=sys.stderr)
+                       f"agent={assignment['agent']} assignment={position + 1}/{len(assignments)} attempt={attempt}", file=sys.stderr)
                 try:
                     result = guarded_call(ledger, measured, key, prompt, assignment["model"], config["max_output_tokens"])
                 except PaidCallError as exc:
@@ -346,7 +388,7 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                         status = ledger.status()
                         reserve = amount(backend.estimate_max_usd(prompt, assignment["model"], config["max_output_tokens"]))
                         shortfall = max(Decimal(0), exact_sum(status["used"], reserve, status["limit"].copy_negate()))
-                        raise BudgetExceeded(f"{exc}; shortfall_usd={shortfall}; pending_agents={len(assignments) - assignment['agent'] + 1}; "
+                        raise BudgetExceeded(f"{exc}; shortfall_usd={shortfall}; pending_agents={len(assignments) - position}; "
                                              "pending_calls_at_least=1 (future actual costs unknown)") from exc
                     raise
                 if measured.persistence_error is not None:
@@ -355,6 +397,8 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                 sync_call(state, key, ledger)
                 try:
                     rows = parse_ideas(result.text, assignment["cards"])
+                    if purpose == "rewrite" and len(rows) != 1:
+                        raise ValueError("A collision rewrite must return exactly one idea")
                 except ValueError as exc:
                     request["status"] = "parse_error"
                     add_failure(state, "parse", key, "invalid_output", str(exc))

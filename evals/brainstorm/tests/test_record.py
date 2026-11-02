@@ -21,6 +21,23 @@ GOOD = json.dumps({"ideas": [{"title": "Divider", "text": "Separate items with a
 
 
 class RecordTests(unittest.TestCase):
+    def test_explicit_single_agent_rewrite_freezes_inputs_and_purpose(self):
+        assignment = [{"agent": 2, "model": "m", "method": None, "cards": ["c1", "c2"]}]
+        original = {"title": "original", "text": "collision original text"}
+        options = dict(assignments=assignment, premises={"dimensions": []}, purpose="rewrite",
+                       returned_from="i-original", returned_idea=original)
+        summary = self.record(**options)
+        self.assertEqual(summary["calls"], 1)
+        self.assertEqual(self.rows("calls.jsonl")[0]["purpose"], "rewrite")
+        self.assertEqual(self.rows("ideas.jsonl")[0]["agent"], 2)
+        self.record(**options)
+        self.assertEqual(self.backend.calls, 1)
+        with self.assertRaisesRegex(ValueError, "identity conflict"):
+            self.record(**{**options, "premises": {"dimensions": ["changed"]}})
+        for field, value in (("agent", 3), ("model", "outside"), ("method", "outside"), ("cards", ["unknown"])):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.record(batch=2, **{**options, "assignments": [{**assignment[0], field: value}]})
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

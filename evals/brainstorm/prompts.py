@@ -16,7 +16,7 @@ def wrap_data(value):
 
 
 def generation_prompt(exam, config, assignment, *, level="round1", forbidden=None,
-                      decompositions=None, previous=None, returned_from=None, returned_idea=None):
+                      decompositions=None, previous=None, returned_from=None, returned_idea=None, premises=None):
     if level not in LEVELS:
         raise ValueError(f"Unknown generation level: {level}")
     parts = ["Generate ideas using only the supplied data. Do not use tools or modify files.",
@@ -26,10 +26,12 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
              "Hard constraints:", wrap_data(exam["constraints"]), "Assigned cards:",
              wrap_data([card for card in exam["card_data"] if card["id"] in assignment["cards"]])]
     if config["three_step"]:
-        parts.append("Three steps: first list 10 idea titles; then rewrite the titles to maximize differences "
+        parts.append("Three steps: first propose one replacement title; then rewrite its mechanism to avoid the original; "
+                     "finally expand the rewritten title into one complete idea." if returned_from is not None else
+                     "Three steps: first list 10 idea titles; then rewrite the titles to maximize differences "
                      "between their mechanisms; finally expand the rewritten titles into complete ideas.")
     else:
-        parts.append("Directly give 10 ideas.")
+        parts.append("Directly give one replacement idea." if returned_from is not None else "Directly give 10 ideas.")
     method = assignment["method"]
     if level != "baseline" and method is not None:
         parts.extend(["Method instructions:", config["methods"][method]])
@@ -38,13 +40,16 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
                      "and use supplied singleton ideas as starting points.")
     if level.startswith("pressure"):
         parts.append({"pressure1": "Pressure 1: use the full exclusion zone; avoid every previously observed mechanism.",
-                      "pressure2": "Pressure 2: Change fuel; use the newly supplied, previously unused cards instead of prior fuel.",
+                       "pressure2": "Pressure 2: Change fuel; prefer previously unused cards when supplied; reused cards may be present when fresh supply is insufficient.",
                       "pressure3": "Pressure 3: Attack premises; question the original problem's assumptions without violating hard constraints.",
                       "pressure4": "Pressure 4: Change method; use the newly assigned method and extreme additional constraints consistent with hard constraints."}[level])
     if forbidden is not None and (level not in ("baseline", "round1") or config["before_generation"] or returned_from):
         parts.extend(["Avoid these already observed mechanisms:", wrap_data(forbidden)])
     if decompositions is not None:
         parts.extend(["Supplied decompositions:", wrap_data(decompositions)])
+    if premises is not None:
+        parts.extend(["Observed decomposition dimensions (a frequency proxy, not proven premises); question these observations:",
+                      wrap_data(premises)])
     if config["decomposition_timing"] == "early":
         parts.append("Decompose the problem before generating ideas; report your decomposition.")
     elif config["decomposition_timing"] == "late":
@@ -62,6 +67,7 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
                 not returned_idea[key].strip() for key in ("title", "text")):
             raise ValueError("Collision return requires the original title and text, not just an ID")
         parts.extend(["Collision return: replace the mechanism, not just its wording.",
+                      "Return exactly one replacement idea for this original.",
                       wrap_data({key: returned_idea[key] for key in ("title", "text")})])
     parts.append('Return only JSON: {"ideas":[{"title":"...","text":"...",'
                   '"cards_used":["assigned card id"],"decomposition":null}]}. '
