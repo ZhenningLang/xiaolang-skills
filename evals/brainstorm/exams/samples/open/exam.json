@@ -1,0 +1,1 @@
+{"id":"open_sample","type":"open","question":"Test only: how can a shared shelf be easier to use?","constraints":["Keep the shelf accessible."],"cards":"cards.jsonl","planted":[],"hidden_answers":[],"wrong_premise":null,"created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0","check_samples":["Remove the shelf and forbid storage."]}

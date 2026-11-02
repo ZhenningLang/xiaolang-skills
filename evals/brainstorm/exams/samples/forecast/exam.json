@@ -1,0 +1,1 @@
+{"id":"forecast_sample","type":"forecast","question":"Test only fictional forecast: what could a future shelf do?","constraints":[],"cards":"cards.jsonl","planted":[],"hidden_answers":["Fictional self sorting shelf; not a historical claim."],"wrong_premise":null,"created_after":"2026-01-01","leak_check":null,"license":"Self authored test fixture; CC0"}

@@ -1,0 +1,1 @@
+{"id":"human_sample","type":"human_baseline","question":"Test only: how can an empty box be reused?","constraints":[],"cards":"cards.jsonl","planted":[],"hidden_answers":[],"wrong_premise":null,"created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0"}

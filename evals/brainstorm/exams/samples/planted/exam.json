@@ -1,0 +1,1 @@
+{"id":"planted_sample","type":"planted","question":"Test only: make a box easy to identify.","constraints":[],"cards":"cards.jsonl","planted":[{"card_id":"c1","kind":"color","marker":"COLOR_AMBER_42"}],"hidden_answers":[],"wrong_premise":null,"created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0"}

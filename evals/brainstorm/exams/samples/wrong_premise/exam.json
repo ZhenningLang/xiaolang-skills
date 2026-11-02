@@ -1,0 +1,1 @@
+{"id":"premise_sample","type":"wrong_premise","question":"Test only: how can everyone own the only key at once?","constraints":[],"cards":"cards.jsonl","planted":[],"hidden_answers":[],"wrong_premise":"Only a physical key can provide access.","created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0"}

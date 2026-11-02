@@ -1,0 +1,1 @@
+{"id":"narrow_sample","type":"narrow","question":"Test only: position one label on a box.","constraints":["Use exactly one label."],"cards":"cards.jsonl","planted":[],"hidden_answers":[],"wrong_premise":null,"created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0"}

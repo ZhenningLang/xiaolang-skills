@@ -1,8 +1,10 @@
 import ast
+import io
 from pathlib import Path
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
 
 from evals.brainstorm.budget import default_ledger_path
 
@@ -11,6 +13,16 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class ContractTests(unittest.TestCase):
+    def test_verification_gate_rejects_skipped_and_undiscovered_tests(self):
+        from evals.brainstorm.tests.__main__ import run
+        def skipped():
+            raise unittest.SkipTest("synthetic gate control")
+        for suite, code in ((unittest.TestSuite([unittest.FunctionTestCase(skipped)]), 1),
+                            (unittest.TestSuite(), 1),
+                            (unittest.TestSuite([unittest.FunctionTestCase(lambda: None)]), 0)):
+            with patch("sys.stderr", new_callable=io.StringIO):
+                self.assertEqual(run(suite), code)
+
     def test_private_and_run_paths_ignored_but_samples_public(self):
         for name, expected in (("evals/brainstorm/exams/private/question.json", 0),
                                ("evals/brainstorm/runs/batch/ideas.jsonl", 0),

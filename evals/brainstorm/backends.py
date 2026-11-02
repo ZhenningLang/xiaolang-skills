@@ -4,6 +4,8 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
+import math
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation, getcontext, localcontext
 from typing import Protocol
@@ -83,11 +85,12 @@ class Backend(Protocol):
 class FakeBackend:
     name = "fake"
 
-    def __init__(self, *, usd="0.01", reserve_usd="0.02", failure=None):
+    def __init__(self, *, usd="0.01", reserve_usd="0.02", failure=None, responses=None):
         self.usd = None if usd is None else Decimal(str(usd))
         self.reserve_usd = Decimal(str(reserve_usd))
         self.failure = failure
         self.calls = 0
+        self.responses = responses
 
     def estimate_max_usd(self, prompt, model, max_output_tokens):
         return self.reserve_usd
@@ -98,8 +101,16 @@ class FakeBackend:
         self.calls += 1
         if self.failure == "unknown":
             raise ResultUnknown("Fake response unreadable")
+        text = hashlib.sha256(f"{prompt}:{model}:{max_output_tokens}".encode()).hexdigest()
+        if self.responses is not None:
+            if callable(self.responses):
+                text = self.responses(prompt, model, max_output_tokens)
+            else:
+                if self.calls > len(self.responses):
+                    raise ResultUnknown("Fake scripted responses exhausted")
+                text = self.responses[self.calls - 1]
         return CallResult(
-            text=hashlib.sha256(f"{prompt}:{model}:{max_output_tokens}".encode()).hexdigest(),
+            text=text,
             usd=None if self.failure == "missing_cost" else self.usd,
             tokens={"input": len(prompt.encode()), "cache_write": 0, "cache_read": 0, "output": 1},
             outcome="paid_error" if self.failure == "paid_error" else "ok",
@@ -173,3 +184,78 @@ class ClaudeCliBackend:
             raise ResultUnknown("Failed model response has unknown billing")
         return CallResult(text=text, usd=usd, tokens=tokens,
                           outcome="paid_error" if paid_error else "ok")
+
+
+class CommandBackend:
+    """An explicitly acknowledged command, not an operating-system sandbox."""
+
+    name = "command"
+
+    def __init__(self, *, provider, argv, pricing, max_usd_per_call, timeout=120,
+                 tools_disabled=False, outbound_ack=False):
+        if tools_disabled is not True or outbound_ack is not True:
+            raise ValueError("command requires tools_disabled: true and outbound_ack: true")
+        if not isinstance(provider, str) or not provider.strip():
+            raise ValueError("provider: required nonempty name")
+        if not isinstance(argv, list) or not argv or any(not isinstance(x, str) for x in argv) or not argv[0]:
+            raise ValueError("argv: expected a nonempty argument array")
+        if type(timeout) not in (int, float) or not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout: expected a positive finite number")
+        self.maximum = amount(max_usd_per_call)
+        if not self.maximum:
+            raise ValueError("max_usd_per_call must be positive")
+        if not isinstance(pricing, dict) or not pricing:
+            raise ValueError("pricing: explicit model prices required")
+        for model, price in pricing.items():
+            if not isinstance(model, str) or not isinstance(price, dict):
+                raise ValueError("pricing: invalid model price")
+            for key in ("fixed_tokens", "input_per_million", "output_per_million"):
+                if key not in price:
+                    raise ValueError(f"pricing: missing {key}")
+                amount(price[key])
+        self.provider, self.argv, self.timeout = provider, argv, timeout
+        self.estimator = ClaudeCliBackend(pricing=pricing)
+
+    def estimate_max_usd(self, prompt, model, max_output_tokens):
+        return max(self.maximum, self.estimator.estimate_max_usd(prompt, model, max_output_tokens))
+
+    def call(self, prompt, model, max_output_tokens):
+        self.estimate_max_usd(prompt, model, max_output_tokens)
+        if type(max_output_tokens) is not int or max_output_tokens <= 0:
+            raise NotStarted("max_output_tokens must be a positive integer")
+        argv = [arg.replace("{model}", model).replace("{max_output_tokens}", str(max_output_tokens))
+                for arg in self.argv]
+        print(f"Outbound warning: question and cards will be sent to {self.provider}; "
+              "tools_disabled is a configuration declaration, not a sandbox.", file=sys.stderr)
+        try:
+            process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE, text=True, encoding="utf-8", shell=False)
+        except OSError as exc:
+            raise NotStarted(f"Could not start command provider {self.provider}: {exc}") from exc
+        with process:
+            try:
+                stdout, _ = process.communicate(input=prompt, timeout=self.timeout)
+            except (subprocess.TimeoutExpired, OSError, UnicodeError) as exc:
+                if process.poll() is None:
+                    process.kill()
+                raise ResultUnknown(f"Command provider {self.provider} response unreadable") from exc
+        try:
+            payload = json.loads(stdout, parse_float=Decimal)
+            if not isinstance(payload, dict):
+                raise ValueError("expected response object")
+            usd = None if payload.get("usd") is None else amount(payload["usd"])
+        except (ValueError, TypeError) as exc:
+            raise ResultUnknown(f"Command provider {self.provider} has unknown billing") from exc
+        outcome = "paid_error" if process.returncode or payload.get("outcome", "ok") != "ok" else "ok"
+        text, tokens, raw_ref = payload.get("text"), payload.get("tokens"), payload.get("raw_ref")
+        try:
+            token_counts(tokens)
+            if set(tokens) != {"input", "cache_write", "cache_read", "output"}:
+                raise ValueError("missing token fields")
+            result = CallResult(text=text, usd=usd, tokens=tokens, raw_ref=raw_ref, outcome=outcome)
+            validate_result(result)
+        except (ValueError, TypeError):
+            result = CallResult(text=text if isinstance(text, str) else "", usd=usd, outcome="paid_error")
+        if result.outcome == "paid_error" and usd is None:
+            raise ResultUnknown(f"Failed command provider {self.provider} has unknown billing")
+        return result

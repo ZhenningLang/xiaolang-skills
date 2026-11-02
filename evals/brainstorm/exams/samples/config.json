@@ -1,0 +1,1 @@
+{"name":"sample","default_model":"fake_model","agents":3,"backend":{"kind":"fake"},"method_mode":"different","methods":{"reverse":"Test placeholder: reverse one assumption.","analogy":"Test placeholder: use a storage analogy."},"materials_mode":"all","materials_proportion":1}

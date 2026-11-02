@@ -1,0 +1,1 @@
+{"id":"parts_sample","type":"decomposable","question":"Test only: improve shelf access and item return.","constraints":[],"cards":"cards.jsonl","planted":[],"hidden_answers":[],"wrong_premise":null,"created_after":null,"leak_check":null,"license":"Self authored test fixture; CC0"}
