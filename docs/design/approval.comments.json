@@ -1,0 +1,226 @@
+{
+  "schema_version": 2,
+  "spec_file": "approval.md",
+  "review_version": 3,
+  "anchors": {
+    "U-DEC-1": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-1-0",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "记不起来的方法就是文章里的三步法，已放进流程。",
+          "response": "已写回 U-DEC-1，投影已刷新",
+          "fingerprint_at_comment": "0101",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-1"
+    },
+    "U-DEC-2": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-2-1",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "公开版默认关闭多模型，读者配置后才开，你本机配好六家。",
+          "response": "已写回 U-DEC-2，投影已刷新",
+          "fingerprint_at_comment": "68e4",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-2"
+    },
+    "U-DEC-3": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-3-2",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "流程改成 8 步，收集材料和跑常见点子清单同时做，各轮生成合成一步。",
+          "response": "已写回 U-DEC-3，投影已刷新",
+          "fingerprint_at_comment": "d9d1",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-3"
+    },
+    "U-DEC-4": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-4-3",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "枯竭之后先用这四级压力，测不出贡献的级别就删掉。",
+          "response": "已写回 U-DEC-4，投影已刷新",
+          "fingerprint_at_comment": "f936",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-4"
+    },
+    "U-DEC-8": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-8-4",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "考题和跑分结果公开，你的私人问题和许可证不清楚的外部数据除外。",
+          "response": "已写回 U-DEC-8，投影已刷新",
+          "fingerprint_at_comment": "9c60",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-8"
+    },
+    "U-DEC-7": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 2 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-7-5",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "按 8 道题、约 2000 万 token 来，先跑一次算单次成本。",
+          "response": "8 道题已定。2000 万的前提算错了，预算部分不沿用，改在 U-DEC-7 重新拍",
+          "fingerprint_at_comment": "3540",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        },
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-7-8",
+          "role": "user",
+          "kind": "comment",
+          "status": "answered",
+          "classification": "question",
+          "text": "我担心预算有限，这个 2000万 你定的有依据吗",
+          "response": "依据不足：我把末轮上下文当成了总用量，单次调用也低估了。实测和新三档见 approval §4",
+          "fingerprint_at_comment": "3540",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        },
+        {
+          "id": "c-2026-11-02T09-27-46-561Z-U-DEC-7-0",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "按分步跑，设 50 美元硬上限，到线就停下来问你。",
+          "response": "已写回 U-DEC-7，投影已刷新",
+          "fingerprint_at_comment": "e6d4",
+          "created_in_version": 2,
+          "resolved_in_version": 2
+        }
+      ],
+      "unit_id": "U-DEC-7"
+    },
+    "U-DEC-5": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-5-6",
+          "role": "user",
+          "kind": "comment",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "排名只排序，不清理，所有点子都需要人来看",
+          "response": "已写回 U-DEC-5：取消名额，排名只排序，全部给人看；流程图和机制表已同步",
+          "fingerprint_at_comment": "6b19",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-5"
+    },
+    "U-DEC-6": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 1 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-6-7",
+          "role": "user",
+          "kind": "comment",
+          "status": "answered",
+          "classification": "question",
+          "text": "这个我有点难以抉择，应为创新可能就是怪，但是怪的质量又很难评估",
+          "response": "怪和好确实无法当场判断。U-DEC-6 已改成把新不新和值不值得试分开问，请再拍一次",
+          "fingerprint_at_comment": "281f",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        },
+        {
+          "id": "c-2026-11-02T09-27-46-561Z-U-DEC-6-1",
+          "role": "user",
+          "kind": "comment",
+          "status": "resolved",
+          "classification": "blocker",
+          "text": "那不行吧，没想到但不想试不就是调研中的创新方案被否决的路子吗",
+          "response": "你说得对：想不想试正是稳妥偏好。U-DEC-6 已改成三问，想不想试只记录不计分，请再拍一次",
+          "fingerprint_at_comment": "187e",
+          "created_in_version": 2,
+          "resolved_in_version": 2
+        },
+        {
+          "id": "c-2026-11-02T09-50-36-370Z-U-DEC-6-0",
+          "role": "user",
+          "kind": "decision",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "没想到、成了会在乎、说不出致命原因的点子才计分，想不想试只记录。",
+          "response": "已写回 U-DEC-6，投影已刷新，机制表和评测方案已同步",
+          "fingerprint_at_comment": "1c5e",
+          "created_in_version": 3,
+          "resolved_in_version": 3
+        }
+      ],
+      "unit_id": "U-DEC-6"
+    },
+    "U-DEC-9": {
+      "kind": "unit",
+      "heading": "2. 要你拍的 9 件事",
+      "comments": [
+        {
+          "id": "c-2026-11-02T09-07-13-262Z-U-DEC-9-9",
+          "role": "user",
+          "kind": "comment",
+          "status": "resolved",
+          "classification": "decision",
+          "text": "用 B 暖色手绘，就是下面三个图中间那个",
+          "response": "已写回 U-DEC-9：流程图换成暖色手绘，其余风格文件已删除",
+          "fingerprint_at_comment": "97f2",
+          "created_in_version": 1,
+          "resolved_in_version": 1
+        }
+      ],
+      "unit_id": "U-DEC-9"
+    }
+  }
+}

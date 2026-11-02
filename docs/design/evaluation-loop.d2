@@ -1,0 +1,22 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "循环结构简单，用克制的流程图说明一次结构调整怎么被判定", "surface": "repo-doc"}
+direction: down
+
+改动: "改一处结构" { class: new }
+录制: "录制\n每题生成点子池\n记录血统" { class: box }
+回放: "回放下游环节\n不重新生成" { class: box }
+机器: "机器指标\n独有机制、基线外比例" { class: box }
+盲评: "作者盲评\n每轮约 15 分钟" { class: decision }
+诊断: "血统诊断\n找没用的环节" { class: box }
+判定: "主分超过噪声线\n护栏没有恶化？" { class: decision }
+账本: "失败账本\n选下一处改动" { class: store }
+留出: "全部调完\n留出题验收一次" { class: new }
+
+改动 -> 录制
+录制 -> 回放
+回放 -> 机器
+机器 -> 盲评
+盲评 -> 诊断
+诊断 -> 判定
+判定 -> 账本: 记录结果
+账本 -> 改动: 下一轮 { class: hero }
+判定 -> 留出: 没有可改的了

@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 /tmp/
+*.review.html
+*.comments.incoming.json
+*.review-inbox.md
