@@ -5,3 +5,5 @@ __pycache__/
 *.review.html
 *.comments.incoming.json
 *.review-inbox.md
+evals/brainstorm/exams/private/
+evals/brainstorm/runs/
