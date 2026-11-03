@@ -143,7 +143,7 @@ const GROUP_PURPOSE = "这张卷用来核对程序合并点子是否准确。";
 const OFFLINE = "连不上本地服务，可能已经停了。已填的内容还在这个页面上；重新运行 serve 命令后，请打开新地址。";
 const QUESTIONS = [
   {field: "unthought", text: "看这道题之前，你想到过吗？", first: ["想到过", false], second: ["没想到", true]},
-  {field: "care", text: "假设它成了，你在乎吗？", first: ["在乎", true], second: ["不在乎", false]},
+  {field: "care", text: "如果这个点子真做成了，这个结果对你重要吗？", first: ["重要", true], second: ["不重要", false]},
   {field: "fatal", text: "你说得出它一定不成的原因吗？", first: ["说得出", "yes"], second: ["说不出", "no"]},
   {field: "want_to_try", text: "你想试吗？（只记录，不计分）", first: ["想试", true], second: ["不想试", false]},
 ];
@@ -534,7 +534,7 @@ function startGroup(state) {
     const left = el("div", {class: "sticky_column"},
       notice(error, failed),
       current ? el("div", {},
-        el("p", {class: "eyebrow group_rule", text: "这条点子放哪一组？做法相同的放一起，说法不同没关系。"}),
+        el("p", {class: "eyebrow group_rule", text: "这条点子放哪一组？做法相同的放一起，说法不同没关系；拿不准就分开。"}),
         el("p", {class: "idea", id: "idea_text", text: current.text}),
         maskNote([current.text])) : el("div", {class: "finish", id: "finish_panel"},
         el("h1", {text: items.length ? "都分好了" : "这张卷子没有要分的内容"}),

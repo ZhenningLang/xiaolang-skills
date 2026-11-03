@@ -163,6 +163,6 @@ class PageCopyTests(unittest.TestCase):
             self.assertIn(name, PAGE)
 
     def test_group_copy_names_the_rule_and_the_purpose(self):
-        self.assertIn("做法相同的放一起，说法不同没关系", PAGE)
+        self.assertIn("做法相同的放一起，说法不同没关系；拿不准就分开", PAGE)
         self.assertIn("这张卷用来核对程序合并点子是否准确", PAGE)
         self.assertNotIn("意思一样的放一起", PAGE)

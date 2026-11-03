@@ -17,7 +17,7 @@ from evals.brainstorm.tests.test_sheet import ANSWER, EXAM_ID, FIXTURE, ROOT, co
 
 WEB = ROOT / "evals/brainstorm/web"
 PAGE = (WEB / "index.html").read_text(encoding="utf-8")
-QUESTIONS = ("看这道题之前，你想到过吗？", "假设它成了，你在乎吗？", "你说得出它一定不成的原因吗？", "你想试吗？（只记录，不计分）")
+QUESTIONS = ("看这道题之前，你想到过吗？", "如果这个点子真做成了，这个结果对你重要吗？", "你说得出它一定不成的原因吗？", "你想试吗？（只记录，不计分）")
 
 
 class PageSourceTests(unittest.TestCase):
@@ -34,7 +34,7 @@ class PageSourceTests(unittest.TestCase):
 
     def test_answer_direction_of_the_first_question_is_inverted(self):
         self.assertIn('first: ["想到过", false], second: ["没想到", true]', PAGE)
-        self.assertIn('first: ["在乎", true], second: ["不在乎", false]', PAGE)
+        self.assertIn('first: ["重要", true], second: ["不重要", false]', PAGE)
         self.assertIn('first: ["想试", true], second: ["不想试", false]', PAGE)
 
     def test_supports_both_color_schemes_and_phone_width(self):
