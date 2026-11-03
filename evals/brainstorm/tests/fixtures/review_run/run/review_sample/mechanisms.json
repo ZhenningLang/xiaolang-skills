@@ -1,0 +1,155 @@
+{
+ "exam_id": "review_sample",
+ "mechanisms": [
+  {
+   "mechanism_id": "m-001",
+   "label": "给每层贴用途标签",
+   "idea_ids": [
+    "i-746106ea24c7",
+    "i-afc347893f5c",
+    "i-8070770db533",
+    "i-4d599e8055dc"
+   ],
+   "in_baseline": false,
+   "representative": "i-afc347893f5c"
+  },
+  {
+   "mechanism_id": "m-002",
+   "label": "按周轮换责任人",
+   "idea_ids": [
+    "i-1d1c4845699a",
+    "i-84bb549af9c3"
+   ],
+   "in_baseline": false,
+   "representative": "i-1d1c4845699a"
+  },
+  {
+   "mechanism_id": "m-003",
+   "label": "只在基线里出现的想法",
+   "idea_ids": [
+    "i-7117a92c98bf",
+    "i-6b12fd919996"
+   ],
+   "in_baseline": true,
+   "representative": "i-7117a92c98bf"
+  },
+  {
+   "mechanism_id": "m-004",
+   "label": "限时存放",
+   "idea_ids": [
+    "i-b71e550b2a76",
+    "i-fd9888ca6c4c",
+    "i-86dfe1b372b6"
+   ],
+   "in_baseline": true,
+   "representative": "i-b71e550b2a76"
+  },
+  {
+   "mechanism_id": "m-005",
+   "label": "把架子搬到人多的地方",
+   "idea_ids": [
+    "i-82e1921f7c91",
+    "i-642674309f47"
+   ],
+   "in_baseline": false,
+   "representative": "i-82e1921f7c91"
+  },
+  {
+   "mechanism_id": "m-006",
+   "label": "用照片做登记",
+   "idea_ids": [
+    "i-c3dbe1c9b40f",
+    "i-05f30b493b9b"
+   ],
+   "in_baseline": false,
+   "representative": "i-c3dbe1c9b40f"
+  },
+  {
+   "mechanism_id": "m-007",
+   "label": "带标记的说明",
+   "idea_ids": [
+    "i-44202f1f2b3c",
+    "i-746ea8781449"
+   ],
+   "in_baseline": false,
+   "representative": "i-44202f1f2b3c"
+  },
+  {
+   "mechanism_id": "m-008",
+   "label": "可拆分隔板",
+   "idea_ids": [
+    "i-62c776893ff0",
+    "i-3c14fb76357d"
+   ],
+   "in_baseline": false,
+   "representative": "i-62c776893ff0"
+  },
+  {
+   "mechanism_id": "m-009",
+   "label": "借用登记本",
+   "idea_ids": [
+    "i-c94def8b53de",
+    "i-640e81c86089"
+   ],
+   "in_baseline": false,
+   "representative": "i-c94def8b53de"
+  },
+  {
+   "mechanism_id": "m-010",
+   "label": "只给长期物品留位置",
+   "idea_ids": [
+    "i-6ce145b289d2",
+    "i-0853ab094199"
+   ],
+   "in_baseline": false,
+   "representative": "i-6ce145b289d2"
+  },
+  {
+   "mechanism_id": "m-011",
+   "label": "取消公共存放",
+   "idea_ids": [
+    "i-850cbf0a4a07",
+    "i-e625ddc4415d"
+   ],
+   "in_baseline": false,
+   "representative": "i-850cbf0a4a07"
+  },
+  {
+   "mechanism_id": "m-012",
+   "label": "按使用频率摆放",
+   "idea_ids": [
+    "i-50b0cbf6ba8d",
+    "i-14845150561e"
+   ],
+   "in_baseline": false,
+   "representative": "i-50b0cbf6ba8d"
+  },
+  {
+   "mechanism_id": "m-013",
+   "label": "贴一张使用须知",
+   "idea_ids": [
+    "i-174b9b9e451b"
+   ],
+   "in_baseline": true,
+   "representative": "i-174b9b9e451b"
+  },
+  {
+   "mechanism_id": "m-014",
+   "label": "换一个大架子",
+   "idea_ids": [
+    "i-fd1165b21f48"
+   ],
+   "in_baseline": true,
+   "representative": "i-fd1165b21f48"
+  },
+  {
+   "mechanism_id": "m-015",
+   "label": "加一个收纳箱",
+   "idea_ids": [
+    "i-da19f7b55de7"
+   ],
+   "in_baseline": true,
+   "representative": "i-da19f7b55de7"
+  }
+ ]
+}

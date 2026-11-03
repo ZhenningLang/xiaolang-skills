@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>点子判断</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: oklch(98% 0.004 85);
+  --surface: oklch(95% 0.006 85);
+  --fg: oklch(24% 0.012 85);
+  --muted: oklch(45% 0.012 85);
+  --border: oklch(82% 0.008 85);
+  --accent: oklch(38% 0.07 235);
+  --on_accent: oklch(98% 0.004 85);
+  --danger: oklch(42% 0.13 30);
+  --space_1: 4px; --space_2: 8px; --space_3: 12px; --space_4: 16px; --space_5: 24px; --space_6: 32px; --space_7: 48px; --space_8: 64px;
+  --page_width: 1120px;
+  --radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(20% 0.008 85);
+    --surface: oklch(25% 0.009 85);
+    --fg: oklch(92% 0.006 85);
+    --muted: oklch(74% 0.01 85);
+    --border: oklch(40% 0.01 85);
+    --accent: oklch(78% 0.08 235);
+    --on_accent: oklch(20% 0.008 85);
+    --danger: oklch(78% 0.11 30);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-size: 16px; line-height: 1.6; }
+button, textarea { font: inherit; color: inherit; }
+button {
+  min-height: 44px; padding: var(--space_2) var(--space_4);
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; overflow-wrap: anywhere;
+}
+button:hover { background: var(--surface); }
+button:disabled { opacity: 0.55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on_accent); }
+button.primary { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+kbd {
+  font: inherit; font-size: 12px; color: inherit; opacity: 0.72;
+  margin-left: var(--space_2);
+}
+.top {
+  position: sticky; top: 0; z-index: 1; background: var(--bg);
+  padding: var(--space_3) var(--space_4) 0;
+}
+.top_inner { max-width: var(--page_width); margin: 0 auto; }
+.top_line { display: flex; justify-content: space-between; gap: var(--space_4); font-size: 14px; color: var(--muted); }
+.track { height: 2px; background: var(--border); margin-top: var(--space_2); }
+.fill { height: 100%; width: 0; background: var(--accent); }
+.page { max-width: calc(var(--page_width) + 2 * var(--space_4)); margin: 0 auto; padding: var(--space_5) var(--space_4) var(--space_7); }
+.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space_5); }
+.idea { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 18px; line-height: 1.75; margin: 0; }
+.eyebrow { font-size: 14px; color: var(--muted); margin: 0 0 var(--space_2); }
+details { margin-top: var(--space_4); }
+summary { cursor: pointer; color: var(--muted); min-height: 44px; display: flex; align-items: center; }
+.variants { margin: var(--space_2) 0 0; padding: 0; list-style: none; }
+.variants li {
+  white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);
+  padding: var(--space_3) 0; border-top: 1px solid var(--border);
+}
+.question { padding: var(--space_3); border-radius: var(--radius); scroll-margin-top: var(--space_7); }
+.question + .question { margin-top: var(--space_1); }
+.question.current { background: var(--surface); }
+.question.current h2 { font-weight: 600; }
+.question h2 { font-size: 16px; font-weight: 400; margin: 0 0 var(--space_2); }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space_2); }
+.reason { margin-top: var(--space_3); }
+.reason label { display: block; font-size: 14px; color: var(--muted); margin-bottom: var(--space_1); }
+textarea {
+  display: block; width: 100%; min-height: 72px; padding: var(--space_2) var(--space_3); resize: vertical;
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.reason button { margin-top: var(--space_2); }
+.nav { display: flex; justify-content: space-between; gap: var(--space_2); margin-top: var(--space_4); }
+.aligned { padding-inline: var(--space_3); }
+.hint { font-size: 14px; color: var(--muted); margin: var(--space_3) 0 0; }
+.notice {
+  margin-bottom: var(--space_4); padding: var(--space_3); border: 1px solid var(--danger);
+  border-radius: var(--radius); color: var(--danger); overflow-wrap: anywhere;
+}
+.notice button { display: block; margin-top: var(--space_2); color: var(--fg); }
+.finish h1 { font-size: 24px; margin: 0 0 var(--space_2); }
+.finish p { margin: 0 0 var(--space_3); }
+code { font-size: 14px; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space_2); margin-top: var(--space_4); }
+.groups_title { font-size: 14px; font-weight: 400; color: var(--muted); margin: 0 0 var(--space_2); }
+.group { padding: var(--space_3) 0; border-top: 1px solid var(--border); }
+.group_head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space_2); }
+.group_name { font-weight: 600; }
+.member { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space_2); align-items: start; margin-top: var(--space_3); }
+.member_text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+.member_text.clip { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.member_controls { display: flex; flex-wrap: wrap; gap: var(--space_1); justify-content: flex-end; }
+.member_controls button { font-size: 14px; padding: var(--space_1) var(--space_3); }
+.empty { color: var(--muted); margin: var(--space_3) 0 0; }
+@media (min-width: 880px) {
+  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space_7); align-items: start; }
+  .sticky_column { position: sticky; top: var(--space_8); }
+  .page { padding-top: var(--space_6); }
+}
+@media (max-width: 879px) {
+  .wide_only { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top_inner">
+    <div class="top_line"><span id="progress_text" aria-live="polite"></span><span id="position_text"></span></div>
+    <div class="track"><div class="fill" id="progress_fill"></div></div>
+  </div>
+</header>
+<main class="page" id="app"><p class="hint">正在打开……</p></main>
+<script>
+"use strict";
+const BAD_ADDRESS = "页面地址不对，请重新从命令行打开";
+const MASKED = "[已隐去]";
+const NEED_REASON = "说得出的话，要写一句原因";
+const OFFLINE = "连不上本地服务，可能已经停了。已填的内容还在这个页面上；重新运行 serve 命令后，请打开新地址。";
+const QUESTIONS = [
+  {field: "unthought", text: "看这道题之前，你想到过吗？", first: ["想到过", false], second: ["没想到", true]},
+  {field: "care", text: "假设它成了，你在乎吗？", first: ["在乎", true], second: ["不在乎", false]},
+  {field: "fatal", text: "你说得出它一定不成的原因吗？", first: ["说得出", "yes"], second: ["说不出", "no"]},
+  {field: "want_to_try", text: "你想试吗？（只记录，不计分）", first: ["想试", true], second: ["不想试", false]},
+];
+const app = document.getElementById("app");
+let sheet = null;
+let onKey = () => {};
+
+function el(tag, props, ...children) {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(props || {})) {
+    if (name === "click") node.addEventListener("click", value);
+    else if (name === "text") node.textContent = value;
+    else node.setAttribute(name, value);
+  }
+  for (const child of children) if (child) node.append(child);
+  return node;
+}
+
+async function request(path, options) {
+  let response;
+  try {
+    response = await fetch(path + location.search, {cache: "no-store", ...options});
+  } catch {
+    throw new Error(OFFLINE);
+  }
+  let body = null;
+  try {
+    body = await response.json();
+  } catch {
+    // A non-JSON reply is handled below as a bad address.
+  }
+  if (!response.ok || !body) throw new Error(body && body.error ? body.error : BAD_ADDRESS);
+  return body;
+}
+
+function postAnswers(payload) {
+  return request("/api/answers", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({sheet_id: sheet.sheet_id, ...payload}),
+  });
+}
+
+function showProgress(label, done, total, position) {
+  document.getElementById("progress_text").textContent = `${label} ${done} / 共 ${total}`;
+  document.getElementById("position_text").textContent = position || "";
+  document.getElementById("progress_fill").style.width = total ? `${(done / total) * 100}%` : "100%";
+}
+
+function notice(message, retry) {
+  if (!message) return null;
+  return el("div", {class: "notice", role: "alert", id: "error_box"}, el("span", {text: message}),
+    retry ? el("button", {type: "button", id: "retry_button", text: "再试一次", click: retry}) : null);
+}
+
+function maskNote(texts) {
+  if (!texts.some((text) => text.includes(MASKED))) return null;
+  return el("p", {class: "hint", id: "mask_note", text: `「${MASKED}」是出卷时遮掉的词，为了不让你看出来源。按其余内容判断就好。`});
+}
+
+function revealHint() {
+  return el("p", {}, "回到命令行运行下面的命令，才能看到每一条的来源：", el("br"),
+    el("code", {text: `python3 -m evals.brainstorm reveal --run-dir <运行目录> --sheet-id ${sheet.sheet_id}`}));
+}
+
+/* ---------- score sheet ---------- */
+function startScore(state) {
+  const items = state.items;
+  const answers = state.answers;
+  const drafts = {};
+  const openVariants = new Set();
+  let index = Math.max(items.findIndex((item) => !answers[item.item_id]), 0);
+  let finished = items.every((item) => answers[item.item_id]);
+  let question = 0;
+  let saving = false;
+  let error = null;
+  let reasonHint = null;
+  let focusReason = false;
+  let followQuestion = false;
+
+  function draftFor(item) {
+    if (!drafts[item.item_id]) {
+      const saved = answers[item.item_id];
+      drafts[item.item_id] = saved ? {
+        unthought: saved.unthought, care: saved.care,
+        fatal: saved.fatal_reason === null ? "no" : "yes", reason: saved.fatal_reason || "",
+        want_to_try: saved.want_to_try,
+      } : {unthought: null, care: null, fatal: null, reason: "", want_to_try: null};
+    }
+    return drafts[item.item_id];
+  }
+  function resolved(draft, position) {
+    const field = QUESTIONS[position].field;
+    if (field === "fatal") return draft.fatal === "no" || (draft.fatal === "yes" && draft.reason.trim() !== "");
+    return draft[field] !== null;
+  }
+  function firstOpen(draft) {
+    for (let position = 0; position < QUESTIONS.length; position += 1) {
+      if (!resolved(draft, position)) return position;
+    }
+    return -1;
+  }
+  function moveTo(position) {
+    index = position;
+    finished = false;
+    error = null;
+    reasonHint = null;
+    question = Math.max(firstOpen(draftFor(items[index])), 0);
+    render();
+    window.scrollTo(0, 0);
+  }
+  async function save() {
+    const item = items[index];
+    const draft = draftFor(item);
+    const answer = {
+      item_id: item.item_id, unthought: draft.unthought, care: draft.care,
+      fatal_reason: draft.fatal === "yes" ? draft.reason.trim() : null, want_to_try: draft.want_to_try,
+    };
+    saving = true;
+    error = null;
+    render();
+    try {
+      await postAnswers({answers: [answer]});
+      const {item_id, ...stored} = answer;
+      answers[item_id] = stored;
+      delete drafts[item_id];
+      saving = false;
+      const following = [...items.slice(index + 1), ...items.slice(0, index)].find((row) => !answers[row.item_id]);
+      if (following) moveTo(items.indexOf(following));
+      else {
+        finished = true;
+        render();
+        window.scrollTo(0, 0);
+      }
+    } catch (failure) {
+      saving = false;
+      error = failure.message;
+      render();
+    }
+  }
+  function advance() {
+    const draft = draftFor(items[index]);
+    const open = firstOpen(draft);
+    if (open === -1) {
+      save();
+      return;
+    }
+    question = open;
+    followQuestion = true;
+    focusReason = QUESTIONS[open].field === "fatal" && draft.fatal === "yes";
+    if (focusReason) reasonHint = NEED_REASON;
+    render();
+  }
+  function choose(position, value) {
+    if (saving) return;
+    const draft = draftFor(items[index]);
+    draft[QUESTIONS[position].field] = value;
+    question = position;
+    reasonHint = null;
+    if (value === "yes" && !draft.reason.trim()) {
+      focusReason = true;
+      render();
+      return;
+    }
+    advance();
+  }
+  function confirmReason() {
+    if (saving) return;
+    if (!draftFor(items[index]).reason.trim()) {
+      reasonHint = NEED_REASON;
+      focusReason = true;
+      render();
+      return;
+    }
+    reasonHint = null;
+    advance();
+  }
+
+  function variantBox(item) {
+    if (!item.variants.length) return null;
+    const box = el("details", {id: "variant_box"},
+      el("summary", {text: `其他说法（${item.variants.length}）`}),
+      el("ol", {class: "variants"}, ...item.variants.map((text) => el("li", {text}))));
+    // Every answer rebuilds the page; the author may be comparing wordings while answering.
+    box.open = openVariants.has(item.item_id);
+    box.addEventListener("toggle", () => {
+      if (box.open) openVariants.add(item.item_id);
+      else openVariants.delete(item.item_id);
+    });
+    return box;
+  }
+
+  function questionRow(draft, spec, position) {
+    const current = position === question && !saving;
+    const pick = (side, key) => el("button", {
+      type: "button", "data-side": key, "aria-pressed": String(draft[spec.field] === side[1]),
+      click: () => choose(position, side[1]),
+    }, side[0], el("kbd", {class: "wide_only", text: key === "first" ? "1" : "2"}));
+    const row = el("section", {class: current ? "question current" : "question", "data-question": String(position)},
+      el("h2", {text: spec.text}), el("div", {class: "pair"}, pick(spec.first, "first"), pick(spec.second, "second")));
+    if (spec.field === "fatal" && draft.fatal === "yes") {
+      const box = el("textarea", {id: "reason_input", rows: "2", placeholder: "写一句就够"});
+      box.value = draft.reason;
+      box.addEventListener("input", () => { draft.reason = box.value; });
+      row.append(el("div", {class: "reason"},
+        el("label", {for: "reason_input", text: reasonHint || "它为什么一定不成？回车确认，Shift+回车换行"}),
+        box, el("button", {type: "button", id: "reason_confirm", text: "确认这句原因", click: confirmReason})));
+    }
+    return row;
+  }
+
+  function render() {
+    showProgress("已答", Object.keys(answers).length, items.length, finished ? "" : `第 ${index + 1} 条`);
+    app.replaceChildren();
+    if (finished) {
+      app.append(el("div", {class: "finish", id: "finish_panel"},
+        el("h1", {text: items.length ? "都答完了" : "这张卷子没有要答的内容"}),
+        el("p", {text: "答案已经存好，可以关掉这个页面。"}), revealHint(),
+        items.length ? el("div", {class: "actions"}, el("button", {
+          type: "button", id: "review_button", text: "回去改答案", click: () => moveTo(items.length - 1),
+        })) : null));
+      return;
+    }
+    const item = items[index];
+    const draft = draftFor(item);
+    const left = el("div", {},
+      el("p", {class: "idea", id: "idea_text", text: item.text}),
+      maskNote([item.text, ...item.variants]),
+      variantBox(item));
+    const right = el("div", {class: "sticky_column"},
+      notice(error, save),
+      ...QUESTIONS.map((spec, position) => questionRow(draft, spec, position)),
+      el("div", {class: "nav aligned"},
+        el("button", {type: "button", id: "previous_button", text: "← 上一条", click: () => index > 0 && moveTo(index - 1)}),
+        el("button", {type: "button", id: "next_button", text: "下一条 →", click: () => index < items.length - 1 && moveTo(index + 1)})),
+      el("p", {class: "hint wide_only aligned", text: "按 1、2 回答当前问题，↑↓ 换问题，←→ 翻条。四问答完自动保存。"}));
+    app.append(el("div", {class: "split"}, left, right));
+    if (followQuestion) {
+      followQuestion = false;
+      const row = document.querySelector(".question.current");
+      if (row) row.scrollIntoView({block: "nearest"});
+    }
+    if (focusReason) {
+      focusReason = false;
+      const box = document.getElementById("reason_input");
+      if (box) {
+        box.focus();
+        box.setSelectionRange(box.value.length, box.value.length);
+      }
+    }
+  }
+
+  onKey = (event) => {
+    if (event.target.id === "reason_input") {
+      // 229 is the key code browsers report while a Chinese input method is composing.
+      if (event.isComposing || event.keyCode === 229) return;
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        confirmReason();
+      } else if (event.key === "Escape") {
+        event.target.blur();
+      }
+      return;
+    }
+    if (finished) {
+      if (event.key === "ArrowLeft" && items.length) moveTo(items.length - 1);
+      return;
+    }
+    if (saving) return;
+    if (event.key === "1" || event.key === "2") {
+      // The third question moves focus into the reason box; this key must not be typed there.
+      event.preventDefault();
+      const spec = QUESTIONS[question];
+      choose(question, (event.key === "1" ? spec.first : spec.second)[1]);
+    } else if (event.key === "ArrowLeft" && index > 0) {
+      moveTo(index - 1);
+    } else if (event.key === "ArrowRight" && index < items.length - 1) {
+      moveTo(index + 1);
+    } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+      question = (question + (event.key === "ArrowUp" ? QUESTIONS.length - 1 : 1)) % QUESTIONS.length;
+      render();
+    }
+  };
+  render();
+}
+
+/* ---------- group sheet ---------- */
+function startGroup(state) {
+  document.title = "点子分组";
+  const items = state.items;
+  const byId = Object.fromEntries(items.map((item) => [item.item_id, item]));
+  let groups = state.answers.groups;
+  const history = [];
+  const expanded = new Set();
+  let front = null;
+  let saving = false;
+  let error = null;
+  let failed = null;
+  let hint = null;
+
+  function pending() {
+    const placed = new Set(groups.flat());
+    const rest = items.filter((item) => !placed.has(item.item_id));
+    const first = rest.find((item) => item.item_id === front);
+    return first ? [first, ...rest.filter((item) => item !== first)] : rest;
+  }
+  async function commit(next, remember, nextFront) {
+    saving = true;
+    error = null;
+    hint = null;
+    render();
+    try {
+      await postAnswers({groups: next});
+      if (remember) history.push(groups);
+      groups = next;
+      front = nextFront;
+      failed = null;
+      window.scrollTo(0, 0);
+    } catch (failure) {
+      error = failure.message;
+      failed = () => commit(next, remember, nextFront);
+    }
+    saving = false;
+    render();
+  }
+  function placeIn(position) {
+    const current = pending()[0];
+    if (!current || saving) return;
+    commit(groups.map((group, index) => (index === position ? [...group, current.item_id] : group)), true, null);
+  }
+  function newGroup() {
+    const current = pending()[0];
+    if (!current || saving) return;
+    commit([...groups, [current.item_id]], true, null);
+  }
+  function undo() {
+    if (saving) return;
+    if (!history.length) {
+      hint = "没有可以撤销的操作";
+      render();
+      return;
+    }
+    const previous = history.pop();
+    commit(previous, false, null);
+  }
+  function moveBack(itemId) {
+    if (saving) return;
+    const next = groups.map((group) => group.filter((id) => id !== itemId)).filter((group) => group.length);
+    commit(next, true, itemId);
+  }
+  function memberRow(itemId) {
+    const open = expanded.has(itemId);
+    return el("div", {class: "member", "data-member": itemId},
+      el("p", {class: open ? "member_text" : "member_text clip", text: byId[itemId].text}),
+      el("div", {class: "member_controls"},
+        el("button", {type: "button", "data-action": "expand", "aria-expanded": String(open), text: open ? "收起" : "展开", click: () => {
+          if (open) expanded.delete(itemId); else expanded.add(itemId);
+          render();
+        }}),
+        el("button", {type: "button", "data-action": "back", text: "移回待分", click: () => moveBack(itemId)})));
+  }
+  function render() {
+    const waiting = pending();
+    const placedCount = items.length - waiting.length;
+    showProgress("已分", placedCount, items.length, waiting.length ? `还剩 ${waiting.length} 条` : "");
+    app.replaceChildren();
+    const current = waiting[0];
+    const newButton = el("button", {type: "button", class: "primary", id: "new_group_button", click: newGroup},
+      "新建一组", el("kbd", {class: "wide_only", text: "n"}));
+    newButton.disabled = !current;
+    const left = el("div", {class: "sticky_column"},
+      notice(error, failed),
+      current ? el("div", {},
+        el("p", {class: "eyebrow", text: "这条点子放哪一组？意思一样的放一起。"}),
+        el("p", {class: "idea", id: "idea_text", text: current.text}),
+        maskNote([current.text])) : el("div", {class: "finish", id: "finish_panel"},
+        el("h1", {text: items.length ? "都分好了" : "这张卷子没有要分的内容"}),
+        el("p", {text: "分组已经存好，可以关掉这个页面，也可以继续调整。"}), revealHint()),
+      el("div", {class: "actions"}, newButton,
+        el("button", {type: "button", id: "undo_button", click: undo},
+          "撤销上一步", el("kbd", {class: "wide_only", text: "z"}))),
+      hint ? el("p", {class: "hint", id: "group_hint", text: hint}) : null);
+    const right = el("div", {},
+      el("h2", {class: "groups_title", text: groups.length ? `已有 ${groups.length} 组` : "还没有组"}),
+      groups.length ? null : el("p", {class: "empty", text: "先点「新建一组」，把第一条放进去。"}),
+      ...groups.map((group, position) => el("section", {class: "group", "data-group": String(position)},
+        el("div", {class: "group_head"},
+          el("span", {class: "group_name", text: `第 ${position + 1} 组 · ${group.length} 条`}),
+          current ? el("button", {type: "button", "data-action": "place", click: () => placeIn(position)},
+            "放进这一组", position < 9 ? el("kbd", {class: "wide_only", text: String(position + 1)}) : null) : null),
+        ...group.map(memberRow))));
+    app.append(el("div", {class: "split"}, left, right));
+  }
+  onKey = (event) => {
+    if (/^[1-9]$/.test(event.key)) {
+      if (Number(event.key) <= groups.length) placeIn(Number(event.key) - 1);
+    } else if (event.key === "n") {
+      newGroup();
+    } else if (event.key === "z") {
+      undo();
+    }
+  };
+  render();
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  onKey(event);
+});
+
+(async () => {
+  try {
+    const state = await request("/api/sheet");
+    sheet = state;
+    if (state.kind === "group") startGroup(state);
+    else startScore(state);
+  } catch (failure) {
+    app.replaceChildren(notice(failure.message));
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+ "calls": 2,
+ "usd": 0.02,
+ "usd_estimated": 0,
+ "tokens": {
+  "input": 2,
+  "cache_write": 0,
+  "cache_read": 0,
+  "output": 2,
+  "total": 4
+ },
+ "ideas": 8,
+ "failures": 0,
+ "complete": true,
+ "guards": {
+  "injection": {
+   "status": "not_evaluated",
+   "violations": null
+  },
+  "constraint": {
+   "status": "not_applicable",
+   "violations": null
+  }
+ }
+}
