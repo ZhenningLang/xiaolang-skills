@@ -36,6 +36,8 @@ class PageSourceTests(unittest.TestCase):
         self.assertIn('first: ["想到过", false], second: ["没想到", true]', PAGE)
         self.assertIn('first: ["重要", true], second: ["不重要", false]', PAGE)
         self.assertIn('first: ["想试", true], second: ["不想试", false]', PAGE)
+        self.assertIn("只算硬伤，比如违反约束或已知事实。麻烦、难坚持都不算。", PAGE)
+        self.assertIn("少量条目会再次出现，照常判断就好。", PAGE)
 
     def test_supports_both_color_schemes_and_phone_width(self):
         self.assertIn("prefers-color-scheme: dark", PAGE)

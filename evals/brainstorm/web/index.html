@@ -76,6 +76,7 @@ summary { cursor: pointer; color: var(--muted); min-height: 44px; display: flex;
 .question.current { background: var(--surface); }
 .question.current h2 { font-weight: 600; }
 .question h2 { font-size: 16px; font-weight: 400; margin: 0 0 var(--space_2); }
+.question_note { font-size: 14px; color: var(--muted); margin: 0 0 var(--space_2); }
 .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space_2); }
 .reason { margin-top: var(--space_3); }
 .reason label { display: block; font-size: 14px; color: var(--muted); margin-bottom: var(--space_1); }
@@ -144,7 +145,7 @@ const OFFLINE = "连不上本地服务，可能已经停了。已填的内容还
 const QUESTIONS = [
   {field: "unthought", text: "看这道题之前，你想到过吗？", first: ["想到过", false], second: ["没想到", true]},
   {field: "care", text: "如果这个点子真做成了，这个结果对你重要吗？", first: ["重要", true], second: ["不重要", false]},
-  {field: "fatal", text: "你说得出它一定不成的原因吗？", first: ["说得出", "yes"], second: ["说不出", "no"]},
+  {field: "fatal", text: "你说得出它一定不成的原因吗？", note: "只算硬伤，比如违反约束或已知事实。麻烦、难坚持都不算。", first: ["说得出", "yes"], second: ["说不出", "no"]},
   {field: "want_to_try", text: "你想试吗？（只记录，不计分）", first: ["想试", true], second: ["不想试", false]},
 ];
 const app = document.getElementById("app");
@@ -359,7 +360,8 @@ function startScore(state) {
       click: () => choose(position, side[1]),
     }, side[0], el("kbd", {class: "wide_only", text: key === "first" ? "1" : "2"}));
     const row = el("section", {class: current ? "question current" : "question", "data-question": String(position)},
-      el("h2", {text: spec.text}), el("div", {class: "pair"}, pick(spec.first, "first"), pick(spec.second, "second")));
+      el("h2", {text: spec.text}), spec.note ? el("p", {class: "question_note", text: spec.note}) : null,
+      el("div", {class: "pair"}, pick(spec.first, "first"), pick(spec.second, "second")));
     if (spec.field === "fatal" && draft.fatal === "yes") {
       const box = el("textarea", {id: "reason_input", rows: "2", placeholder: "写一句就够"});
       box.value = draft.reason;
@@ -395,6 +397,7 @@ function startScore(state) {
       el("div", {class: "nav aligned"},
         el("button", {type: "button", id: "previous_button", text: "← 上一条", click: () => index > 0 && moveTo(index - 1)}),
         el("button", {type: "button", id: "next_button", text: "下一条 →", click: () => index < items.length - 1 && moveTo(index + 1)})),
+      el("p", {class: "hint aligned", text: "少量条目会再次出现，照常判断就好。"}),
       el("p", {class: "hint wide_only aligned", text: "按 1、2 回答当前问题，↑↓ 换问题，←→ 翻条。四问答完自动保存。"}));
     app.append(el("div", {class: "split"}, left, right));
     if (followQuestion) {
