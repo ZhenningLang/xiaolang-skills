@@ -16,6 +16,7 @@ from unittest.mock import patch
 from evals.brainstorm import dedupe, e2e, replay, report, sheet
 from evals.brainstorm.backends import FakeBackend
 from evals.brainstorm.budget import BudgetExceeded, BudgetLedger, LedgerError, cli_boundary, default_ledger_path
+from evals.brainstorm.config import validate_config
 from evals.brainstorm.exam import load_exams, read_jsonl, validate_exam
 from evals.brainstorm.loop import run_loop
 from evals.brainstorm.record import read_file, read_rows
@@ -29,6 +30,10 @@ SUMMARY_FIELDS = {"calls_total": int, "usd_total": (int, float, Decimal), "mecha
 DECISIONS = {"accept", "reject", "indeterminate", "prefer_simpler"}
 SECTION_TITLES = ("判定", "主分和噪声线", "护栏和成本", "贡献度", "留一对照", "失败账本", "计分规则自检",
                   "想试比例和计了分但不想试", "机器指标和两种比较口径", "费用", "条数核对", "校准", "被合并的说法")
+# Picked by hand for open_sample at the default seed: the mean gap of 5/3 clears the noise line of 1.
+# If the fake scenario changes, work out a new set from the units in that run's comparison key.
+WINNERS = {"m-003", "m-011", "m-014", "m-016", "m-019"}
+ACCEPT_SCORES = {"cfg_plain": [1, 2, 2], "cfg_return": [3, 4, 3]}
 
 
 def quiet(function, *args, **options):
@@ -342,6 +347,81 @@ class ConservationTests(Workspace):
                     with self.assertRaisesRegex(ValueError, "Conservation"):
                         report.verify_counts(target, "open_sample")
 
+    def assertRefused(self, target, sheet_id):
+        """Both doors refuse, and the reveal leaves no marker behind."""
+        with self.assertRaisesRegex(ValueError, "Conservation"):
+            report.verify_counts(target, "open_sample")
+        marker = target / "sheets" / sheet_id / "revealed.json"
+        marker.unlink(missing_ok=True)
+        with self.assertRaisesRegex(ValueError, "Conservation"):
+            sheet.reveal(target, sheet_id)
+        self.assertFalse(marker.exists())
+
+    def later_compare(self, name):
+        """A comparison sheet issued once every verdict exists, which is how a real sheet comes to hold reused rows."""
+        target = self.copy(name)
+        exam = next(row for row in load_exams(e2e.EXAM_DIR) if row["id"] == "open_sample")
+        sheet.make_sheet(target, exam, kind="score", sheet_id="open_sample_later", seed=e2e.DEFAULT_SEED + 1,
+                         configs=["cfg_plain", "cfg_return"])
+        path = target / "sheets/open_sample_later"
+        self.assertGreater(read_file(path / "sheet.key.json")["counts"]["reused"], 0)
+        return target, path
+
+    def mechanism_outside(self, target, path):
+        """A real mechanism of this exam that the sheet never issued: nothing but the issued record can tell."""
+        selected = set(read_file(path / sheet.ISSUED_NAME)["selected"])
+        table = read_file(target / "open_sample/mechanisms.json")["mechanisms"]
+        return next(row for row in table if row["mechanism_id"] not in selected)
+
+    def test_compare_reused_row_and_unit_slot_lost_with_matching_counts(self):
+        target, path = self.later_compare("reused_and_slot")
+        key = read_file(path / "sheet.key.json")
+        lost = sorted(set(key["reused"]).intersection(*map(set, key["units"].values())))[-1]
+
+        def change(data):
+            data["reused"].remove(lost)
+            for rows in data["units"].values():
+                rows.remove(lost)
+            for field in ("reused", "selected_target"):
+                data["counts"][field] -= 1
+        self.edit_key(path / "sheet.key.json", change)
+        self.assertRefused(target, "open_sample_later")
+
+    def test_full_sheet_losing_a_check_sample_is_caught(self):
+        target = self.copy()
+        self.lose_one(target, "open_sample_full", "check_bad")
+        self.assertRefused(target, "open_sample_full")
+
+    def test_item_pointed_at_another_valid_mechanism_is_caught(self):
+        target = self.copy()
+        path = target / "sheets/open_sample_compare"
+        other = self.mechanism_outside(target, path)
+
+        def change(data):
+            item = next(row for row in data["items"].values() if row["type"] == "target")
+            item.update(mechanism_id=other["mechanism_id"], idea_ids=other["idea_ids"])
+        self.edit_key(path / "sheet.key.json", change)
+        self.assertRefused(target, "open_sample_compare")
+
+    def test_reused_row_swapped_for_another_valid_mechanism_is_caught(self):
+        target, path = self.later_compare("reused_swap")
+        other = self.mechanism_outside(target, path)["mechanism_id"]
+        self.edit_key(path / "sheet.key.json", lambda data: data["reused"].__setitem__(0, other))
+        self.assertRefused(target, "open_sample_later")
+
+    def test_unit_slot_swapped_for_another_valid_mechanism_is_caught(self):
+        target = self.copy()
+        path = target / "sheets/open_sample_compare"
+        other = self.mechanism_outside(target, path)["mechanism_id"]
+        self.edit_key(path / "sheet.key.json", lambda data: next(iter(data["units"].values())).__setitem__(0, other))
+        self.assertRefused(target, "open_sample_compare")
+
+    def test_count_no_equation_reads_is_still_caught(self):
+        target = self.copy()
+        self.edit_key(target / "sheets/open_sample_compare/sheet.key.json",
+                      lambda data: data["counts"].__setitem__("mechanisms_total", data["counts"]["mechanisms_total"] + 1))
+        self.assertRefused(target, "open_sample_compare")
+
     def test_damage_before_reveal_stops_the_reveal(self):
         target = self.copy()
         path = target / "sheets/open_sample_full"
@@ -429,13 +509,84 @@ class ConservationTests(Workspace):
         self.assertEqual(report.verify_counts(target, "open_sample")["new_after_issue"], ["m-900"])
 
 
+class AcceptPathTests(Workspace):
+    """Fake-backend products and fixed answers, through the real sheets and report, reach accept and what overrides it."""
+
+    @classmethod
+    def setUpClass(cls):
+        temp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(temp.cleanup)
+        cls.source = Path(temp.name).resolve() / "run"
+        original = e2e.simulate_answers
+
+        def answer(run_dir, sheet_id, seed):
+            key = read_file(Path(run_dir) / "sheets" / sheet_id / "sheet.key.json")
+            if key["kind"] == "group":
+                original(run_dir, sheet_id, seed)
+                return
+            sheet.merge_answers(run_dir, sheet_id, {"sheet_id": sheet_id, "answers": [
+                {"item_id": item_id, "unthought": item["mechanism_id"] in WINNERS, "care": item["mechanism_id"] in WINNERS,
+                 "fatal_reason": None, "want_to_try": False} for item_id, item in key["items"].items()]})
+
+        with patch.object(e2e, "simulate_answers", answer):
+            cls.summary = quiet(e2e.run_e2e, cls.source, exam_ids=("open_sample",), reps=3)
+
+    def copy(self, name="copy"):
+        target = self.temp / name
+        shutil.copytree(self.source, target)
+        return target
+
+    def rebuild(self, root, **options):
+        exams = [exam for exam in load_exams(e2e.EXAM_DIR) if exam["id"] == "open_sample"]
+        configs = [validate_config(read_file(root / "e2e_inputs" / f"{name}.json")) for name in ("cfg_plain", "cfg_return")]
+        return quiet(report.build_report, root, exams, configs, baseline="cfg_plain", candidate="cfg_return",
+                     decision_exam_ids=["open_sample"], seed=e2e.DEFAULT_SEED, ledger_path=root / "ledger.fake.jsonl",
+                     exact_receipts=True, **options)["decision"]
+
+    def add_constraint_violation(self, root):
+        """Edit the candidate's real judge result: one idea it generated now breaks the constraint."""
+        unit = root / "open_sample/cfg_return/rep-1"
+        produced = {row["idea_id"] for row in read_rows(unit / "ideas.jsonl") if row["level"] != "baseline"}
+        path = unit / "judges/constraint/result.json"
+        result = json.loads(path.read_text(encoding="utf-8"))
+        next(row for row in result["verdicts"] if row["idea_id"] in produced).update(violation=True, reason="Blocks the shelf.")
+        result["violations"] += 1
+        path.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
+
+    def test_fixed_answers_reach_accept(self):
+        self.assertEqual((self.summary["decision"], self.summary["preferred"]), ("accept", "cfg_return"))
+        built = read_file(self.source / "report.json")
+        self.assertEqual(built["decision"]["matched_row"], 4)
+        self.assertEqual(built["exams"]["open_sample"]["evidence"]["scores"], ACCEPT_SCORES)
+        check_run(self.source)
+        # The control for the tests below: rebuilding the same products changes nothing on its own.
+        self.assertEqual(self.rebuild(self.copy())["matched_row"], 4)
+
+    def test_cost_over_limit_turns_accept_into_reject(self):
+        decision = self.rebuild(self.copy(), cost_ratio="1.4")
+        self.assertEqual((decision["decision"], decision["matched_row"]), ("reject", 3), decision["reason"])
+        self.assertIn("成本", decision["reason"])
+
+    def test_more_constraint_violations_turn_accept_into_reject(self):
+        target = self.copy()
+        self.add_constraint_violation(target)
+        decision = self.rebuild(target)
+        self.assertEqual((decision["decision"], decision["matched_row"]), ("reject", 3), decision["reason"])
+        self.assertIn("硬约束", decision["reason"])
+
+    def test_cost_and_constraints_together_still_reject(self):
+        target = self.copy()
+        self.add_constraint_violation(target)
+        decision = self.rebuild(target, cost_ratio="1.4")
+        self.assertEqual((decision["decision"], decision["matched_row"]), ("reject", 3), decision["reason"])
+
+
 class HiddenFailureRowsTests(Workspace):
     def test_open_sheet_hides_idea_ids_in_the_built_report(self):
         target = self.copy()
         (target / "sheets/open_sample_full/revealed.json").unlink()
         exams = [exam for exam in load_exams(e2e.EXAM_DIR) if exam["id"] == "open_sample"]
         configs = [read_file(target / "e2e_inputs" / f"{name}.json") for name in ("cfg_plain", "cfg_return")]
-        from evals.brainstorm.config import validate_config
         built = quiet(report.build_report, target, exams, [validate_config(row) for row in configs], baseline="cfg_plain",
                       candidate="cfg_return", decision_exam_ids=["open_sample"], ledger_path=target / "ledger.fake.jsonl")
         rows = [row for row in built["failures"] if row["config"]]

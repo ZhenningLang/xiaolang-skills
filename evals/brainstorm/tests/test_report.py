@@ -130,6 +130,19 @@ class DecisionTableTests(unittest.TestCase):
     def test_row3_cost_over_limit(self):
         self.assertRow(decide([row(new_cost="1.51")]), "reject", 3)
 
+    def test_row3_cost_over_limit_outranks_a_better_score(self):
+        result = decide([row(old=FLAT, new=(9, 9, 9), new_cost="1.51")])
+        self.assertRow(result, "reject", 3)
+        self.assertEqual(result["preferred"], OLD)
+        self.assertIn("成本", result["reason"])
+
+    def test_row3_more_violations_outrank_a_better_score(self):
+        result = decide([row(old=FLAT, new=(9, 9, 9), old_guard=guard(constraint={"status": "checked", "violations": 0}),
+                             new_guard=guard(constraint={"status": "checked", "violations": 1}))])
+        self.assertRow(result, "reject", 3)
+        self.assertEqual(result["preferred"], OLD)
+        self.assertIn("硬约束", result["reason"])
+
     def test_row4_accept(self):
         result = decide([row(old=FLAT, new=(9, 9, 9))])
         self.assertRow(result, "accept", 4)
