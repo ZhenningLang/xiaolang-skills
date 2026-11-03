@@ -23,7 +23,8 @@ def positive_int(value, field):
 def validate_config(value):
     if not isinstance(value, dict):
         raise ValueError("config: expected an object")
-    unknown = value.keys() - (DEFAULTS.keys() | {"name", "default_model", "models"})
+    # complexity stays out of DEFAULTS, so configs that omit it keep their recorded identity digest.
+    unknown = value.keys() - (DEFAULTS.keys() | {"name", "default_model", "models", "complexity"})
     if unknown:
         raise ValueError(f"Unknown config fields: {sorted(unknown)}")
     result = {**deepcopy(DEFAULTS), **value}
@@ -36,6 +37,8 @@ def validate_config(value):
         raise ValueError("models: unique nonempty list must include default_model")
     for key in ("agents", "max_batches", "max_output_tokens"):
         positive_int(result[key], key)
+    if "complexity" in value:
+        positive_int(value["complexity"], "complexity")
     for key in ("three_step", "predict_peers", "serial_visible", "return_collisions",
                 "before_generation", "stop_on_exhaustion"):
         if type(result[key]) is not bool:

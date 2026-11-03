@@ -10,6 +10,7 @@
 |:---|:---|:---|
 | [brainstorm](skills/brainstorm/SKILL.md) | 头脑风暴：先把点子撑开，再谈好坏 | 设计中，暂不可用 |
 
+这些技能的评测工具见 [evals/README.md](evals/README.md)。它们只做测量，不是技能。
 ## 安装
 
 **Claude Code**：

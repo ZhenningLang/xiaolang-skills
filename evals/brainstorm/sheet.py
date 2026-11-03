@@ -21,6 +21,7 @@ from .record import MeasuredBackend, add_failure, digest, read_file, read_rows, 
 
 RESERVED_EXAMS = {"sheets", "replay"}
 KEY_NAME = "sheet.key.json"
+ISSUED_NAME = "sheet.issued.json"
 ANSWER_FIELDS = {"unthought", "care", "fatal_reason", "want_to_try"}
 VERDICT_FIELDS = {"exam_id", "mechanism_id", "label", "idea_ids", "sheet_id", "ts"} | ANSWER_FIELDS
 ITEM_FIELDS = {"item_id", "text", "variants"}
@@ -535,7 +536,7 @@ def group_plan(ideas, *, seed, count, warnings):
     slots = [{"position": i, "type": "target", "mechanism_id": None, "idea_ids": [key],
               "original": idea_text(ideas[key]), "variants": []} for i, key in enumerate(chosen)]
     # Calibration is a cold start: this view deliberately ignores any machine partition.
-    return {"view": "group", "slots": slots, "reused": [], "units": {}, "config_reps": {},
+    return {"view": "group", "slots": slots, "selected": chosen, "reused": [], "units": {}, "config_reps": {},
             "source_digest": digest([ideas[key] for key in chosen]),
             "counts": {"mechanisms_total": None, "selected_target": len(chosen), "presented_target": len(chosen),
                        "reused": 0, "check_bad": 0, "repeat": 0}}
@@ -591,12 +592,40 @@ def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count
     config_reps = {row["mechanism_id"]: sorted({unit_name(ideas[key]["config"], ideas[key]["rep"]) for key in row["idea_ids"]})
                    for row in table["mechanisms"]}
     view = "all" if all_view else "compare"
-    return {"view": view, "slots": slots, "reused": reused, "units": assignment,
+    return {"view": view, "slots": slots, "selected": selected, "reused": reused, "units": assignment,
             "config_reps": config_reps,
             "source_digest": digest([table, sorted(verdicts)]),
             "counts": {"mechanisms_total": len(table["mechanisms"]), "selected_target": len(selected),
                        "presented_target": sum(slot["type"] == "target" for slot in slots),
                        "reused": len(reused), "check_bad": len(chosen), "repeat": actual_repeats}}
+
+
+def issued_record(sheet, items, *, sheet_id, exam_id):
+    """The complete ID sets of one sheet, fixed when it is issued and never rewritten for that sheet."""
+    return {"sheet_id": sheet_id, "exam_id": exam_id, "view": sheet["view"], "selected": sorted(sheet["selected"]),
+            "reused": sorted(sheet["reused"]), "units": sheet["units"], "counts": sheet["counts"],
+            "items": {item_id: {"type": item["type"], "mechanism_id": item["mechanism_id"]} for item_id, item in items.items()}}
+
+
+def load_issued(path):
+    file = Path(path) / ISSUED_NAME
+    if not file.is_file():
+        raise ValueError(f"Conservation failed: {Path(path).name} has no issued record")
+    return read_file(file)
+
+
+def check_issued(record, key, public_ids):
+    """Set equality against the issued record: a row lost later cannot hide by lowering the counts to match."""
+    name = record["sheet_id"]
+    items = {item_id: {"type": item["type"], "mechanism_id": item["mechanism_id"]} for item_id, item in key["items"].items()}
+    if items != record["items"] or set(public_ids) != set(record["items"]) or len(public_ids) != len(record["items"]):
+        raise ValueError(f"Conservation failed: {name} items differ from its issued record")
+    if sorted(key["reused"]) != record["reused"] or key["units"] != record["units"] or key["counts"] != record["counts"]:
+        raise ValueError(f"Conservation failed: {name} reused, units or counts differ from its issued record")
+    if record["view"] != "group":
+        targets = {item["mechanism_id"] for item in record["items"].values() if item["type"] == "target"}
+        if targets | set(record["reused"]) != set(record["selected"]):
+            raise ValueError(f"Conservation failed: {name} presented and reused mechanisms differ from those selected")
 
 
 def issue(path, sheet, slots, texts, identity, *, exam_id, kind, sheet_id, seed, warnings):
@@ -623,6 +652,9 @@ def issue(path, sheet, slots, texts, identity, *, exam_id, kind, sheet_id, seed,
     key = {"sheet_id": sheet_id, "kind": kind, "exam_id": exam_id, "seed": seed, "view": sheet["view"],
            "identity": fingerprint, "items": items, "reused": sheet["reused"], "units": sheet["units"],
            "counts": sheet["counts"]}
+    record = issued_record(sheet, items, sheet_id=sheet_id, exam_id=exam_id)
+    check_issued(record, key, [row["item_id"] for row in public])
+    atomic_write(path / ISSUED_NAME, dumps(record) + "\n")
     atomic_write(key_path, dumps(key) + "\n")
     atomic_write(path / "sheet.json", dumps({"sheet_id": sheet_id, "kind": kind, "items": public}) + "\n")
     return {"sheet_id": sheet_id, "counts": sheet["counts"], "warnings": warnings}
@@ -815,6 +847,7 @@ def reveal(run_dir, sheet_id):
     with recording_lock(path.parent), recording_lock(path):
         key = load_key(run_dir, sheet)
         check_conservation(key.get("view"), key["items"], key["counts"], key["reused"])
+        check_issued(load_issued(path), key, [item["item_id"] for item in sheet["items"]])
         answers = load_answers(run_dir, sheet)
         done = progress(sheet, answers)
         if done["done"] != done["total"]:

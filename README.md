@@ -10,6 +10,7 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 |:---|:---|:---|
 | [brainstorm](skills/brainstorm/SKILL.md) | Brainstorming that spreads ideas wide before judging any of them | In design, not usable yet |
 
+Evaluation tools for these skills: [evals/README.md](evals/README.md). They measure; they are not a skill.
 ## Install
 
 **Claude Code**:

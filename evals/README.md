@@ -1,10 +1,110 @@
 # Brainstorm Evaluation Tools
 
+Measuring tools for the brainstorm skill: record ideas, merge them by mechanism,
+compute machine metrics, score them blind, and decide whether a change helped.
 Python 3.13 and the standard library only. File locking requires POSIX; Windows
-is not supported. This stage provides offline backends, persistent billing,
-and ledger reconciliation, not an exam runner or the brainstorm skill.
+is not supported. The brainstorm skill itself and any real exam are not here.
 
-## Offline Example
+## Quick Start
+
+```sh
+python3 -m evals.brainstorm e2e --fake --run-dir /tmp/brainstorm_e2e
+```
+
+This chains the stages on the fake backend, without network or money: recording,
+mechanism grouping, calibration against simulated human groups, constraint checks,
+one replay per exam, metrics, sheets, simulated answers, reveal and the report.
+Simulated answers call the same functions as the scoring page but bypass the page
+itself, whose server has its own tests. It writes
+`report.md` (read this), `report.json` and `e2e_summary.json` into the run directory.
+Its decision **only proves the wiring**. It is not a finding about any method.
+`--fake` is mandatory because this command has no real-backend mode on purpose.
+
+With real recordings, build the report yourself:
+
+```sh
+python3 -m evals.brainstorm report --run-dir RUN --exam-dir EXAMS \
+  --config old.json --config new.json --baseline old --candidate new \
+  --decision-exams exam_a,exam_b,exam_c
+```
+
+- `--decision-exams` has no default. Exams do not say which are development exams,
+  and defaulting to "the exams with answers" could never detect a missing answer.
+- `report` is read-only for money. Only `--judge-config` pays, for hard-constraint
+  checks through the ledger, and a repeat run reuses the paid result.
+- The main score needs exactly one revealed comparison sheet whose units cover exactly
+  the two compared configs. None or several count as missing answers.
+- Thresholds are provisional, and can be changed: `--cost-ratio` (1.5),
+  `--check-bad-ratio` (0.34), `--contribution-floor` (0).
+
+## How Money Is Controlled
+
+- **The hard limit is checked before each call, against the worst case.** A call
+  reserves `(fixed overhead + input estimate + max output) x price`. If that would
+  cross the limit, the call never starts and the command stops with exit code 3.
+- **A single call can still exceed its reservation**, because providers do not enforce
+  it. The real cost is recorded, every later call on that ledger stops, and the
+  command reports the overrun. Raising the limit does not clear this.
+- Stopping at the limit loses nothing. Rerun the same command with a higher limit
+  (`--budget-usd` for `e2e`, `--limit` elsewhere): finished calls replay from cache
+  without paying again.
+- A process killed during a call is different. The call stays uncertain and holds its
+  reservation until you reconcile it by hand, and the two commands lead to different places:
+  - `ledger release` says no charge happened. It needs independent evidence, and the run can
+    then resume. Do not release a call just to continue: a request that was already sent has
+    usually been charged.
+  - `ledger settle` records the bill, nothing more. That call cannot be retried and there is
+    no recovery command. In recording its unit becomes a failed unit, as below. In grouping,
+    calibration, constraint checks, replay or rewriting, resuming keeps reporting the call as
+    already paid and failed.
+- All real backends share one cumulative ledger, whatever the run directory.
+  Do not start a new ledger to get around it.
+- **A failed unit blocks its config, and there is no recovery path yet.** A generation
+  agent that fails twice leaves its unit unusable, and resuming it stops at once. Another
+  repetition does not help: a comparison sheet covers every repetition of a config, so one
+  failed unit refuses the sheet and the decision stays `indeterminate`. Do not pay for more
+  repetitions to get around this. The recovery policy is still undecided.
+
+## Where Data Lives
+
+- `evals/brainstorm/runs/` holds run directories and the real ledger
+  (`ledger.real.jsonl`). `evals/brainstorm/exams/private/` holds private questions.
+  Git ignores both. Never run `git clean` on them: the ledger is the only record of
+  what was spent.
+- A fake run keeps its own `ledger.fake.jsonl` inside the run directory.
+- `<run-dir>/sheets/<id>/sheet.issued.json` fixes every ID a sheet must hold when it is
+  issued. Reveal and the report compare against it as sets, so a lost row fails even if the
+  counts were lowered to match. The scoring page never reads it.
+- `<run-dir>/<exam_id>/mechanisms.json` is the only authority for mechanism IDs.
+  `replay/` holds replay and calibration outputs, which are never reused for verdicts.
+
+## Writing Exams
+
+- `check_samples` must each be a **title line**, a newline, then a body. Real items look
+  like that, and a one-line sample would stand out, so it is left out with a warning.
+- Use descriptive names for configs, methods and models. Text that repeats such a name is
+  masked on full and group sheets, and refused on comparison sheets.
+- Imported units do not count as complete. Importing records their cost and ideas, but
+  provides no evidence of a finished population for metrics, comparison or replay.
+
+## Not Verified
+
+- How real models format output and rewrites: code fences, kept title lines and uniform
+  style. A single smoke run is an observation, not a guarantee.
+- Rewrite quality. The fake rewrite proves wiring only.
+- Backends other than Claude, such as a generic command backend pointing at another tool.
+  Those paths have only been tested against local fake processes.
+- Mechanism grouping on real text. The fake classifier matches identical text only.
+- Real calls for calibration, constraint checks, replay, methods and pressure levels. The
+  one real smoke run covered one agent, the baseline and first round, grouping, and one
+  rewritten item.
+- Running a real backend from inside an agent session. The adapter passes its whole
+  environment to the subprocess, including that session's variables. The smoke run removed
+  them by hand first, so this path has never run as it stands.
+- Bigram TF-IDF is a rough lexical estimate, not semantic coverage.
+- Any real decision. Samples are small: a decision is a direction, not proof.
+
+## Offline Backend Example
 
 ```python
 from evals.brainstorm.backends import FakeBackend

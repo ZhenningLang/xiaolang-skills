@@ -2,7 +2,7 @@
 
 import argparse
 
-from . import budget, dedupe, exam, loop, metrics, record, replay, serve, sheet
+from . import budget, dedupe, e2e, exam, loop, metrics, record, replay, report, serve, sheet
 
 
 def main():
@@ -17,6 +17,8 @@ def main():
     replay.register(subparsers)
     sheet.register(subparsers)
     serve.register(subparsers)
+    report.register(subparsers)
+    e2e.register(subparsers)
     args = parser.parse_args()
     return args.func(args)
 

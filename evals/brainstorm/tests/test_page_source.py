@@ -107,7 +107,8 @@ class RepositoryRuleTests(unittest.TestCase):
         tree = ast.parse((ROOT / "evals/brainstorm/__main__.py").read_text())
         calls = [node.func.value.id for node in ast.walk(tree) if isinstance(node, ast.Call)
                  and isinstance(node.func, ast.Attribute) and node.func.attr == "register"]
-        self.assertEqual(calls, ["budget", "exam", "record", "dedupe", "loop", "metrics", "replay", "sheet", "serve"])
+        self.assertEqual(calls, ["budget", "exam", "record", "dedupe", "loop", "metrics", "replay", "sheet", "serve",
+                                 "report", "e2e"])
 
     def test_new_tests_never_build_a_real_backend(self):
         banned = ("Claude" + "CliBackend", "Command" + "Backend", '"kind": "' + "claude", '"kind": "' + "command")
