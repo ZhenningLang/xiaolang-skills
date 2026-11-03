@@ -25,6 +25,8 @@ ISSUED_NAME = "sheet.issued.json"
 ANSWER_FIELDS = {"unthought", "care", "fatal_reason", "want_to_try"}
 VERDICT_FIELDS = {"exam_id", "mechanism_id", "label", "idea_ids", "sheet_id", "ts"} | ANSWER_FIELDS
 ITEM_FIELDS = {"item_id", "text", "variants"}
+SHEET_FIELDS = {"sheet_id", "kind", "question", "constraints", "items"}
+OLD_SHEET_FIELDS = {"sheet_id", "kind", "items"}  # Issued before the page showed the question.
 DEFAULT_COMPARE_COUNT = 40
 DEFAULT_GROUP_COUNT = 30
 MIN_UNIT_SAMPLE = 10
@@ -458,6 +460,7 @@ def make_sheet(run_dir, exam, *, kind, sheet_id, seed, all_view=False, configs=N
     exam_id = safe_segment(exam["id"])
     if exam_id in RESERVED_EXAMS:
         raise ValueError(f"exam id {exam_id} collides with a reserved run directory")
+    check_exam(exam)
     if any(type(value) is not int or value < 0 for value in (check_samples, repeats)):
         raise ValueError("check_samples and repeats must be non-negative integers")
     path = sheet_path(run_dir, sheet_id)
@@ -481,12 +484,16 @@ def make_sheet(run_dir, exam, *, kind, sheet_id, seed, all_view=False, configs=N
                     "sources": digest([sorted(ideas), sheet["source_digest"]])}
         slots = sheet["slots"]
         patterns = term_patterns(terms)
+        # Shown as written: the same text sits above every item, so it cannot tell one item's source from another's.
+        context_hits = lineage_hits("\n".join([exam["question"], *exam["constraints"]]), patterns)
+        if context_hits:
+            warnings.append(f"The exam question or constraints name a source term ({', '.join(context_hits)}); "
+                            "shown as written, so reword the exam if that gives too much away")
         if sheet["view"] == "compare" and slots:
             if backend is None or ledger is None or not isinstance(model, str) or not model.strip():
                 raise ValueError("Comparison sheets require a rewrite backend, ledger and model")
             positive_int(rewrite_attempt, "rewrite_attempt")
             positive_int(max_output_tokens, "max_output_tokens")
-            check_exam(exam)
             texts = rewrite_all(path, exam, slots, {**identity, "model": model, "backend": backend.name,
                                                     "ledger": str(ledger.path), "rewrite_batch": rewrite_batch,
                                                     "max_output_tokens": max_output_tokens},
@@ -506,7 +513,7 @@ def make_sheet(run_dir, exam, *, kind, sheet_id, seed, all_view=False, configs=N
                 warnings.append(f"{flagged} items contain a source term ({detail}); masked on the page and kept in the key. "
                                 "Ordinary words with the same name are masked too, so use distinctive source names")
         identity["attempt"] = rewrite_attempt if sheet["view"] == "compare" else None
-        return issue(path, sheet, slots, texts, identity, exam_id=exam_id, kind=kind, sheet_id=sheet_id,
+        return issue(path, sheet, slots, texts, identity, exam=exam, kind=kind, sheet_id=sheet_id,
                      seed=seed, warnings=warnings)
 
 
@@ -628,8 +635,9 @@ def check_issued(record, key, public_ids):
             raise ValueError(f"Conservation failed: {name} presented and reused mechanisms differ from those selected")
 
 
-def issue(path, sheet, slots, texts, identity, *, exam_id, kind, sheet_id, seed, warnings):
+def issue(path, sheet, slots, texts, identity, *, exam, kind, sheet_id, seed, warnings):
     """Key first, sheet.json last: the sheet file is the commit point the service can open."""
+    exam_id = exam["id"]
     key_path = path / KEY_NAME
     fingerprint = digest(identity)
     existing = None
@@ -656,8 +664,15 @@ def issue(path, sheet, slots, texts, identity, *, exam_id, kind, sheet_id, seed,
     check_issued(record, key, [row["item_id"] for row in public])
     atomic_write(path / ISSUED_NAME, dumps(record) + "\n")
     atomic_write(key_path, dumps(key) + "\n")
-    atomic_write(path / "sheet.json", dumps({"sheet_id": sheet_id, "kind": kind, "items": public}) + "\n")
+    atomic_write(path / "sheet.json", dumps({"sheet_id": sheet_id, "kind": kind, "question": exam["question"],
+                                             "constraints": exam["constraints"], "items": public}) + "\n")
     return {"sheet_id": sheet_id, "counts": sheet["counts"], "warnings": warnings}
+
+
+def valid_context(sheet):
+    question, constraints = sheet["question"], sheet["constraints"]
+    return (isinstance(question, str) and bool(question.strip()) and isinstance(constraints, list)
+            and all(isinstance(text, str) and text.strip() for text in constraints))
 
 
 def load_public_sheet(run_dir, sheet_id):
@@ -666,8 +681,12 @@ def load_public_sheet(run_dir, sheet_id):
     if not path.is_file():
         raise ValueError(f"Sheet {sheet_id} does not exist")
     sheet = read_json(path)
-    if (not isinstance(sheet, dict) or set(sheet) != {"sheet_id", "kind", "items"} or sheet["sheet_id"] != sheet_id
-            or sheet["kind"] not in ("score", "group") or not isinstance(sheet["items"], list)):
+    if isinstance(sheet, dict) and set(sheet) == OLD_SHEET_FIELDS:
+        # Still readable: an unrevealed score sheet blocks the next one, so refusing it would be a dead end.
+        sheet = {**sheet, "question": None, "constraints": []}
+    elif not isinstance(sheet, dict) or set(sheet) != SHEET_FIELDS or not valid_context(sheet):
+        raise ValueError("sheet.json has unexpected fields")
+    if sheet["sheet_id"] != sheet_id or sheet["kind"] not in ("score", "group") or not isinstance(sheet["items"], list):
         raise ValueError("sheet.json has unexpected fields")
     seen = set()
     for item in sheet["items"]:
@@ -725,7 +744,8 @@ def progress(sheet, answers):
 def public_state(run_dir, sheet_id):
     sheet = load_public_sheet(run_dir, sheet_id)
     answers = load_answers(run_dir, sheet)
-    return {"sheet_id": sheet_id, "kind": sheet["kind"], "items": sheet["items"],
+    return {"sheet_id": sheet_id, "kind": sheet["kind"], "question": sheet["question"],
+            "constraints": sheet["constraints"], "items": sheet["items"],
             "answers": answers if sheet["kind"] == "score" else {"groups": answers},
             "progress": progress(sheet, answers)}
 
@@ -903,21 +923,19 @@ def run_reveal(args):
 
 
 def run_sheet(args):
+    if args.exam_dir is None:
+        raise ValueError("Sheets require --exam-dir: the page shows the exam's question")
     if args.kind == "group":
         if args.all or args.configs or args.rewrite_config:
             raise ValueError("Group sheets take no --all, --configs or --rewrite-config")
-        exam = {"id": args.exam_id}
-    else:
-        if args.exam_dir is None:
-            raise ValueError("Score sheets require --exam-dir")
-        if args.all and (args.count is not None or args.rewrite_config):
-            raise ValueError("--all shows everything without rewriting; it takes no --count or --rewrite-config")
-        if Path(args.run_dir).resolve().is_relative_to(Path(args.exam_dir).resolve()):
-            raise ValueError("run-dir must not be inside the read-only exam-dir")
-        matches = [row for row in load_exams(args.exam_dir) if row["id"] == args.exam_id]
-        if not matches:
-            raise ValueError("exam-id was not found")
-        exam = matches[0]
+    elif args.all and (args.count is not None or args.rewrite_config):
+        raise ValueError("--all shows everything without rewriting; it takes no --count or --rewrite-config")
+    if Path(args.run_dir).resolve().is_relative_to(Path(args.exam_dir).resolve()):
+        raise ValueError("run-dir must not be inside the read-only exam-dir")
+    matches = [row for row in load_exams(args.exam_dir) if row["id"] == args.exam_id]
+    if not matches:
+        raise ValueError("exam-id was not found")
+    exam = matches[0]
     configs = [name for name in (args.configs or "").split(",") if name] or None
     options = {}
     if args.kind == "score" and not args.all:

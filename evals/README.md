@@ -78,6 +78,25 @@ python3 -m evals.brainstorm report --run-dir RUN --exam-dir EXAMS \
 - `<run-dir>/<exam_id>/mechanisms.json` is the only authority for mechanism IDs.
   `replay/` holds replay and calibration outputs, which are never reused for verdicts.
 
+## Sheets And Pages
+
+```sh
+python3 -m evals.brainstorm sheet --kind group --run-dir RUN --exam-dir EXAMS \
+  --exam-id exam_a --sheet-id group_1 --seed 1
+python3 -m evals.brainstorm serve --run-dir RUN --sheet-id group_1
+```
+
+- Every sheet needs `--exam-dir`, grouping sheets too: both pages show the exam's question
+  and hard constraints at the top, exactly as written. Judging "had you thought of this" is
+  impossible without the question.
+- Nothing else from the exam reaches the page. Hidden answers, the wrong premise, planted
+  probes and the exam id stay out; so do lineage and internal IDs.
+- The question is not masked. It is the same above every item, so it cannot tell one item's
+  source from another's. If it names a config, model, method or card, `sheet` warns.
+- A sheet issued before this change has no question. It still opens and can be revealed, and
+  both `serve` and the page say the question is missing. To see it, issue a new sheet. A
+  score sheet must be revealed first, because an exam allows one open score sheet.
+
 ## Writing Exams
 
 - `check_samples` must each be a **title line**, a newline, then a body. Real items look

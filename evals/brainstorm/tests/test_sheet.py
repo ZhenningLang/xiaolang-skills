@@ -552,7 +552,7 @@ class FullViewTests(SheetCase):
 
     def test_group_sheet_masks_lineage_too(self):
         self.taint_recordings()
-        result = sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_grp", seed=3, count=8)
+        result = sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_grp", seed=3, count=8)
         self.assertTrue(any("source term" in text for text in result["warnings"]))
         text = json.dumps(public_of(self.run_dir, "s_grp"), ensure_ascii=False)
         self.assertIsNone(LINEAGE.search(text))
@@ -923,7 +923,7 @@ class RevealTests(SheetCase):
         self.assertEqual(result["unjudged_mechanisms"], ["m-016"])
 
     def test_group_sheet_reveals_files_that_really_calibrate(self):
-        result = sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_grp", seed=3, count=8)
+        result = sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_grp", seed=3, count=8)
         self.assertEqual(result["counts"]["presented_target"], 8)
         key, public = key_of(self.run_dir, "s_grp"), public_of(self.run_dir, "s_grp")
         self.assertTrue(all(len(item["idea_ids"]) == 1 and item["mechanism_id"] is None for item in key["items"].values()))
@@ -947,7 +947,7 @@ class RevealTests(SheetCase):
         self.assertIsNotNone(report["ami"]["a_human"])
 
     def test_group_output_conflict_is_an_error(self):
-        sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_grp", seed=3, count=4)
+        sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_grp", seed=3, count=4)
         ids = [row["item_id"] for row in public_of(self.run_dir, "s_grp")["items"]]
         sheet.merge_answers(self.run_dir, "s_grp", {"sheet_id": "s_grp", "groups": [ids]})
         (self.run_dir / EXAM_ID / "human_groups.json").write_text("{}")
@@ -958,14 +958,14 @@ class RevealTests(SheetCase):
     def test_group_sheet_needs_no_machine_partition_and_is_not_blocked_by_an_open_score_sheet(self):
         self.all_sheet()
         (self.run_dir / EXAM_ID / "mechanisms.json").unlink()
-        result = sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_cold", seed=3, count=100)
+        result = sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_cold", seed=3, count=100)
         self.assertEqual(result["counts"]["presented_target"], 30)
         self.assertTrue(any("Only 30" in text for text in result["warnings"]))
 
     def test_group_sampling_is_seeded_and_ignores_machine_groups(self):
         def chosen(name, seed):
             run = copy_run(self.root, name)
-            sheet.make_sheet(run, {"id": EXAM_ID}, kind="group", sheet_id="s", seed=seed, count=5)
+            sheet.make_sheet(run, self.exam, kind="group", sheet_id="s", seed=seed, count=5)
             return [item["idea_ids"][0] for item in key_of(run, "s")["items"].values()]
         first = chosen("g1", 1)
         self.assertEqual(first, chosen("g2", 1))

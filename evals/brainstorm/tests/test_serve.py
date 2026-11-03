@@ -180,7 +180,7 @@ class BlindTests(ServerCase):
         self.assertEqual(status, 200)
         self.assertBlind(body)
         state = json.loads(body)
-        self.assertEqual(set(state), {"sheet_id", "kind", "items", "answers", "progress"})
+        self.assertEqual(set(state), {"sheet_id", "kind", "question", "constraints", "items", "answers", "progress"})
         for item in state["items"]:
             self.assertEqual(set(item), {"item_id", "text", "variants"})
         key = key_of(self.run_dir, sheet_id)
@@ -218,7 +218,7 @@ class BlindTests(ServerCase):
         self.exercise("s_cmp")
 
     def test_group_view_exposes_no_lineage(self):
-        sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_grp", seed=7, count=10)
+        sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_grp", seed=7, count=10)
         self.start("s_grp")
         body = self.get("/api/sheet")[1]
         self.assertBlind(body)
@@ -350,7 +350,7 @@ class AnswerTests(ServerCase):
 class GroupAnswerTests(ServerCase):
     def setUp(self):
         super().setUp()
-        sheet.make_sheet(self.run_dir, {"id": EXAM_ID}, kind="group", sheet_id="s_grp", seed=7, count=6)
+        sheet.make_sheet(self.run_dir, self.exam, kind="group", sheet_id="s_grp", seed=7, count=6)
         self.start("s_grp")
         self.ids = [row["item_id"] for row in self.items("s_grp")]
 

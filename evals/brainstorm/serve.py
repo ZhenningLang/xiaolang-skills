@@ -5,6 +5,7 @@ import hmac
 import json
 from pathlib import Path
 import secrets
+import sys
 from urllib.parse import parse_qs
 
 from .budget import cli_boundary
@@ -19,6 +20,8 @@ MAX_QUERY_FIELDS = 4
 BAD_ADDRESS = "页面地址不对，请重新从命令行打开"
 BAD_FORMAT = "提交的内容格式不对，请刷新页面再试"
 NO_PAGE = "没有这个页面"
+NO_QUESTION = ("Warning: this sheet has no question, because an older version issued it. The page says so. "
+               "To show the question, finish and reveal this sheet, then issue a new one.")
 CSP = ("default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; "
        "img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 
@@ -122,6 +125,7 @@ def make_server(run_dir, sheet_id):
     load_answers(run_dir, sheet)
     server = LocalServer((HOST, 0), Handler)
     server.run_dir, server.sheet_id = run_dir, sheet_id
+    server.has_question = sheet["question"] is not None
     server.token = secrets.token_urlsafe(32)
     server.page = PAGE.read_bytes()
     server.address = f"{HOST}:{server.server_address[1]}"
@@ -131,6 +135,8 @@ def make_server(run_dir, sheet_id):
 
 def run_cli(args):
     with make_server(args.run_dir, args.sheet_id) as server:
+        if not server.has_question:
+            print(NO_QUESTION, file=sys.stderr, flush=True)
         print(server.url, flush=True)
         try:
             server.serve_forever()

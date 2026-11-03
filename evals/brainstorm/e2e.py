@@ -161,7 +161,7 @@ def run_exam(root, exam, configs, classifier, *, seed, reps, ledger, marker):
             run_loop(exam, config, root, seed=seed, backend=generation, ledger=ledger, dedupe_config=classifier,
                      dedupe_backend=grouping, rep=rep)
     progress(exam_id, "group_sheet")
-    complete_sheet(root, {"id": exam_id}, f"{exam_id}_group", seed, kind="group")
+    complete_sheet(root, exam, f"{exam_id}_group", seed, kind="group")
     progress(exam_id, "calibration")
     models = classifier["models"]
     dedupe.calibrate(record.read_rows(root / exam_id / "human_group_ideas.jsonl"),

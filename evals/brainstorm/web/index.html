@@ -106,6 +106,12 @@ code { font-size: 14px; overflow-wrap: anywhere; }
 .member_controls { display: flex; flex-wrap: wrap; gap: var(--space_1); justify-content: flex-end; }
 .member_controls button { font-size: 14px; padding: var(--space_1) var(--space_3); }
 .empty { color: var(--muted); margin: var(--space_3) 0 0; }
+.exam { margin-bottom: var(--space_5); padding-bottom: var(--space_4); border-bottom: 1px solid var(--border); }
+.exam .notice { margin-bottom: 0; }
+.exam .hint { margin: 0 0 var(--space_3); }
+.exam_question { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600; }
+.exam_list { margin: 0; padding-left: var(--space_5); overflow-wrap: anywhere; }
+.exam_list_title { margin: var(--space_3) 0 var(--space_1); }
 @media (min-width: 880px) {
   .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space_7); align-items: start; }
   .sticky_column { position: sticky; top: var(--space_8); }
@@ -123,12 +129,17 @@ code { font-size: 14px; overflow-wrap: anywhere; }
     <div class="track"><div class="fill" id="progress_fill"></div></div>
   </div>
 </header>
-<main class="page" id="app"><p class="hint">正在打开……</p></main>
+<main class="page">
+  <section class="exam" id="exam_box" hidden></section>
+  <div id="app"><p class="hint">正在打开……</p></div>
+</main>
 <script>
 "use strict";
 const BAD_ADDRESS = "页面地址不对，请重新从命令行打开";
 const MASKED = "[已隐去]";
 const NEED_REASON = "说得出的话，要写一句原因";
+const NO_QUESTION = "这张卷子是旧版程序出的，没有存题目，所以这里没有显示。判断前请先想清楚题目是什么；要显示题目，需要重新出卷。";
+const GROUP_PURPOSE = "这张卷用来核对程序合并点子是否准确。";
 const OFFLINE = "连不上本地服务，可能已经停了。已填的内容还在这个页面上；重新运行 serve 命令后，请打开新地址。";
 const QUESTIONS = [
   {field: "unthought", text: "看这道题之前，你想到过吗？", first: ["想到过", false], second: ["没想到", true]},
@@ -196,6 +207,22 @@ function maskNote(texts) {
 function revealHint() {
   return el("p", {}, "回到命令行运行下面的命令，才能看到每一条的来源：", el("br"),
     el("code", {text: `python3 -m evals.brainstorm reveal --run-dir <运行目录> --sheet-id ${sheet.sheet_id}`}));
+}
+
+function showExam(state) {
+  // Outside #app: answering rebuilds the item area, and the question must stay as it is.
+  const box = document.getElementById("exam_box");
+  if (state.kind === "group") box.append(el("p", {class: "hint", id: "sheet_purpose", text: GROUP_PURPOSE}));
+  if (state.question === null) {
+    box.append(el("div", {class: "notice", role: "alert", id: "no_question", text: NO_QUESTION}));
+  } else {
+    box.append(el("p", {class: "eyebrow", text: "题目"}), el("p", {class: "exam_question", id: "exam_question", text: state.question}));
+    if (state.constraints.length) {
+      box.append(el("p", {class: "eyebrow exam_list_title", text: "硬约束"}),
+        el("ul", {class: "exam_list", id: "exam_constraints"}, ...state.constraints.map((text) => el("li", {text}))));
+    }
+  }
+  box.hidden = false;
 }
 
 /* ---------- score sheet ---------- */
@@ -507,7 +534,7 @@ function startGroup(state) {
     const left = el("div", {class: "sticky_column"},
       notice(error, failed),
       current ? el("div", {},
-        el("p", {class: "eyebrow", text: "这条点子放哪一组？意思一样的放一起。"}),
+        el("p", {class: "eyebrow group_rule", text: "这条点子放哪一组？做法相同的放一起，说法不同没关系。"}),
         el("p", {class: "idea", id: "idea_text", text: current.text}),
         maskNote([current.text])) : el("div", {class: "finish", id: "finish_panel"},
         el("h1", {text: items.length ? "都分好了" : "这张卷子没有要分的内容"}),
@@ -548,6 +575,7 @@ document.addEventListener("keydown", (event) => {
   try {
     const state = await request("/api/sheet");
     sheet = state;
+    showExam(state);
     if (state.kind === "group") startGroup(state);
     else startScore(state);
   } catch (failure) {
