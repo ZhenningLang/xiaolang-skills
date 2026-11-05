@@ -69,6 +69,10 @@ def unit_status(root, exam_id, config, rep, events):
                 unsettled.append(grouping["pending"])
             else:
                 classify("grouping", grouping["pending"])
+        # A paid grouping failure freed from the queue is still this unit's failure: without this the unit reads as resumable.
+        for key in grouping.get("abandoned", []):
+            if owners_of(grouping["requests"].get(key)) == {(config, rep)}:
+                failures.append(("grouping", "paid_error", key))
     batches = state["batches"]
     if batches and batches[-1]["stage"] != "done" and batches[-1]["fallback_ids"]:
         failures.append(("grouping", "invalid_partition", None))
@@ -115,12 +119,25 @@ def settle_failed_unit(root, exam, config, rep, ledger):
         judge.sync_failed(path / "judges/constraint", ledger)
 
 
+def owners_of(request):
+    return {(row["config"], row["rep"]) for row in request.get("ideas", [])} if request else set()
+
+
+def own_grouping_keys(root, exam_id, config, rep):
+    """Grouping calls whose batch held only this unit's ideas, paid or failed; mixed batches stay unattributed."""
+    shared = Path(root).resolve() / exam_id / "dedupe/state.json"
+    if not shared.is_file():
+        return set()
+    return {key for key, request in signed_state(shared)["requests"].items() if owners_of(request) == {(config, rep)}}
+
+
 def receipts_usd(root, row, rep, *, shared_keys=()):
     """Everything this unit's own files recorded, plus any grouping call that was its alone."""
     path = unit_path(root, row["exam_id"], row["config"], rep)
     amounts = [amount(entry["usd"]) for file in sorted(path.rglob("calls.jsonl")) for entry in record.read_rows(file)]
     shared = Path(root).resolve() / row["exam_id"] / "dedupe/calls.jsonl"
-    amounts += [amount(entry["usd"]) for entry in record.read_rows(shared) if entry["call_key"] in shared_keys]
+    keys = set(shared_keys) | own_grouping_keys(root, row["exam_id"], row["config"], rep)
+    amounts += [amount(entry["usd"]) for entry in record.read_rows(shared) if entry["call_key"] in keys]
     return exact_sum(0, *amounts)
 
 

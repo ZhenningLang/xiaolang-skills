@@ -171,6 +171,33 @@ class OnceOnlyTests(Flow):
         self.assertRaisesRegex(ValueError, "already replaced", self.replace, new=5, generation=fresh)
         self.assertEqual((fresh.calls, self.events()), (0, before))
 
+    def test_replacement_failing_at_grouping_stays_failed_after_the_queue_is_freed(self):
+        self.fail_unit()
+        before_replacement = Decimal(self.ledger.status()["used"])
+        with self.assertRaises(ReplacementFailed) as caught:
+            self.replace(grouping=FakeBackend(failure="paid_error"))
+        spent = Decimal(self.ledger.status()["used"]) - before_replacement
+        self.assertIn(f"{spent} on its replacement", str(caught.exception))
+        # Another unit grouping afterwards changes the shared table, so the old failed call key no longer matches.
+        self.run_unit(self.plain, 1)
+        before = self.events()
+        fresh, grouping = FakeBackend(responses=e2e.scenario), FakeBackend(responses=dedupe.fake_partition)
+        with self.assertRaises(ReplacementFailed):
+            self.replace(generation=fresh, grouping=grouping)
+        self.assertEqual((fresh.calls, grouping.calls, self.events()), (0, 0, before))
+        status = replace_unit.unit_status(self.root, self.exam["id"], "cfg_return", 4, replace_unit.last_events(self.ledger.path))
+        self.assertEqual((status["state"], status["stage"]), ("failed", "grouping"))
+
+    def test_original_grouping_failure_is_billed_to_the_failed_unit(self):
+        before_failure = Decimal(self.ledger.status()["used"])
+        with self.assertRaises((ValueError, LedgerError)):
+            self.run_unit(self.returned, 1, grouping=FakeBackend(failure="paid_error"))
+        failed_cost = Decimal(self.ledger.status()["used"]) - before_failure
+        before_replacement = Decimal(self.ledger.status()["used"])
+        result = self.replace()
+        self.assertEqual(Decimal(result["failed_usd"]), failed_cost)
+        self.assertEqual(Decimal(result["new_usd"]), Decimal(self.ledger.status()["used"]) - before_replacement)
+
     def test_new_rep_must_be_fresh(self):
         self.fail_unit()
         self.run_unit(rep=2)
@@ -315,6 +342,12 @@ class ReplacedSetTests(Flow):
         unit = self.root / self.exam["id"] / "cfg_return"
         failed = sum(entry["usd"] for entry in read_rows(unit / "rep-1/calls.jsonl"))
         new = sum(entry["usd"] for path in (unit / "rep-4").rglob("calls.jsonl") for entry in read_rows(path))
+        # Grouping calls whose batch held only rep 4's ideas are rep 4's cost too; mixed batches stay unattributed.
+        requests = read_file(self.root / self.exam["id"] / "dedupe/state.json")["state"]["requests"]
+        alone = {key for key, request in requests.items()
+                 if {(idea["config"], idea["rep"]) for idea in request.get("ideas", [])} == {("cfg_return", 4)}}
+        self.assertTrue(alone)
+        new += sum(entry["usd"] for entry in read_rows(self.root / self.exam["id"] / "dedupe/calls.jsonl") if entry["call_key"] in alone)
         self.assertGreater(failed, 0)
         self.assertEqual((row["failed_usd"], row["new_usd"]), (failed, new))
         self.assertEqual(row["status"], "complete")
