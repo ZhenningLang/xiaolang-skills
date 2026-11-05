@@ -21,6 +21,7 @@ from .budget import (BudgetLedger, BudgetExceeded, LedgerError, PaidCallError, a
 from .config import LEVELS, load_config, positive_int
 from .exam import load_exams, read_json, read_jsonl, safe_segment, text_list
 from .prompts import generation_prompt
+from . import replacements
 
 
 def digest(value):
@@ -314,6 +315,7 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
     if assignments is not None:
         assignments = checked_assignments(assignments, exam, config, level, returned_from)
     path = output_dir(run_dir, exam["id"], config["name"], rep)
+    replacements.refuse_if_retired(run_dir, exam["id"], config["name"], rep)
     effective = {k: v for k, v in config.items() if k != "budget_usd"}
     identity = {"exam": digest(exam), "config": digest(effective), "seed": seed,
                 "ledger": str(ledger.path), "backend": backend.name}

@@ -2,6 +2,7 @@
 
 import copy
 from decimal import Decimal
+import html
 import json
 from pathlib import Path
 import shutil
@@ -77,6 +78,7 @@ class BlindReportTests(FixtureCase):
         self.answer_and_reveal("s_all")
         built = self.build()
         text = (self.run_dir / "report.md").read_text(encoding="utf-8")
+        page = (self.run_dir / "report.html").read_text(encoding="utf-8")
         table = json.loads((self.run_dir / EXAM_ID / "mechanisms.json").read_text(encoding="utf-8"))
         rows = {row["mechanism_id"]: row for row in built["exams"][EXAM_ID]["expansion"]}
         self.assertEqual(set(rows), {row["mechanism_id"] for row in table["mechanisms"]})
@@ -87,7 +89,10 @@ class BlindReportTests(FixtureCase):
         ideas = {row["idea_id"]: row for row in self.all_ideas()}
         for mechanism in merged:
             for key in mechanism["idea_ids"]:
-                self.assertIn(" ".join(ideas[key]["text"].split()), text)
+                # This fixture text is a live script probe, so both files must show it as text, whole.
+                wording = " ".join(ideas[key]["text"].split())
+                self.assertIn(wording.replace("<", "&lt;"), text)
+                self.assertIn(html.escape(wording, quote=True), page)
         self.assertEqual(built["unrevealed_sheets"], 0)
 
     def test_compare_only_sheet_expands_only_judged_mechanisms(self):
@@ -110,11 +115,11 @@ class BlindReportTests(FixtureCase):
     def test_every_section_says_no_data_rather_than_zero_before_any_answer(self):
         built = self.build()
         text = (self.run_dir / "report.md").read_text(encoding="utf-8")
-        sections = text.split("\n## ")[1:]
-        self.assertEqual(len(sections), 13)
+        sections = text.split("\n<summary>")[1:]
+        self.assertEqual(len(sections), 14)
         for number, section in enumerate(sections, 1):
             self.assertTrue(section.startswith(f"{number}. "), section[:30])
-            self.assertGreater(len(section.split("\n", 2)[2].strip()), 0, section[:30])
+            self.assertGreater(len(section.split("</summary>", 1)[1].split("</details>", 1)[0].strip()), 0, section[:30])
         self.assertIn("贡献度只说明相关，不说明因果", text)
         contribution = next(section for section in sections if section.startswith("4. "))
         self.assertIn("无数据", contribution)

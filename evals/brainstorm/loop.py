@@ -6,7 +6,7 @@ from pathlib import Path
 import random
 import sys
 
-from . import dedupe, record
+from . import dedupe, record, replacements
 from .allocate import allocate
 from .backends import NotStarted
 from .budget import BudgetExceeded, BudgetLedger, atomic_write, cli_boundary, default_ledger_path, dumps
@@ -194,6 +194,14 @@ def advance(state, batch, levels, config):
     batch["stop_reason"] = state["stop_reason"]
 
 
+def loop_identity(exam, config, seed, rep, ledger, backend, dedupe_config, dedupe_backend):
+    effective = lambda value: {k: v for k, v in value.items() if k != "budget_usd"}
+    return {"loop_policy": "unit-local-baseline-v1", "exam": record.digest(exam),
+            "config": record.digest(effective(config)), "seed": seed, "rep": rep,
+            "ledger": str(ledger.path), "backend": backend.name,
+            "dedupe_config": record.digest(effective(dedupe_config)), "dedupe_backend": dedupe_backend.name}
+
+
 def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, dedupe_backend, rep=1):
     """Run one exam/configuration/repetition using one fixed authoritative classifier."""
     if type(seed) is not int:
@@ -202,12 +210,9 @@ def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, ded
         raise ValueError("Generation and dedupe cannot mix fake and real billing")
     if dedupe_config["default_model"] not in dedupe_config["models"]:
         raise ValueError("Classifier model must be allowed by dedupe config")
-    effective = lambda value: {k: v for k, v in value.items() if k != "budget_usd"}
-    identity = {"loop_policy": "unit-local-baseline-v1", "exam": record.digest(exam),
-                "config": record.digest(effective(config)), "seed": seed, "rep": rep,
-                "ledger": str(ledger.path), "backend": backend.name,
-                "dedupe_config": record.digest(effective(dedupe_config)), "dedupe_backend": dedupe_backend.name}
+    identity = loop_identity(exam, config, seed, rep, ledger, backend, dedupe_config, dedupe_backend)
     path = record.output_dir(run_dir, exam["id"], config["name"], rep)
+    replacements.refuse_if_retired(run_dir, exam["id"], config["name"], rep)
     path.mkdir(parents=True, exist_ok=True)
     # ceiling: serialize one unit across model calls; split reservations only if unit parallelism is needed.
     with (path / "loop.lock").open("a+b") as lock:

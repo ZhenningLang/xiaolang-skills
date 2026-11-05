@@ -16,6 +16,7 @@ from .exam import load_exams, read_json, safe_segment
 from .judge import check_exam, safe_output, stage_backend
 from .metrics import load_unit, unit_completion
 from .prompts import wrap_data
+from . import replacements
 from .record import MeasuredBackend, add_failure, digest, read_file, read_rows, recording_lock, sync_call
 
 
@@ -103,6 +104,11 @@ def load_ideas(run_dir, exam_id):
                for r in source):
             raise ValueError("Recording file disagrees with its unit directory")
         rows.extend(source)
+    retired = {(row["config"], row["failed_rep"]) for row in replacements.load(run_dir, exam_id)}
+    if retired and (root / "mechanisms.json").is_file():
+        # A replaced unit's ideas that were never grouped stay on disk and in the report's count, not in the table's universe.
+        grouped = {key for row in read_file(root / "mechanisms.json")["mechanisms"] for key in row["idea_ids"]}
+        rows = [row for row in rows if (row.get("config"), row.get("rep")) not in retired or row.get("idea_id") in grouped]
     return checked_ideas(rows, exam_id)
 
 
@@ -111,7 +117,14 @@ def load_table(run_dir, exam_id, ideas):
     if not path.is_file():
         raise ValueError("Authoritative mechanisms.json is missing; run dedupe first")
     table = read_file(path)
-    validate_table(table, ideas, exam_id)
+    try:
+        validate_table(table, ideas, exam_id)
+    except ValueError as exc:
+        members = {key for row in table.get("mechanisms", []) for key in row.get("idea_ids", [])} if isinstance(table, dict) else set()
+        if set(ideas) - members:
+            raise ValueError(f"{exc}: {len(set(ideas) - members)} recorded ideas are not grouped yet. Finish their unit, "
+                             "or if it failed, run replace-unit") from exc
+        raise
     return table
 
 
@@ -210,7 +223,8 @@ def discover_units(run_dir, exam_id, config):
     safe_segment(config)
     root = Path(run_dir).resolve() / exam_id / config
     matches = (re.fullmatch(r"rep-([1-9][0-9]*)", path.name) for path in root.glob("rep-*"))
-    reps = sorted(int(match.group(1)) for match in matches if match)
+    retired = replacements.retired_reps(replacements.load(run_dir, exam_id), config)
+    reps = sorted(int(match.group(1)) for match in matches if match and int(match.group(1)) not in retired)
     if not reps:
         raise ValueError(f"Config {config} has no recorded units")
     return [(config, rep) for rep in reps]

@@ -113,7 +113,7 @@ def export_outputs(path, state):
         rows = state[kind]
         if kind == "failures":
             rows = [row for row in rows if row["reason"] == "invalid_partition"
-                    or row["call_key"] == state["pending"]]
+                    or row["call_key"] == state["pending"] or row["call_key"] in state.get("abandoned", [])]
         atomic_write(path / f"dedupe/{kind}.jsonl", "".join(dumps(row) + "\n" for row in rows))
     state.pop("previous_table", None)
     save_state(path, state)
@@ -303,6 +303,24 @@ def deduplicate(ideas, run_dir, *, exam_id, seed, backend, ledger, model,
                 "fallback_ids": list(state["fallback_ids"]), "failures": read_rows(path / "dedupe/failures.jsonl"),
                 "mechanisms_path": str(path / "mechanisms.json"), "calls_path": str(path / "dedupe/calls.jsonl"),
                 "failures_path": str(path / "dedupe/failures.jsonl")}
+
+
+def abandon_pending(run_dir, exam_id, ledger, key):
+    """Free the queue from a paid failure whose unit was replaced. Its ideas stay on disk, ungrouped; the charge stays."""
+    path = stage_path(run_dir, exam_id, None)
+    with recording_lock(path / "dedupe"):
+        classifier = read_file(path / "dedupe/state.json")["state"]["classifier"]
+        state = load_state(path, exam_id, ledger, classifier)
+        if state["pending"] != key:
+            return
+        sync_call(state, key, ledger)
+        state.setdefault("abandoned", []).append(key)
+        state["pending"] = None
+        failure = {"stage": "dedupe", "call_key": key, "reason": "abandoned", "detail": "Unit replaced; these ideas were never grouped"}
+        if failure not in state["failures"]:
+            state["failures"].append(failure)
+        save_state(path, state)
+        export_outputs(path, state)
 
 
 def collisions(table, reference_ids, batch_ids):

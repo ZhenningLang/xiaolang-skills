@@ -92,11 +92,29 @@ def alive(pid):
     return True
 
 
+def real_ledger_path():
+    """Outside every worktree, so cleaning or switching one can neither lose nor split the real ledger."""
+    configured = os.environ.get("XDG_STATE_HOME", "")
+    # The XDG spec says a relative value is invalid and must be ignored.
+    state = Path(configured) if configured and Path(configured).is_absolute() else Path.home() / ".local" / "state"
+    return state / "xiaolang-skills" / "brainstorm" / "ledger.real.jsonl"
+
+
+def legacy_ledger_path(*, repo_root=None):
+    root = Path(repo_root) if repo_root is not None else Path(__file__).resolve().parents[2]
+    return root / "evals" / "brainstorm" / "runs" / "ledger.real.jsonl"
+
+
 def default_ledger_path(backend, run_dir, *, repo_root=None):
     if backend == "fake":
         return Path(run_dir) / "ledger.fake.jsonl"
-    root = Path(repo_root) if repo_root is not None else Path(__file__).resolve().parents[2]
-    return root / "evals" / "brainstorm" / "runs" / "ledger.real.jsonl"
+    path, old = real_ledger_path(), legacy_ledger_path(repo_root=repo_root)
+    if old.exists() and not path.exists():
+        # An empty ledger here would reset the spending limit, so nothing is created and nothing is moved.
+        raise LedgerError(f"The real ledger moved. Found the old one at {old} and none at {path}. Stop all runs, then move "
+                          f"it with its .lock and .cache: mkdir -p '{path.parent}' && mv '{old}' '{old}.lock' '{old}.cache' "
+                          f"'{path.parent}/'. A run that must stay on the old file can pass --ledger.")
+    return path
 
 
 class BudgetLedger:
@@ -432,7 +450,7 @@ def cli_boundary(function, args):
 
 
 def _run(args):
-    ledger = BudgetLedger(args.ledger, args.limit)
+    ledger = BudgetLedger(args.ledger or default_ledger_path("claude", "."), args.limit)
     if args.action == "settle":
         ledger.settle(args.call_key, args.usd)
     elif args.action == "release":
@@ -442,7 +460,7 @@ def _run(args):
 
 def register(subparsers):
     parser = subparsers.add_parser("ledger", help="Inspect or reconcile model billing")
-    parser.add_argument("--ledger", type=Path, default=default_ledger_path("claude", "."))
+    parser.add_argument("--ledger", type=Path, help="Default: the real ledger")
     parser.add_argument("--limit", default="50")
     actions = parser.add_subparsers(dest="action", required=True)
     actions.add_parser("status")

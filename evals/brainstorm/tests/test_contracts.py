@@ -3,10 +3,11 @@ import io
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
-from evals.brainstorm.budget import default_ledger_path
+from evals.brainstorm.budget import default_ledger_path, real_ledger_path
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -44,9 +45,9 @@ class ContractTests(unittest.TestCase):
                     self.assertIn(name, sys.stdlib_module_names | {"evals"}, str(path))
 
     def test_real_default_path_does_not_follow_run_directory(self):
-        expected = ROOT / "evals" / "brainstorm" / "runs" / "ledger.real.jsonl"
-        self.assertEqual(default_ledger_path("claude", "one"), expected)
-        self.assertEqual(default_ledger_path("claude", "two"), expected)
+        with tempfile.TemporaryDirectory() as repo:
+            self.assertEqual(default_ledger_path("claude", "one", repo_root=repo), real_ledger_path())
+            self.assertEqual(default_ledger_path("claude", "two", repo_root=repo), real_ledger_path())
 
     def test_entrypoint_only_registers_and_dispatches(self):
         tree = ast.parse((ROOT / "evals/brainstorm/__main__.py").read_text())

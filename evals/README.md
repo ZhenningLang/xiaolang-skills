@@ -16,7 +16,8 @@ mechanism grouping, calibration against simulated human groups, constraint check
 one replay per exam, metrics, sheets, simulated answers, reveal and the report.
 Simulated answers call the same functions as the scoring page but bypass the page
 itself, whose server has its own tests. It writes
-`report.md` (read this), `report.json` and `e2e_summary.json` into the run directory.
+`report.html` (open this), `report.md` with the same content, `report.json` and
+`e2e_summary.json` into the run directory.
 Its decision **only proves the wiring**. It is not a finding about any method.
 `--fake` is mandatory because this command has no real-backend mode on purpose.
 
@@ -34,8 +35,26 @@ python3 -m evals.brainstorm report --run-dir RUN --exam-dir EXAMS \
   checks through the ledger, and a repeat run reuses the paid result.
 - The main score needs exactly one revealed comparison sheet whose units cover exactly
   the two compared configs. None or several count as missing answers.
+- Hard-constraint violations are judged exam by exam: a rise on any decision exam rejects
+  the candidate, and the report names that exam. Cost is compared as a total.
 - Thresholds are provisional, and can be changed: `--cost-ratio` (1.5),
   `--check-bad-ratio` (0.34), `--contribution-floor` (0).
+
+## Reading The Report
+
+The report has three layers, for someone deciding which stage to change:
+
+1. **Start here**: the conclusion, the next step and how far to trust it, in five lines at most.
+2. **Stage table**: one row per stage, with how many scored ideas needed it, what a removal
+   comparison showed and one of four pieces of advice: keep, try removing, can delete, no data.
+   A removal nobody has run says "not tested", never zero.
+3. **Detail**: every other section, folded.
+
+"Try removing" is correlation only. To test one, copy `drop_config` from that stage's row in
+`leave_one` in `report.json` into a file and keep its `<config>__drop_<stage>` name. Record it
+with `loop`, issue and answer a comparison sheet over the original and that config, then pass
+it as one more `--config` to `report`. The stage's row then shows the result. A removal with no
+worse result is "can delete".
 
 ## How Money Is Controlled
 
@@ -53,24 +72,59 @@ python3 -m evals.brainstorm report --run-dir RUN --exam-dir EXAMS \
   - `ledger release` says no charge happened. It needs independent evidence, and the run can
     then resume. Do not release a call just to continue: a request that was already sent has
     usually been charged.
-  - `ledger settle` records the bill, nothing more. That call cannot be retried and there is
-    no recovery command. In recording its unit becomes a failed unit, as below. In grouping,
-    calibration, constraint checks, replay or rewriting, resuming keeps reporting the call as
-    already paid and failed.
+  - `ledger settle` records the bill, nothing more. That call cannot be retried. In recording,
+    grouping inside a loop or a constraint check its unit becomes a failed unit, as below.
+    Calibration, replay and rewriting have no unit to replace: start calibration or replay
+    under a new name, or issue the sheet again with a higher `--rewrite-attempt`. Each pays
+    again and the first charge stays. Grouping inside a loop also keeps the older choice of
+    `dedupe run --retry-paid-error`, at most two attempts in total.
 - All real backends share one cumulative ledger, whatever the run directory.
   Do not start a new ledger to get around it.
-- **A failed unit blocks its config, and there is no recovery path yet.** A generation
-  agent that fails twice leaves its unit unusable, and resuming it stops at once. Another
-  repetition does not help: a comparison sheet covers every repetition of a config, so one
-  failed unit refuses the sheet and the decision stays `indeterminate`. Do not pay for more
-  repetitions to get around this. The recovery policy is still undecided.
+
+## Replacing A Failed Unit
+
+A failed unit blocks its config: a comparison sheet covers every repetition of a config, so
+one failed unit refuses the sheet and the decision stays `indeterminate`. Another repetition
+alone does not help. You can replace the failed one, only once, and only by asking:
+
+```sh
+python3 -m evals.brainstorm replace-unit --run-dir RUN --exam-dir EXAMS --exam-id exam_a \
+  --config new.json --dedupe-config classifier.json --failed-rep 2 --new-rep 4
+```
+
+- Nothing retries by itself. No other command starts a replacement.
+- Only a unit that truly failed qualifies: a paid failure, output unusable on both attempts,
+  a grouping result that could not be used, or a failed constraint check. A unit stopped by
+  the limit can resume, so it is refused. An uncertain call must be reconciled first.
+- A failed unit is replaced only once. If the replacement fails too, the command stops and
+  reports, the record stays, and neither unit can be replaced again.
+- The failed unit's files and cost stay, and the ledger is only appended to. The seed comes
+  from the failed unit, and the config, classifier and ledger must match it, so none of them
+  can be changed to erase a failure. The new repetition reserves budget like any other, and
+  rerunning the same command resumes it after a limit stop without paying twice.
+- `<run-dir>/<exam_id>/replacements.jsonl` holds the record. Sheets, the guard counts and the
+  main score use the replaced set, so counts stay equal. A sheet issued before the replacement
+  no longer counts: issue a new one, and answers already given are reused.
+- Grouped ideas of the failed unit stay in the mechanism table and the full view. Its ideas that
+  were never grouped stay on disk and out of every sheet, and the report counts them.
+- The report says which unit was replaced and what both units cost, at the top and in the
+  detail. The failed unit's cost is in the totals, not in the decision's cost comparison.
+- A standalone `record` unit has no loop to rerun, so it cannot be replaced.
 
 ## Where Data Lives
 
-- `evals/brainstorm/runs/` holds run directories and the real ledger
-  (`ledger.real.jsonl`). `evals/brainstorm/exams/private/` holds private questions.
-  Git ignores both. Never run `git clean` on them: the ledger is the only record of
-  what was spent.
+- The real ledger is outside every worktree, at
+  `$XDG_STATE_HOME/xiaolang-skills/brainstorm/ledger.real.jsonl`, or
+  `~/.local/state/xiaolang-skills/brainstorm/ledger.real.jsonl` when that is unset. Its lock and
+  cache sit next to it. It is the only record of what was spent, so never delete it.
+- A ledger left at the old path, `evals/brainstorm/runs/ledger.real.jsonl`, stops every real
+  backend until it is moved, because a new empty ledger would reset the limit. The error
+  prints the move command. Nothing moves it for you. `--ledger` still picks any file you name.
+  A run recorded on the old path keeps that path in its state, so finish it with `--ledger`
+  or start a new run.
+- `evals/brainstorm/runs/` holds run directories and
+  `evals/brainstorm/exams/private/` holds private questions. Git ignores both. Never
+  run `git clean` on them.
 - A fake run keeps its own `ledger.fake.jsonl` inside the run directory.
 - `<run-dir>/sheets/<id>/sheet.issued.json` fixes every ID a sheet must hold when it is
   issued. Reveal and the report compare against it as sets, so a lost row fails even if the
@@ -122,6 +176,7 @@ python3 -m evals.brainstorm serve --run-dir RUN --sheet-id group_1
   them by hand first, so this path has never run as it stands.
 - Bigram TF-IDF is a rough lexical estimate, not semantic coverage.
 - Any real decision. Samples are small: a decision is a direction, not proof.
+- Replacement and the removal comparison on a real backend. Both have only run on the fake one.
 
 ## Offline Backend Example
 
@@ -204,7 +259,7 @@ this condition. Existing successful caches can still be read. This protects
 subsequent calls, but a **single call** can exceed its reservation and budget.
 
 `default_ledger_path(backend, run_dir)` selects `run_dir/ledger.fake.jsonl` for
-fake calls and `evals/brainstorm/runs/ledger.real.jsonl` for all real backends,
+fake calls and the state-directory path above for all real backends,
 independent of run directory. An explicit ledger path overrides this selection;
 do not use a new empty real ledger to evade cumulative costs. Private exams and
 run outputs are ignored by Git. Do not publish raw model responses or caches.
@@ -272,4 +327,5 @@ bash scripts/check-leaks.sh
 
 Tests use fake backends, simulated subprocess responses, and actual local
 processes for concurrency, crash recovery, and CLI boundaries. They never need
-network access, credentials, or paid model calls.
+network access, credentials, or paid model calls. The test package points `HOME` and
+`XDG_STATE_HOME` at a throwaway directory, so no test can reach the real ledger.

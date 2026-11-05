@@ -13,9 +13,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from evals.brainstorm import dedupe, e2e, replay, report, sheet
+from evals.brainstorm import dedupe, e2e, replace_unit, replay, report, sheet
 from evals.brainstorm.backends import FakeBackend
-from evals.brainstorm.budget import BudgetExceeded, BudgetLedger, LedgerError, cli_boundary, default_ledger_path
+from evals.brainstorm.budget import BudgetExceeded, BudgetLedger, LedgerError, cli_boundary, default_ledger_path, legacy_ledger_path
 from evals.brainstorm.config import validate_config
 from evals.brainstorm.exam import load_exams, read_jsonl, validate_exam
 from evals.brainstorm.loop import run_loop
@@ -23,13 +23,13 @@ from evals.brainstorm.record import read_file, read_rows
 
 
 ROOT = Path(__file__).resolve().parents[3]
-REAL_LEDGER = default_ledger_path("claude", ".")
+REAL_LEDGER = legacy_ledger_path()
 SMALL = {"exam_ids": ("open_sample",), "reps": 1}
 SUMMARY_FIELDS = {"calls_total": int, "usd_total": (int, float, Decimal), "mechanisms_total": int, "presented_target": int,
                   "reused": int, "assignment_digest": str, "decision": str}
 DECISIONS = {"accept", "reject", "indeterminate", "prefer_simpler"}
 SECTION_TITLES = ("判定", "主分和噪声线", "护栏和成本", "贡献度", "留一对照", "失败账本", "计分规则自检",
-                  "想试比例和计了分但不想试", "机器指标和两种比较口径", "费用", "条数核对", "校准", "被合并的说法")
+                  "想试比例和计了分但不想试", "机器指标和两种比较口径", "费用", "条数核对", "校准", "被合并的说法", "单元替换")
 # Picked by hand for open_sample at the default seed: the mean gap of 5/3 clears the noise line of 1.
 # If the fake scenario changes, work out a new set from the units in that run's comparison key.
 WINNERS = {"m-003", "m-011", "m-014", "m-016", "m-019"}
@@ -59,11 +59,11 @@ def check_run(run_dir):
         ensure(isinstance(summary.get(field), kind) and not isinstance(summary.get(field), bool), f"summary field {field}")
     ensure(summary["decision"] in DECISIONS, "decision value")
     text = (root / "report.md").read_text(encoding="utf-8")
-    sections = text.split("\n## ")[1:]
-    ensure([section.split("\n", 1)[0] for section in sections]
-           == [f"{number}. {title}" for number, title in enumerate(SECTION_TITLES, 1)], "report has the 13 sections")
+    sections = text.split("\n<summary>")[1:]
+    ensure([section.split("</summary>", 1)[0] for section in sections]
+           == [f"{number}. {title}" for number, title in enumerate(SECTION_TITLES, 1)], "report folds the 14 sections")
     for section in sections:
-        ensure(section.split("\n", 1)[1].strip(), f"empty section: {section[:20]}")
+        ensure(section.split("</summary>", 1)[1].split("</details>", 1)[0].strip(), f"empty section: {section[:20]}")
     head = sections[0]
     ensure("只证明接线" in head and "样本小，只作方向判断" in head, "first section warns about the fake backend and sample size")
     built = read_file(root / "report.json")
@@ -188,7 +188,7 @@ class RunShapeTests(unittest.TestCase):
         self.assertFalse({row["purpose"] for row in receipts} & {"generate", "rewrite"})
 
     def test_report_shows_replay_sizes_one_by_one(self):
-        section = (Shared.root / "report.md").read_text(encoding="utf-8").split("\n## 9.")[1].split("\n## 10.")[0]
+        section = (Shared.root / "report.md").read_text(encoding="utf-8").split("\n<summary>9.")[1].split("\n<summary>10.")[0]
         self.assertIn("回放", section)
         self.assertIn("生成调用 0 次", section)
         self.assertIn("5 个 agent：未评估（Insufficient recorded agents", section)
@@ -209,7 +209,7 @@ class RunShapeTests(unittest.TestCase):
         built = read_file(Shared.root / "report.json")
         comparison = built["exams"]["open_sample"]["comparisons"]["1"]
         self.assertEqual(set(comparison), {"same_ideas", "same_tokens"})
-        section = (Shared.root / "report.md").read_text(encoding="utf-8").split("\n## 9.")[1].split("\n## 10.")[0]
+        section = (Shared.root / "report.md").read_text(encoding="utf-8").split("\n<summary>9.")[1].split("\n<summary>10.")[0]
         self.assertIn("相同点子数", section)
         self.assertIn("相同 token", section)
         self.assertIn("粗估", section)
@@ -597,7 +597,8 @@ class HiddenFailureRowsTests(Workspace):
 
 
 class CrashRecoveryTests(Workspace):
-    """Pins what the README promises: reconciling a crashed call keeps the bill right and does not resume the work."""
+    """Pins what the README promises: reconciling a crashed call keeps the bill right, does not resume the work,
+    and leaves one recorded replacement as the way forward."""
 
     def setUp(self):
         super().setUp()
@@ -624,17 +625,45 @@ class CrashRecoveryTests(Workspace):
             self.run_unit(generation, grouping)
         return self.uncertain_key()
 
+    def replace(self):
+        return quiet(replace_unit.replace_unit, self.exam, self.config, self.root, failed_rep=1, new_rep=4, backend=self.generation,
+                     ledger=self.ledger, dedupe_config=self.classifier, dedupe_backend=self.grouping)
+
+    def assertReplaced(self, key, stage, events):
+        """The bill stays, the receipt matches it, the new unit finishes, and there is no second replacement."""
+        result = self.replace()
+        self.assertEqual((result["status"], result["stage"], result["failed_usd"] >= Decimal("0.01")), ("complete", stage, True))
+        after = read_rows(self.ledger.path)
+        self.assertEqual(after[:len(events)], events)
+        self.assertEqual(report.read_ledger(self.ledger.path)[key]["usd"], Decimal("0.01"))
+        self.assertTrue(report.reconcile(report.load_receipts(self.root), report.read_ledger(self.ledger.path))["ok"])
+        self.assertEqual(sheet.discover_units(self.root, "parts_sample", "cfg_plain"), [("cfg_plain", 4)])
+        with self.assertRaisesRegex(ValueError, "replaced"):
+            self.run_unit(self.generation, self.grouping)
+
     def test_settled_recording_call_stops_the_unit(self):
         key = self.crash(FakeBackend(failure="unknown"), self.grouping)
         self.ledger.settle(key, Decimal("0.01"))
         with self.assertRaisesRegex(ValueError, "Generation failed"):
             self.run_unit(self.generation, self.grouping)
+        self.assertReplaced(key, "recording", read_rows(self.ledger.path))
+
+    def test_settled_recording_call_is_replaceable_without_resuming_first(self):
+        key = self.crash(FakeBackend(failure="unknown"), self.grouping)
+        self.ledger.settle(key, Decimal("0.01"))
+        self.assertReplaced(key, "recording", read_rows(self.ledger.path))
 
     def test_settled_later_stage_call_keeps_refusing(self):
         key = self.crash(self.generation, FakeBackend(failure="unknown"))
         self.ledger.settle(key, Decimal("0.01"))
         with self.assertRaisesRegex(LedgerError, "already paid"):
             self.run_unit(self.generation, self.grouping)
+        self.assertReplaced(key, "grouping", read_rows(self.ledger.path))
+
+    def test_uncertain_call_cannot_be_replaced_before_it_is_reconciled(self):
+        self.crash(FakeBackend(failure="unknown"), self.grouping)
+        with self.assertRaisesRegex(ValueError, "Reconcile"):
+            self.replace()
 
     def test_released_call_resumes(self):
         key = self.crash(FakeBackend(failure="unknown"), self.grouping)
@@ -761,8 +790,7 @@ class ReadmeTests(unittest.TestCase):
         text = (ROOT / "evals/README.md").read_text(encoding="utf-8")
         for needle in ("e2e --fake", "--budget-usd", "exit code 3", "worst case", "evals/brainstorm/runs/", "Not Verified",
                        "title line", "--judge-config", "--decision-exams", "only proves the wiring", "replay",
-                       "bypass the page", "does not help", "agent session", "cannot be retried",
-                       "no recovery command", "Do not release a call"):
+                       "bypass the page", "agent session", "cannot be retried", "replace-unit", "Do not release a call"):
             self.assertIn(needle, text)
         self.assertNotIn("not an exam runner", text)
 

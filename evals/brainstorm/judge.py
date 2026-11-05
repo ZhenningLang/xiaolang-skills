@@ -113,6 +113,29 @@ def fake_judge(prompt, model, max_output_tokens):
     return dumps({'ranking': [{'item_id': row['item_id'], 'score': len(items) - i} for i, row in enumerate(items)]})
 
 
+def save_state(path, state):
+    encoded = dumps(state)
+    atomic_write(path / 'state.json', '{"digest":' + json.dumps(hashlib.sha256(encoded.encode()).hexdigest())
+                 + ',"state":' + encoded + '}\n')
+
+
+def export_state(path, state):
+    save_state(path, state)
+    for name in ('calls', 'failures'):
+        atomic_write(path / f'{name}.jsonl', ''.join(dumps(row) + '\n' for row in state[name]))
+    if state.get('result') is not None:
+        atomic_write(path / 'result.json', dumps(state['result']) + '\n')
+
+
+def sync_failed(output_dir, ledger):
+    """Bring a failed check's receipt up to the ledger without calling anything, once its unit is replaced."""
+    path = safe_output(output_dir, ('state.json', 'calls.jsonl', 'failures.jsonl', 'result.json', 'record.lock'))
+    with recording_lock(path):
+        state = read_state(path / 'state.json')
+        sync_call(state, next(iter(state['requests'])), ledger)
+        export_state(path, state)
+
+
 def evaluate(ideas, exam, output_dir, *, backend, ledger, model, mode='rank', max_output_tokens=2048):
     check_exam(exam)
     if mode not in ('rank', 'self', 'constraint'):
@@ -141,16 +164,8 @@ def evaluate(ideas, exam, output_dir, *, backend, ledger, model, mode='rank', ma
     identity = {'ideas': rows, 'exam': exam, 'model': model, 'mode': mode, 'backend': backend.name,
                 'ledger': str(ledger.path), 'max_output_tokens': max_output_tokens}
     with recording_lock(path):
-        def save():
-            encoded = dumps(state)
-            atomic_write(path / 'state.json', '{"digest":' + json.dumps(hashlib.sha256(encoded.encode()).hexdigest())
-                         + ',"state":' + encoded + '}\n')
-        def export():
-            save()
-            for name in ('calls', 'failures'):
-                atomic_write(path / f'{name}.jsonl', ''.join(dumps(row) + '\n' for row in state[name]))
-            if state.get('result') is not None:
-                atomic_write(path / 'result.json', dumps(state['result']) + '\n')
+        save = lambda: save_state(path, state)
+        export = lambda: export_state(path, state)
         if (path / 'state.json').exists():
             state = read_state(path / 'state.json')
             if dumps(state['identity']) != dumps(identity):

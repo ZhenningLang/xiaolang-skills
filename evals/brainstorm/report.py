@@ -4,6 +4,7 @@ from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
 from fractions import Fraction
+import html
 import json
 from pathlib import Path
 import re
@@ -13,11 +14,13 @@ from .backends import NotStarted, amount, exact_sum
 from .budget import BudgetLedger, atomic_write, cli_boundary, default_ledger_path
 from .config import DEFAULTS, LEVELS, load_config, validate_config
 from .exam import load_exams, safe_segment
+from . import replacements
 from .judge import evaluate, fake_judge, stage_backend
 from .metrics import compare_units, compute_unit, dumps as metric_dumps, load_unit, noise_line, save_metrics
 from .record import output_dir, read_file, read_rows
+from .replace_unit import describe as describe_replacement
 from .sheet import (KEY_NAME, MASK, MIN_UNIT_SAMPLE, check_conservation, check_issued, check_results, discover_units,
-                    load_ideas, load_issued, load_table, load_verdicts, scored)
+                    load_ideas, load_issued, load_table, load_verdicts, scored, unit_name)
 
 
 DEFAULT_COST_RATIO = "1.5"
@@ -37,6 +40,14 @@ MANUAL_SYMPTOMS = {"method_same_mechanism": ("换方法后机制仍然相同", "
 SYMPTOMS = {**AUTOMATIC_SYMPTOMS, **MANUAL_SYMPTOMS}
 CONTRIBUTION_NOTE = "贡献度只说明相关，不说明因果：它只数了计分的机制是否都经过某环节，没有真的去掉这个环节。"
 SAMPLE_NOTE = "样本小，只作方向判断。"
+DETAIL_TITLE = "明细（需要查原因时再看）"
+NOT_TESTED = "还没测"
+KEEP, TRY_REMOVING, REMOVABLE, NO_DATA = "留下", "试着去掉", "可以删", "没数据"
+LEVEL_WORDS = {"round1": "第一轮", "round2": "第二轮", "pressure1": "压力一级", "pressure2": "压力二级",
+               "pressure3": "压力三级", "pressure4": "压力四级"}
+SWITCH_WORDS = {"three_step": "三步法", "predict_peers": "预判同伴", "serial_visible": "串行可见",
+                "before_generation": "禁区放在生成前", "decomposition_timing": "拆解时机"}
+STAGE_WORDS = {"recording": "录制", "grouping": "去重分组", "constraint": "硬约束判定"}
 
 
 def exact(value):
@@ -125,7 +136,7 @@ def decide(exams, *, decision_exam_ids, policy, complexity):
     judgeable = [key for key in selected if key in public and public[key]["judgeable"]]
     result = {"known_injection_violations": known, "exams": public, "judgeable_exams": judgeable,
               "known_constraint_violations": known_violations(exams, "constraint", incomplete_only=True),
-              "decision_exams": selected, "warnings": []}
+              "decision_exams": selected, "warnings": [], "blockers": [], "constraint_rises": []}
 
     def finish(row, decision, preferred, reason):
         return {**result, "decision": decision, "preferred": preferred, "matched_row": row,
@@ -143,19 +154,27 @@ def decide(exams, *, decision_exam_ids, policy, complexity):
         else:
             blockers.extend(missing_evidence(row, configs))
     if blockers:
+        result["blockers"] = blockers
         return finish(1, "indeterminate", None, "；".join(blockers))
     if known:
         return finish(2, "reject", baseline, f"注入违规非零，共 {sum(row['violations'] for row in known)} 次")
 
     # Not applicable means no constraint exists to break. Unknown and partial counts were stopped by the first row.
-    violations = {config: sum(mean([entry["constraint"].get("violations") or 0 for entry in by_id[key]["guards"][config]])
-                              for key in selected) for config in configs}
+    per_exam = {key: {config: mean([entry["constraint"].get("violations") or 0 for entry in by_id[key]["guards"][config]])
+                      for config in configs} for key in selected}
+    violations = {config: sum(per_exam[key][config] for key in selected) for config in configs}
     costs = {config: sum(mean(by_id[key]["cost_usd"][config]) for key in selected) for config in configs}
     result["totals"] = {"constraint_violations": {key: as_decimal(value) for key, value in violations.items()},
                         "cost_usd": {key: as_decimal(value) for key, value in costs.items()},
                         "cost_ratio_limit": as_decimal(ratio)}
-    if violations[candidate] > violations[baseline]:
-        return finish(3, "reject", baseline, "硬约束违规增加")
+    # Exam by exam: a drop on one exam must not pay for a rise on another. Cost stays a total, below.
+    rises = [{"exam_id": key, "baseline": as_decimal(per_exam[key][baseline]), "candidate": as_decimal(per_exam[key][candidate])}
+             for key in selected if per_exam[key][candidate] > per_exam[key][baseline]]
+    result["constraint_rises"] = rises
+    if rises:
+        named = "；".join(f"{row['exam_id']}（{candidate} 平均 {text_value(row['candidate'])} 次，"
+                         f"{baseline} 平均 {text_value(row['baseline'])} 次）" for row in rises)
+        return finish(3, "reject", baseline, f"硬约束违规增加：{named}")
     # A zero baseline makes the ratio undefined: an equal zero is no rise, anything above it exceeds the limit.
     if costs[candidate] > (costs[baseline] * ratio):
         return finish(3, "reject", baseline, f"成本超过基线的 {as_decimal(ratio)} 倍")
@@ -216,16 +235,18 @@ def sheet_keys(root):
     return [(path.parent, read_file(path)) for path in sorted((Path(root) / "sheets").glob(f"*/{KEY_NAME}"))]
 
 
-def find_compare_sheet(root, exam_id, configs):
+def find_compare_sheet(root, exam_id, configs, retired=()):
     """Exactly one revealed comparison sheet over exactly the compared configs; never guess between several."""
     wanted = set(configs)
-    matches, unrevealed = [], 0
+    matches, unrevealed, outdated = [], 0, 0
     for path, key in sheet_keys(root):
         if key.get("exam_id") != exam_id or key.get("view") != "compare":
             continue
         if set(split_units(key.get("units", {}))) != wanted:
             continue
-        if is_revealed(path):
+        if set(key["units"]) & set(retired):
+            outdated += 1
+        elif is_revealed(path):
             matches.append(key)
         else:
             unrevealed += 1
@@ -233,6 +254,8 @@ def find_compare_sheet(root, exam_id, configs):
         return matches[0], None
     if matches:
         return None, f"有 {len(matches)} 张已还原的比较卷，不猜用哪张"
+    if outdated:
+        return None, f"有 {outdated} 张比较卷还算着已被替换的单元，要重新出一张"
     return None, f"没有已还原的比较卷（未还原 {unrevealed} 张）"
 
 
@@ -358,7 +381,7 @@ def contribution(config, ideas, table, verdicts, *, floor=DEFAULT_CONTRIBUTION_F
     groups, waiting = [], []
     for mechanism in table["mechanisms"]:
         verdict = verdicts.get(mechanism["mechanism_id"])
-        members = [ideas[key] for key in mechanism["idea_ids"] if ideas[key]["config"] == config["name"]]
+        members = [ideas[key] for key in mechanism["idea_ids"] if key in ideas and ideas[key]["config"] == config["name"]]
         if not members:
             continue
         if verdict is None:
@@ -664,13 +687,30 @@ def compact_comparison(comparison):
     return output
 
 
-def exam_report(root, exam, configs, *, baseline, candidate, seed, floor):
+def pair_evidence(root, exam_id, pair, verdicts, guards, spent, retired):
+    """What the acceptance table reads for one pair of configs on one exam."""
+    key, reason = find_compare_sheet(root, exam_id, pair, retired)
+    scores, warnings, per_unit = {}, [], None
+    if key is not None:
+        scoring = main_scores(key, verdicts)
+        warnings, per_unit = scoring["warnings"], scoring["per_unit"]
+        for name, values in split_units(scoring["units"]).items():
+            scores[name] = [values[rep] for rep in sorted(values)]
+    return {"exam_id": exam_id, "answers_present": key is not None, "answers_reason": reason,
+            "scores": scores, "guards": guards, "cost_usd": spent}, warnings, per_unit
+
+
+def exam_report(root, exam, configs, *, baseline, candidate, seed, floor, removals=()):
     exam_id = exam["id"]
     annotation_path = root / exam_id / "subproblems.json"
     annotation = read_file(annotation_path) if annotation_path.is_file() else None
     ideas = load_ideas(root, exam_id)
     table = load_table(root, exam_id, ideas) if (root / exam_id / "mechanisms.json").is_file() else None
     verdicts = load_verdicts(root, exam_id, table) if table is not None else {}
+    swaps = replacements.load(root, exam_id)
+    retired = {unit_name(row["config"], row["failed_rep"]) for row in swaps}
+    # Diagnostics read the same population as the score: a replaced unit is not part of either.
+    counted = {key: row for key, row in ideas.items() if unit_name(row["config"], row["rep"]) not in retired}
     units, failures, guards, spent = {}, [], {}, {}
     comparisons, datasets = {}, {}
     open_sheets = [path.name for path, key in sheet_keys(root)
@@ -687,27 +727,28 @@ def exam_report(root, exam, configs, *, baseline, candidate, seed, floor):
             failures.extend(failure_rows({"exam_id": exam_id, "config": name, "rep": rep}, data["ideas"],
                 table, data["fallback_ids"], result["exhaustion"],
                 generation_levels(config), annotation, completion=result["completion"]))
-    for rep in sorted({rep for name, rep in datasets if name == baseline} & {rep for name, rep in datasets if name == candidate}):
-        data, result = datasets[(baseline, rep)]
-        result["comparisons"] = compare_units(data, datasets[(candidate, rep)][0], seed=seed)
-        comparisons[rep] = compact_comparison(result["comparisons"])
+    slots = {name: {replacements.slot(swaps, name, rep): rep for unit, rep in datasets if unit == name} for name in (baseline, candidate)}
+    for slot in sorted(slots[baseline].keys() & slots[candidate].keys()):
+        first, second = slots[baseline][slot], slots[candidate][slot]
+        data, result = datasets[(baseline, first)]
+        result["comparisons"] = compare_units(data, datasets[(candidate, second)][0], seed=seed, replaced=first != second)
+        comparisons[slot] = compact_comparison(result["comparisons"])
     for _, result in datasets.values():
         save_metrics(root, result)
-    key, reason = find_compare_sheet(root, exam_id, (baseline, candidate))
-    scores, warnings = {}, []
-    if key is not None:
-        scoring = main_scores(key, verdicts)
-        warnings = scoring["warnings"]
-        for name, values in split_units(scoring["units"]).items():
-            scores[name] = [values[rep] for rep in sorted(values)]
+    evidence, warnings, per_unit = pair_evidence(root, exam_id, (baseline, candidate), verdicts, guards, spent, retired)
     if open_sheets:
         hide_idea_ids(failures)
-    return {"evidence": {"exam_id": exam_id, "answers_present": key is not None, "answers_reason": reason,
-                         "scores": scores, "guards": guards, "cost_usd": spent},
+    tested = {}
+    for parent, removed in removals:
+        pair = (parent, removed)
+        # Only this pair's guards: a violation in some other removal must not decide this one.
+        tested[removed] = pair_evidence(root, exam_id, pair, verdicts, {name: guards.get(name, []) for name in pair},
+                                        {name: spent.get(name, []) for name in pair}, retired)[0]
+    return {"evidence": evidence, "removal_evidence": tested, "per_unit": per_unit,
             "warnings": warnings, "units": units, "failures": failures, "comparisons": comparisons,
             # The classifier state is per exam, so every unit of the exam reports the same fallback list.
             "open_sheets": open_sheets, "fallback_ids": len(next(iter(datasets.values()))[0]["fallback_ids"]) if datasets else 0,
-            "contribution": {config["name"]: contribution(config, ideas, table, verdicts, floor=floor) for config in configs},
+            "contribution": {config["name"]: contribution(config, counted, table, verdicts, floor=floor) for config in configs},
             "want": want_summary(table, verdicts), "expansion": expansion(table, ideas, verdicts),
             "unjudged_count": len(table["mechanisms"]) - len(verdicts) if table else None,
             "counts": verify_counts(root, exam_id)}
@@ -765,7 +806,14 @@ def nothing(reason):
 
 
 def md_table(header, rows):
-    return [f"| {' | '.join(header)} |", f"|{':---|' * len(header)}", *(f"| {' | '.join(row)} |" for row in rows)]
+    cells = lambda row: " | ".join(str(cell).replace("|", "\\|") for cell in row)
+    return [f"| {cells(header)} |", f"|{':---|' * len(header)}", *(f"| {cells(row)} |" for row in rows)]
+
+
+def money(value):
+    """Exact, unlike text_value: a small real charge must not round away to nothing."""
+    text = format(Decimal(str(value)), "f")
+    return text.rstrip("0").rstrip(".") if "." in text else text
 
 
 def guard_text(guard):
@@ -826,9 +874,16 @@ def section_guards(report):
     lines = md_table(["题", "配置", "重复", "注入", "硬约束", "录制费用（美元）"], rows)
     totals = report["decision"].get("totals")
     if totals:
-        lines.extend(["", f"判定题汇总（各题各配置均值相加）：硬约束 {dict_text(totals['constraint_violations'])}；"
+        lines.extend(["", *constraint_lines(report["decision"]), f"判定题汇总（各题各配置均值相加，硬约束这项只作参考）：硬约束 {dict_text(totals['constraint_violations'])}；"
                           f"费用 {dict_text(totals['cost_usd'])}；费用上限是基线的 {text_value(totals['cost_ratio_limit'])} 倍（暂定）。",
                       "费用只含录制，不含去重、改写和约束判定：那些按题共用，分不到配置，见第 10 节。"])
+    return lines
+
+
+def constraint_lines(decision):
+    lines = ["硬约束按单题判定：任何一道判定题上，候选的违规均值高于基线就拒绝。"]
+    for row in decision["constraint_rises"]:
+        lines.append(f"- 硬约束变差的题：{row['exam_id']}，基线平均 {text_value(row['baseline'])} 次，候选平均 {text_value(row['candidate'])} 次。")
     return lines
 
 
@@ -949,7 +1004,10 @@ def section_metrics(report):
                 rows.append([name, *cells])
             lines.extend(["", f"**{exam_id} / {config}**", "", *md_table(["指标", *(f"重复 {rep}" for rep in sorted(reps))], rows)])
         for rep, comparison in sorted(entry["comparisons"].items()):
-            lines.extend(["", f"**{exam_id} 重复 {rep} 的两种比较口径**", ""])
+            stand_ins = [f"{row['config']} 用替换后的重复 {row['new_rep']}" for row in report.get("replacements", [])
+                         if row["exam_id"] == exam_id and str(row["failed_rep"]) == str(rep)]
+            note = f"（{'；'.join(stand_ins)}）" if stand_ins else ""
+            lines.extend(["", f"**{exam_id} 重复 {rep} 的两种比较口径{note}**", ""])
             for mode, label in (("same_ideas", "相同点子数"), ("same_tokens", "相同 token")):
                 row = comparison[mode]
                 if row["status"] != "ok":
@@ -1053,18 +1111,337 @@ def section_expansion(report):
     return lines or nothing("还没有作者判断")
 
 
+def stage_name(kind, value):
+    return {"level": lambda: LEVEL_WORDS[value], "return": lambda: "撞车退回", "method": lambda: f"方法 {value}",
+            "materials": lambda: "材料", "model": lambda: f"模型 {value}", "switch": lambda: SWITCH_WORDS[value]}[kind]()
+
+
+def removal_words(comparison):
+    """What a recorded leave-one comparison said, and the advice it settles. An undecided one settles nothing."""
+    if comparison["decision"] == "indeterminate":
+        return f"判断不了：{comparison['blockers'][0]}", None
+    if comparison["decision"] == "accept":
+        return "去掉后变好", REMOVABLE
+    if comparison["decision"] == "prefer_simpler":
+        return "去掉后没明显变化", REMOVABLE
+    words = {2: "对比里有注入违规", 3: "去掉后硬约束或成本变差"}.get(comparison["matched_row"], "去掉后变差")
+    return words, KEEP
+
+
+def stage_rows(report):
+    """One row per stage. The kept version's stages come first; a stage only the other version has follows, marked so."""
+    policy = report["policy"]
+    kept = report["decision"].get("preferred") or policy["baseline"]
+    other = next(name for name in (policy["baseline"], policy["candidate"]) if name != kept)
+    by_name = {config["name"]: config for config in report["configs"]}
+    floor = exact(policy["contribution_floor"])
+    rows, seen = [], set()
+    for name in (kept, other):
+        config = by_name[name]
+        entries = [(stage, kind, value) for stage, _, kind, value, _ in stages(config)]
+        entries += [(row["stage"], row["kind"], row["value"]) for row in unrecorded_switches(config)]
+        for stage, kind, value in entries:
+            if stage in seen:
+                continue
+            seen.add(stage)
+            found = [row for entry in report["exams"].values()
+                     for result in [entry["contribution"].get(name, {})] if result.get("status") == "ok"
+                     for row in result["stages"] if row["stage"] == stage]
+            numerator, denominator = sum(row["numerator"] for row in found), sum(row["denominator"] for row in found)
+            waiting, present = sum(row["unjudged"] for row in found), sum(row["present"] for row in found)
+            # Judged on the sum the row shows: a stage that helped on any exam is not suspect because another exam lacks it.
+            # The per-exam view stays in the leave-one section of the detail.
+            suspect = bool(denominator and present and not waiting and Fraction(numerator, denominator) <= floor)
+            needed = "算不了：血统没记录" if kind == "switch" else f"{numerator} / {denominator}" if denominator else "无数据"
+            if waiting:
+                needed += f"（另有 {waiting} 条没判）"
+            changes, blocked = drop_changes(config, kind, value)
+            removed = None if changes is None else f"{name}__drop_{stage}"
+            comparison = report["drop_comparisons"].get(removed)
+            result, advice = removal_words(comparison) if comparison else (NOT_TESTED, None)
+            if changes is None:
+                result = f"去不掉：{blocked}"
+            if advice is None:
+                has_data = denominator and present
+                if suspect:
+                    advice = KEEP if changes is None else TRY_REMOVING
+                elif has_data and Fraction(numerator, denominator) > floor:
+                    advice = KEEP
+                else:
+                    advice = NO_DATA
+            rows.append({"stage": stage, "config": name, "kind": kind, "value": value, "drop_config": removed,
+                         "name": stage_name(kind, value) + ("" if name == kept else f"（`{name}` 才有）"),
+                         "needed": needed, "removal_result": result, "advice": advice, "present": present,
+                         "denominator": denominator, "waiting": waiting, "kept": name == kept,
+                         "suspect_exams": sum(row["suspect"] for row in found), "stuck": suspect and changes is None})
+    return rows
+
+
+def section_stage_table(report):
+    rows = report["stage_table"]
+    kept = report["decision"].get("preferred") or report["policy"]["baseline"]
+    return [f"按留下的版本 `{kept}` 列出。留下 = 有计分点子必须经过它；试着去掉 = 没有计分点子必须经过它，但还没跑对比；"
+            "可以删 = 跑过对比，去掉后没变差；没数据 = 还没有能看的判断。",
+            "", *md_table(["环节", "计分点子里有多少必须经过它", "去掉后对比结果", "建议"],
+                          [[row["name"], row["needed"], row["removal_result"], row["advice"]] for row in rows])]
+
+
+def conclusion_line(report):
+    decision = report["decision"]
+    preferred, verdict, matched = decision["preferred"], decision["decision"], decision["matched_row"]
+    if verdict == "accept":
+        return f"结论：这次改动有用，留 `{preferred}`。多数判定题的分数提升超过了重复之间的波动。"
+    if verdict == "reject":
+        why = {2: "出现了注入违规", 3: decision["reason"]}.get(matched, "多数判定题的分数下降超过了重复之间的波动")
+        return f"结论：这次改动不能留，留 `{preferred}`。原因：{why}。"
+    if verdict == "prefer_simpler":
+        if preferred is None:
+            return "结论：没看出这次改动明显变好或变坏，但配置里没写复杂度，选不出该留哪个。"
+        return f"结论：没看出这次改动明显变好或变坏，留更简单的 `{preferred}`。"
+    blockers = decision["blockers"]
+    more = f"（还有 {len(blockers) - 1} 条，见明细第 1 节）" if len(blockers) > 1 else ""
+    return f"结论：还判断不了这次改动有没有用，先别换版本。原因：{blockers[0]}{more}。"
+
+
+def next_step_line(report):
+    rows = report["stage_table"]
+    # Order: stages already shown removable come first because no further run is needed; then the kept version's,
+    # since that is what gets edited; then stages suspect on more exams; then more ideas spent, as removing those
+    # saves the most. The stage id breaks ties so the order never changes between runs.
+    order = lambda row: (row["advice"] != REMOVABLE, not row["kept"], -row["suspect_exams"], -row["present"], row["stage"])
+    actionable = sorted((row for row in rows if row["advice"] in (REMOVABLE, TRY_REMOVING)), key=order)
+    picked, parts = actionable[:3], []
+    for row in picked:
+        plain = stage_name(row["kind"], row["value"])
+        parts.append(f"{plain}可以删（配置 `{row['drop_config']}`，对比已跑过）" if row["advice"] == REMOVABLE
+                     else f"试着去掉{plain}（用配置 `{row['drop_config']}` 跑对比）")
+    if picked:
+        more = f"，还有 {len(actionable) - 3} 个见环节表" if len(actionable) > 3 else ""
+        note = "这只是相关，要跑对比才算数。" if any(row["advice"] == TRY_REMOVING for row in picked) else ""
+        return f"下一步：{'；'.join(parts)}{more}。完整配置在 report.json。{note}"
+    stuck = [row for row in rows if row["stuck"]]
+    if stuck:
+        return f"下一步：只有{stage_name(stuck[0]['kind'], stuck[0]['value'])}可疑，但它去不掉，没有能跑的对比。"
+    if not any(row["denominator"] for row in rows):
+        return "下一步：还没有作者判断或计分的点子，没有数据，说不出该去掉哪个环节。"
+    waiting = "还有环节没判完，判完再看。" if any(row["waiting"] for row in rows) else ""
+    return f"下一步：现在没有可疑环节，不用去掉什么。{waiting}"
+
+
+def trust_line(report):
+    notes = []
+    if "fake" in report["costs"]["backends"]:
+        notes.append("这次用假后端，判定只证明流程接通了，不是真结论。")
+    sizes = [entry["per_unit"] for entry in report["exams"].values() if entry.get("per_unit") is not None]
+    if sizes and min(sizes) < MIN_UNIT_SAMPLE:
+        notes.append(f"样本小：每个单元最少只有 {min(sizes)} 条，只能看方向。")
+    if report["unrevealed_sheets"]:
+        notes.append(f"还有 {report['unrevealed_sheets']} 张卷子没还原，结论可能变。")
+    if report["self_check"]["warning"]:
+        notes.append(f"规则自检有警告：{report['self_check']['warning']}。")
+    unfinished = sum(result["completion"]["status"] != "ok" for entry in report["exams"].values()
+                     for reps in entry["units"].values() for result in reps.values())
+    if unfinished:
+        notes.append(f"有 {unfinished} 个单元失败或没跑完，判定不完整。")
+    if not report["receipts"]["ok"]:
+        notes.append("收据和账本对不上，费用不可信。")
+    return "能信多少：" + ("".join(notes) or "没发现影响结论的问题。")
+
+
+def replacement_sentence(row):
+    head = f"题 {row['exam_id']} 配置 `{row['config']}` 的第 {row['failed_rep']} 次重复失败，换成第 {row['new_rep']} 次"
+    money_text = f"失败那次花了 {money(row['failed_usd'])} 美元，替换那次花了 {money(row['new_usd'])} 美元"
+    status = {"complete": "", "failed": "；替换也失败了，不能再替换，要人来决定", "unfinished": "；替换还没跑完"}[row["status"]]
+    return f"{head}；{money_text}{status}。"
+
+
+def summary_lines(report):
+    """Five lines at most, for someone who has never seen the code. Config names stay: they are what to run."""
+    lines = [conclusion_line(report), next_step_line(report), trust_line(report)]
+    if report["replacements"]:
+        lines.append("替换：" + "".join(replacement_sentence(row) for row in report["replacements"]))
+    return lines
+
+
+def section_replacements(report):
+    if not report["replacements"]:
+        return ["没有单元被替换。"]
+    lines = ["失败单元的文件和费用都保留，账本不删不改。它的费用只算在总账里，不进判定的成本比较。"]
+    for row in report["replacements"]:
+        cause = STAGE_WORDS[row["stage"]]
+        lines.append(f"- {replacement_sentence(row)}失败环节：{cause}。")
+        if row["ungrouped_ideas"]:
+            lines.append(f"  - 失败单元有 {row['ungrouped_ideas']} 条点子没分组，留在磁盘上，不进卷子。")
+        if row["reason"]:
+            lines.append(f"  - 作者写的原因：{row['reason']}")
+    return lines
+
+
 SECTIONS = (("判定", section_decision), ("主分和噪声线", section_scores), ("护栏和成本", section_guards),
             ("贡献度", section_contribution), ("留一对照", section_leave_one), ("失败账本", section_failures),
             ("计分规则自检", section_self_check), ("想试比例和计了分但不想试", section_want),
             ("机器指标和两种比较口径", section_metrics), ("费用", section_costs), ("条数核对", section_counts),
-            ("校准", section_calibration), ("被合并的说法", section_expansion))
+            ("校准", section_calibration), ("被合并的说法", section_expansion), ("单元替换", section_replacements))
+
+
+def labelled(line):
+    """Bold the label a summary line opens with."""
+    label, rest = line.split("：", 1)
+    return f"**{label}：**{rest}"
+
+
+def report_parts(report):
+    return ("头脑风暴评测报告", [labelled(line) for line in report["summary"]], section_stage_table(report),
+            [(f"{number}. {title}", render(report)) for number, (title, render) in enumerate(SECTIONS, 1)])
+
+
+def fold_markdown(title, body):
+    """Stored text cannot open or close a fold, or reach a Markdown viewer as live HTML."""
+    text = "\n".join(body).replace("<", "&lt;")
+    return f"<details>\n<summary>{title}</summary>\n\n{text}\n\n</details>\n"
 
 
 def render_markdown(report):
-    lines = ["# 头脑风暴评测报告"]
-    for number, (title, render) in enumerate(SECTIONS, 1):
-        lines.extend(["", f"## {number}. {title}", "", *render(report)])
-    return "\n".join(lines) + "\n"
+    title, summary, table, details = report_parts(report)
+    lines = [f"# {title}", "", "## 先看这里", "", *(f"- {line}" for line in summary), "", "## 环节表", "", *table,
+             "", f"## {DETAIL_TITLE}", ""]
+    return "\n".join(lines) + "\n" + "\n".join(fold_markdown(*part) for part in details)
+
+
+ADVICE_CLASSES = {KEEP: "keep", TRY_REMOVING: "try", REMOVABLE: "remove", NO_DATA: "none"}
+PAGE_STYLE = """
+:root { color-scheme: light dark; --bg: #faf9f6; --panel: #ffffff; --ink: #1f2328; --muted: #59616b; --line: #d8d6cf;
+  --code: #efede7; --keep: #1c6b3c; --keep-bg: #e0f1e6; --try: #875400; --try-bg: #fbeed2;
+  --remove: #a12d24; --remove-bg: #fae3e0; --none: #59616b; --none-bg: #ececea; }
+@media (prefers-color-scheme: dark) { :root { --bg: #16181b; --panel: #1f2226; --ink: #e8e6e1; --muted: #a4abb3; --line: #3a3f45;
+  --code: #2c3036; --keep: #8fd9aa; --keep-bg: #1b3526; --try: #f0c674; --try-bg: #3b2f14;
+  --remove: #f3a79f; --remove-bg: #421f1b; --none: #b4bac1; --none-bg: #2c3036; } }
+* { box-sizing: border-box; }
+body { margin: 0 auto; max-width: 62rem; padding: 2rem 1rem 4rem; background: var(--bg); color: var(--ink);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
+h1 { font-size: 1.5rem; margin: 0 0 1.25rem; }
+h2 { font-size: 1.15rem; margin: 2.25rem 0 .75rem; }
+p { margin: .5rem 0; overflow-wrap: anywhere; }
+code { background: var(--code); border-radius: 4px; padding: .05em .35em; font: .9em ui-monospace, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+ul { margin: .5rem 0; padding-left: 1.25rem; }
+li { margin: .3rem 0; overflow-wrap: anywhere; }
+li.sub { margin-left: 1.25rem; color: var(--muted); }
+.first { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .5rem 1.25rem; }
+.first h2 { margin-top: .75rem; }
+.first ul { list-style: none; padding: 0; }
+.first li { margin: .75rem 0; }
+.scroll { overflow-x: auto; margin: .75rem 0; }
+table { border-collapse: collapse; width: 100%; background: var(--panel); font-size: .95em; }
+th, td { border: 1px solid var(--line); padding: .45rem .65rem; text-align: left; vertical-align: top; }
+th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+.tag { display: inline-block; border-radius: 4px; padding: 0 .5em; font-weight: 600; white-space: nowrap; }
+.tag.keep { color: var(--keep); background: var(--keep-bg); }
+.tag.try { color: var(--try); background: var(--try-bg); }
+.tag.remove { color: var(--remove); background: var(--remove-bg); }
+.tag.none { color: var(--none); background: var(--none-bg); }
+details { border-top: 1px solid var(--line); padding: .55rem 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; }
+details > :not(summary) { margin-left: 1rem; }
+"""
+
+
+def inline_html(text):
+    """Escape first, so stored text can only ever become text. The two marks added afterwards hold no attributes."""
+    parts = re.split(r"(`[^`]+`)", html.escape(text, quote=True))
+    return "".join(f"<code>{part[1:-1]}</code>" if part.startswith("`") and len(part) > 2 and part.endswith("`")
+                   else re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", part) for part in parts)
+
+
+def table_html(rows):
+    """Rows as md_table wrote them, where a pipe inside a cell is backslash-escaped."""
+    split = lambda line: [cell.strip().replace("\\|", "|") for cell in re.split(r"(?<!\\)\|", line.strip()[1:-1])]
+    head = "".join(f"<th>{inline_html(cell)}</th>" for cell in split(rows[0]))
+    def cell(value):
+        kind = ADVICE_CLASSES.get(value)
+        return f'<td><span class="tag {kind}">{inline_html(value)}</span></td>' if kind else f"<td>{inline_html(value)}</td>"
+    body = "".join("<tr>" + "".join(map(cell, split(row))) + "</tr>\n" for row in rows[2:])
+    return f'<div class="scroll"><table><thead><tr>{head}</tr></thead>\n<tbody>\n{body}</tbody></table></div>'
+
+
+def blocks_html(lines):
+    output, index = [], 0
+    lines = "\n".join(lines).split("\n")
+    while index < len(lines):
+        line = lines[index]
+        if line.startswith("|"):
+            end = index
+            while end < len(lines) and lines[end].startswith("|"):
+                end += 1
+            output.append(table_html(lines[index:end]))
+            index = end
+        elif line.startswith(("- ", "  - ")):
+            items = []
+            while index < len(lines) and lines[index].startswith(("- ", "  - ")):
+                nested = lines[index].startswith("  - ")
+                items.append(f"<li{' class=\"sub\"' if nested else ''}>{inline_html(lines[index].lstrip()[2:])}</li>")
+                index += 1
+            output.append("<ul>" + "".join(items) + "</ul>")
+        else:
+            if line.strip():
+                output.append(f"<p>{inline_html(line)}</p>")
+            index += 1
+    return "\n".join(output)
+
+
+def render_html(title, summary, table, details):
+    folded = "\n".join(f"<details>\n<summary>{inline_html(name)}</summary>\n{blocks_html(body)}\n</details>" for name, body in details)
+    bullets = "".join(f"<li>{inline_html(line)}</li>" for line in summary)
+    # The policy backs up the escaping: even a slip here cannot load or run anything.
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>{inline_html(title)}</title>
+<style>{PAGE_STYLE}</style>
+</head>
+<body>
+<h1>{inline_html(title)}</h1>
+<section class="first">
+<h2>先看这里</h2>
+<ul>{bullets}</ul>
+</section>
+<section>
+<h2>环节表</h2>
+{blocks_html(table)}
+</section>
+<section>
+<h2>{DETAIL_TITLE}</h2>
+{folded}
+</section>
+</body>
+</html>
+"""
+
+
+def render_report_html(report):
+    return render_html(*report_parts(report))
+
+
+def removal_pairs(configs):
+    """Leave-one configs among the supplied ones, recognised by the name the report told the author to use."""
+    names = {config["name"] for config in configs}
+    return [(config["name"], f"{config['name']}__drop_{stage}") for config in configs
+            for stage in [entry[0] for entry in stages(config)] + [row["stage"] for row in unrecorded_switches(config)]
+            if f"{config['name']}__drop_{stage}" in names]
+
+
+def removal_decisions(removals, tested, decision_exam_ids, policy):
+    """The same acceptance table per removal. Removing a stage is simpler by construction, whatever complexity was copied."""
+    output = {}
+    for parent, removed in removals:
+        result = decide([entry[removed] for entry in tested.values()], decision_exam_ids=decision_exam_ids,
+                        policy={"baseline": parent, "candidate": removed, "cost_ratio": policy["cost_ratio"]},
+                        complexity={parent: 1, removed: 0})
+        output[removed] = {key: result[key] for key in ("decision", "preferred", "matched_row", "reason", "blockers")}
+    return output
 
 
 def build_report(run_dir, exams, configs, *, baseline, candidate, decision_exam_ids, seed=0, ledger_path=None,
@@ -1078,8 +1455,10 @@ def build_report(run_dir, exams, configs, *, baseline, candidate, decision_exam_
     policy = {"baseline": baseline, "candidate": candidate, "cost_ratio": amount(cost_ratio),
               "check_bad_ratio": amount(check_bad_ratio), "contribution_floor": amount(contribution_floor)}
     selected = [exam for exam in exams if (root / exam["id"]).is_dir()]
+    removals = removal_pairs(configs)
     per_exam = {exam["id"]: exam_report(root, exam, configs, baseline=baseline, candidate=candidate, seed=seed,
-                                        floor=contribution_floor) for exam in selected}
+                                        floor=contribution_floor, removals=removals) for exam in selected}
+    tested = {entry_id: entry.pop("removal_evidence") for entry_id, entry in per_exam.items()}
     decision = decide([entry["evidence"] for entry in per_exam.values()], decision_exam_ids=decision_exam_ids,
                       policy=policy, complexity={config["name"]: config.get("complexity") for config in configs})
     receipts = load_receipts(root)
@@ -1098,15 +1477,21 @@ def build_report(run_dir, exams, configs, *, baseline, candidate, decision_exam_
               "self_check": rule_self_check(self_check_results(root), check_bad_ratio),
               "costs": costs, "receipts": check, "calibration": calibration, "replay": replay_rows(root, set(per_exam)),
               "unrevealed_sheets": sum(not is_revealed(path) for path, _ in sheet_keys(root)),
-              "warnings": [f"{exam_id}：{text}" for exam_id, entry in per_exam.items() for text in entry["warnings"]]}
+              "warnings": [f"{exam_id}：{text}" for exam_id, entry in per_exam.items() for text in entry["warnings"]],
+              "drop_comparisons": removal_decisions(removals, tested, decision_exam_ids, policy),
+              "replacements": [describe_replacement(root, row, events) for exam_id in per_exam
+                               for row in replacements.load(root, exam_id)]}
     report["warnings"].extend(f"{exam_id}：有机制不在全量卷里，还没判：{'、'.join(entry['counts']['new_after_issue'])}"
                               for exam_id, entry in per_exam.items() if entry["counts"]["new_after_issue"])
     if report["self_check"]["warning"]:
         report["warnings"].append(report["self_check"]["warning"])
     if not check["ok"]:
         report["warnings"].append("收据和账本对不上，见第 10 节")
+    report["stage_table"] = stage_rows(report)
+    report["summary"] = summary_lines(report)
     atomic_write(root / "report.json", metric_dumps(json_ready(report)) + "\n")
     atomic_write(root / "report.md", render_markdown(report))
+    atomic_write(root / "report.html", render_report_html(report))
     return report
 
 

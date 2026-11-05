@@ -378,7 +378,7 @@ def comparison_calls(data, seed):
     return calls
 
 
-def compare_units(a, b, *, seed, idea_count=None, token_cap=None):
+def compare_units(a, b, *, seed, idea_count=None, token_cap=None, replaced=False):
     if type(seed) is not int:
         raise ValueError('Comparison seed must be an integer')
     if idea_count is not None:
@@ -398,7 +398,8 @@ def compare_units(a, b, *, seed, idea_count=None, token_cap=None):
             if len(units) != 1:
                 raise ValueError('Comparison sides must each contain one complete unit')
             identity.append(next(iter(units)))
-    if len(identity) == 2 and (identity[0][0] != identity[1][0] or identity[0][2] != identity[1][2]
+    # A replacement takes the place of the unit it replaced, so that one pair may hold different repetition numbers.
+    if len(identity) == 2 and (identity[0][0] != identity[1][0] or (identity[0][2] != identity[1][2] and not replaced)
                                 or identity[0][1] == identity[1][1]):
         raise ValueError('Compare different configs of the same exam and rep')
     ordered = {key: comparison_calls(data, seed) for key, data in sides.items()}

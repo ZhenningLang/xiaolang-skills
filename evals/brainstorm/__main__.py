@@ -2,7 +2,7 @@
 
 import argparse
 
-from . import budget, dedupe, e2e, exam, loop, metrics, record, replay, report, serve, sheet
+from . import budget, dedupe, e2e, exam, loop, metrics, record, replace_unit, replay, report, serve, sheet
 
 
 def main():
@@ -13,6 +13,7 @@ def main():
     record.register(subparsers)
     dedupe.register(subparsers)
     loop.register(subparsers)
+    replace_unit.register(subparsers)
     metrics.register(subparsers)
     replay.register(subparsers)
     sheet.register(subparsers)
