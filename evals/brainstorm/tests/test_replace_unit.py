@@ -187,6 +187,10 @@ class OnceOnlyTests(Flow):
         self.assertEqual((fresh.calls, grouping.calls, self.events()), (0, 0, before))
         status = replace_unit.unit_status(self.root, self.exam["id"], "cfg_return", 4, replace_unit.last_events(self.ledger.path))
         self.assertEqual((status["state"], status["stage"]), ("failed", "grouping"))
+        # The normal loop entry must refuse it too, before any call.
+        with self.assertRaisesRegex(ValueError, "replacement that failed"):
+            self.run_unit(self.returned, 4, generation=fresh, grouping=grouping)
+        self.assertEqual((fresh.calls, grouping.calls, self.events()), (0, 0, before))
 
     def test_original_grouping_failure_is_billed_to_the_failed_unit(self):
         before_failure = Decimal(self.ledger.status()["used"])

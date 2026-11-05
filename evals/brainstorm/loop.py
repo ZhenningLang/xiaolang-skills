@@ -202,6 +202,17 @@ def loop_identity(exam, config, seed, rep, ledger, backend, dedupe_config, dedup
             "dedupe_config": record.digest(effective(dedupe_config)), "dedupe_backend": dedupe_backend.name}
 
 
+def refuse_if_failed_replacement(run_dir, exam_id, config_name, rep, ledger):
+    """A replacement that failed is final on every entry, not only on replace-unit."""
+    if rep not in replacements.new_reps(replacements.load(run_dir, exam_id), config_name):
+        return
+    from . import replace_unit  # replace_unit imports this module
+    status = replace_unit.unit_status(run_dir, exam_id, config_name, rep, replace_unit.last_events(ledger.path))
+    if status["state"] == "failed":
+        raise ValueError(f"{exam_id}/{config_name} rep {rep} is a replacement that failed at {status['stage']}; "
+                         "it keeps its files and cost but cannot run again. Stop and report")
+
+
 def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, dedupe_backend, rep=1):
     """Run one exam/configuration/repetition using one fixed authoritative classifier."""
     if type(seed) is not int:
@@ -213,6 +224,7 @@ def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, ded
     identity = loop_identity(exam, config, seed, rep, ledger, backend, dedupe_config, dedupe_backend)
     path = record.output_dir(run_dir, exam["id"], config["name"], rep)
     replacements.refuse_if_retired(run_dir, exam["id"], config["name"], rep)
+    refuse_if_failed_replacement(run_dir, exam["id"], config["name"], rep, ledger)
     path.mkdir(parents=True, exist_ok=True)
     # ceiling: serialize one unit across model calls; split reservations only if unit parallelism is needed.
     with (path / "loop.lock").open("a+b") as lock:
