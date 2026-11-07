@@ -237,9 +237,11 @@ def unit_mechanisms(table, ideas, unit, *, include_baseline):
                    and (include_baseline or ideas[key]["level"] != "baseline") for key in row["idea_ids"])}
 
 
-def select_compare(table, ideas, units, verdicts, *, seed, count, per_unit):
-    """All units share one priority order, so each sample is a uniform subset with maximal overlap."""
-    members = {unit: unit_mechanisms(table, ideas, unit, include_baseline=False) for unit in units}
+def select_compare(table, ideas, units, verdicts, *, seed, count, per_unit, include_baseline=False):
+    """All units share one priority order, so each sample is a uniform subset with maximal overlap.
+
+    include_baseline scores everything a unit produced: a direct-to-model config has nothing past its baseline."""
+    members = {unit: unit_mechanisms(table, ideas, unit, include_baseline=include_baseline) for unit in units}
     priority = sorted(row["mechanism_id"] for row in table["mechanisms"])
     random.Random(f"{seed}:priority").shuffle(priority)
     ranked = {unit: [key for key in priority if key in members[unit]] for unit in units}
@@ -464,7 +466,7 @@ def target_slots(table, ideas, presented, *, seed, all_view, repeats):
 
 
 def make_sheet(run_dir, exam, *, kind, sheet_id, seed, all_view=False, configs=None, count=None, per_unit=None,
-               check_samples=3, repeats=2, backend=None, ledger=None, model=None,
+               check_samples=3, repeats=2, backend=None, ledger=None, model=None, include_baseline=False,
                rewrite_batch=10, rewrite_attempt=1, max_output_tokens=2048):
     if kind not in ("score", "group"):
         raise ValueError("kind must be score or group")
@@ -493,10 +495,11 @@ def make_sheet(run_dir, exam, *, kind, sheet_id, seed, all_view=False, configs=N
         else:
             sheet = score_plan(run_dir, exam, ideas, sheet_id=sheet_id, seed=seed, all_view=all_view, configs=configs,
                                count=DEFAULT_COMPARE_COUNT if count is None else count, per_unit=per_unit, check_samples=check_samples,
-                               repeats=repeats, warnings=warnings)
+                               repeats=repeats, warnings=warnings, include_baseline=include_baseline)
         identity = {"kind": kind, "exam_id": exam_id, "seed": seed, "view": sheet["view"], "configs": configs,
                     "count": count, "per_unit": per_unit, "check_samples": check_samples, "repeats": repeats,
-                    "sources": digest([sorted(ideas), sheet["source_digest"]])}
+                    "sources": digest([sorted(ideas), sheet["source_digest"]]),
+                    **({"include_baseline": True} if include_baseline else {})}
         slots = sheet["slots"]
         patterns = term_patterns(terms)
         # Shown as written: the same text sits above every item, so it cannot tell one item's source from another's.
@@ -564,7 +567,8 @@ def group_plan(ideas, *, seed, count, warnings):
                        "reused": 0, "check_bad": 0, "repeat": 0}}
 
 
-def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count, per_unit, check_samples, repeats, warnings):
+def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count, per_unit, check_samples, repeats, warnings,
+               include_baseline=False):
     exam_id = exam["id"]
     table = load_table(run_dir, exam_id, ideas)
     verdicts = load_verdicts(run_dir, exam_id, table)
@@ -572,8 +576,8 @@ def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count
     if other is not None:
         raise ValueError(f"Sheet {other} for this exam has not been revealed yet")
     if all_view:
-        if configs or per_unit is not None:
-            raise ValueError("--all shows everything; it takes no --configs or --per-unit")
+        if configs or per_unit is not None or include_baseline:
+            raise ValueError("--all shows everything; it takes no --configs, --per-unit or --include-baseline")
         units = sorted({(row["config"], row["rep"]) for row in ideas.values()})
         members = {unit: unit_mechanisms(table, ideas, unit, include_baseline=True) for unit in units}
         assignment = {unit_name(*unit): sorted(members[unit]) for unit in units}
@@ -589,7 +593,8 @@ def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count
             completion = unit_completion(load_unit(run_dir, exam_id, *unit))
             if completion["status"] != "ok":
                 raise ValueError(f"Unit {unit_name(*unit)} is incomplete: {completion.get('reason')}")
-        k, assignment = select_compare(table, ideas, units, verdicts, seed=seed, count=count, per_unit=per_unit)
+        k, assignment = select_compare(table, ideas, units, verdicts, seed=seed, count=count, per_unit=per_unit,
+                                       include_baseline=include_baseline)
         if k < MIN_UNIT_SAMPLE:
             warnings.append(f"Each unit has only {k} items, below the {MIN_UNIT_SAMPLE} sample warning line")
         selected = sorted({key for rows in assignment.values() for key in rows})
@@ -615,6 +620,7 @@ def score_plan(run_dir, exam, ideas, *, sheet_id, seed, all_view, configs, count
                    for row in table["mechanisms"]}
     view = "all" if all_view else "compare"
     return {"view": view, "slots": slots, "selected": selected, "reused": reused, "units": assignment,
+            "include_baseline": include_baseline,
             "config_reps": config_reps,
             "source_digest": digest([table, sorted(verdicts)]),
             "counts": {"mechanisms_total": len(table["mechanisms"]), "selected_target": len(selected),
@@ -673,6 +679,7 @@ def issue(path, sheet, slots, texts, identity, *, exam, kind, sheet_id, seed, wa
                        "variants": slot["variants"]})
     check_conservation(sheet["view"], items, sheet["counts"], sheet["reused"])
     key = {"sheet_id": sheet_id, "kind": kind, "exam_id": exam_id, "seed": seed, "view": sheet["view"],
+           "include_baseline": sheet.get("include_baseline", False),
            "identity": fingerprint, "items": items, "reused": sheet["reused"], "units": sheet["units"],
            "counts": sheet["counts"]}
     record = issued_record(sheet, items, sheet_id=sheet_id, exam_id=exam_id)
@@ -969,7 +976,7 @@ def run_sheet(args):
         result = make_sheet(args.run_dir, exam, kind=args.kind, sheet_id=args.sheet_id, seed=args.seed, all_view=args.all,
                             configs=configs, count=args.count, per_unit=args.per_unit, check_samples=args.check_samples,
                             repeats=args.repeats, rewrite_batch=args.rewrite_batch, rewrite_attempt=args.rewrite_attempt,
-                            **options)
+                            include_baseline=args.include_baseline, **options)
     except NotStarted as exc:
         raise ValueError(f"Sheet stopped before provider startup: {exc}") from exc
     print(dumps(result))
@@ -988,6 +995,8 @@ def register(subparsers):
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--count", type=int, help=f"Default: {DEFAULT_COMPARE_COUNT} for comparison sheets, {DEFAULT_GROUP_COUNT} for group sheets")
     parser.add_argument("--per-unit", type=int)
+    parser.add_argument("--include-baseline", action="store_true",
+                        help="Score every mechanism a unit produced, baseline included (needed for a direct-to-model config)")
     parser.add_argument("--check-samples", type=int, default=3)
     parser.add_argument("--repeats", type=int, default=2)
     parser.add_argument("--rewrite-batch", type=int, default=10)

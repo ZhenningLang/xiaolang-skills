@@ -159,6 +159,13 @@ class CompareSelectionTests(SheetCase):
         # m-004 exists in this unit only at baseline level, so it does not belong to the unit.
         self.assertNotIn("m-004", key["units"][f"{B}/rep-1"])
 
+    def test_include_baseline_scores_what_each_config_produced_in_total(self):
+        # A direct-to-model config has only baseline ideas; comparing it with a full flow needs both scored in full.
+        self.compare_sheet(per_unit=6, include_baseline=True)
+        key = key_of(self.run_dir, "s_cmp")
+        self.assertIn("m-004", {m for rows in key["units"].values() for m in rows} | set(key["units"][f"{B}/rep-1"]))
+        self.assertTrue(key["include_baseline"])
+
     def test_automatic_k_is_the_largest_within_count_and_warns_below_ten(self):
         result = self.compare_sheet(per_unit=None, count=8)
         key = key_of(self.run_dir, "s_cmp")
