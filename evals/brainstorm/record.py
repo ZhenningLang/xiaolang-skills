@@ -20,7 +20,7 @@ from .budget import (BudgetLedger, BudgetExceeded, LedgerError, PaidCallError, a
                      cli_boundary, default_ledger_path, dumps, guarded_call)
 from .config import LEVELS, load_config, positive_int
 from .exam import load_exams, read_json, read_jsonl, safe_segment, text_list
-from .prompts import generation_prompt
+from .prompts import generation_prompt, model_json
 from . import replacements
 
 
@@ -194,7 +194,7 @@ def export_outputs(path, state, exam):
 
 def parse_ideas(text, cards):
     try:
-        payload = json.loads(text)
+        payload = json.loads(model_json(text))
     except (ValueError, RecursionError) as exc:
         raise ValueError(f"Invalid generated JSON: {exc}") from exc
     if not isinstance(payload, dict) or set(payload) != {"ideas"} or not isinstance(payload["ideas"], list) or not payload["ideas"]:

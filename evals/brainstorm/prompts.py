@@ -2,8 +2,17 @@
 
 import hashlib
 import json
+import re
 
 from .config import LEVELS
+
+
+def model_json(text):
+    """A reply that is exactly one fenced block reads as its content; anything else is parsed as sent."""
+    lines = text.strip().split("\n")
+    if len(lines) >= 3 and re.fullmatch(r"```(?:json)?", lines[0].strip()) and lines[-1].strip() == "```":
+        return "\n".join(lines[1:-1])
+    return text
 
 
 def wrap_data(value):

@@ -14,7 +14,7 @@ from .config import positive_int
 from .dedupe import checked_ideas
 from .exam import safe_segment
 from .metrics import dumps, missing
-from .prompts import wrap_data
+from .prompts import model_json, wrap_data
 from .record import MeasuredBackend, digest, make_backend, recording_lock, sync_call
 
 
@@ -79,7 +79,7 @@ def parse_response(text, items, mode):
             value[key] = entry
         return value
     try:
-        data = json.loads(text, object_pairs_hook=unique_object)
+        data = json.loads(model_json(text), object_pairs_hook=unique_object)
         key = 'verdicts' if mode == 'constraint' else 'ranking'
         if not isinstance(data, dict) or set(data) != {key} or not isinstance(data[key], list):
             raise ValueError('Invalid response envelope')

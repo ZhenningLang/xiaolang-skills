@@ -15,7 +15,7 @@ from .budget import (BudgetLedger, LedgerError, PaidCallError, atomic_write, cli
                      default_ledger_path, dumps, guarded_call)
 from .config import load_config, positive_int
 from .exam import safe_segment
-from .prompts import wrap_data
+from .prompts import model_json, wrap_data
 from .record import (MeasuredBackend, digest, make_backend, read_file, read_rows,
                      recording_lock, sync_call, validate_idea)
 
@@ -149,7 +149,7 @@ def parse_partition(text, batch, table):
         return result
 
     try:
-        payload = json.loads(text, object_pairs_hook=unique_object)
+        payload = json.loads(model_json(text), object_pairs_hook=unique_object)
         if not isinstance(payload, dict) or set(payload) != {"groups"} or not isinstance(payload["groups"], list):
             raise ValueError("Expected a groups array")
         for row in payload["groups"]:

@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from evals.brainstorm.config import validate_config
@@ -124,3 +125,29 @@ class OutputLanguageTests(unittest.TestCase):
         # The grouping call never sees the question, so its labels follow the ideas' language instead.
         self.assertIn("same language as the ideas", dedupe.mechanism_prompt(batch, {"mechanisms": []}, {}))
         self.assertIn(self.RULE, sheet.rewrite_prompt("怎样？", [{"item": "r-0", "text": "正文"}]))
+
+
+class FencedReplyTests(unittest.TestCase):
+    """Real models sometimes wrap the whole JSON reply in one ``` block (2026-11-07 grouping call); every parser must read it."""
+
+    def fence(self, payload, tag="json"):
+        return f"```{tag}\n{json.dumps(payload, ensure_ascii=False)}\n```"
+
+    def test_every_model_reply_parser_reads_a_reply_that_is_one_fenced_block(self):
+        from evals.brainstorm import dedupe, judge, record, sheet
+        idea = {"title": "标题", "text": "正文", "cards_used": [], "decomposition": None}
+        for tag in ("json", ""):
+            self.assertEqual(record.parse_ideas(self.fence({"ideas": [idea]}, tag), []), [idea])
+        batch = [{"idea_id": "i-1", "title": "标题", "text": "正文"}]
+        reply = self.fence({"groups": [{"target": "new:a", "label": "机制", "idea_ids": ["i-1"]}]})
+        buckets, fallback, errors = dedupe.parse_partition(reply, batch, {"mechanisms": []})
+        self.assertEqual((errors, fallback, [b["idea_ids"] for b in buckets]), ([], [], [["i-1"]]))
+        self.assertEqual(sheet.parse_rewrites(self.fence({"rewrites": [{"item": "r-0", "text": "改写"}]}), ["r-0"]),
+                         {"r-0": "改写"})
+        self.assertNotIn("Invalid", str(judge.parse_response(self.fence({"verdicts": []}), [], "constraint")))
+
+    def test_text_outside_the_block_is_still_rejected(self):
+        from evals.brainstorm import record
+        idea = {"title": "标题", "text": "正文", "cards_used": [], "decomposition": None}
+        with self.assertRaises(ValueError):
+            record.parse_ideas("Here you go:\n" + self.fence({"ideas": [idea]}), [])

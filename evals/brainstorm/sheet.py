@@ -15,7 +15,7 @@ from .dedupe import checked_ideas, validate_table
 from .exam import load_exams, read_json, safe_segment
 from .judge import check_exam, safe_output, stage_backend
 from .metrics import load_unit, unit_completion
-from .prompts import wrap_data
+from .prompts import model_json, wrap_data
 from . import replacements
 from .record import MeasuredBackend, add_failure, digest, read_file, read_rows, recording_lock, sync_call
 
@@ -310,7 +310,7 @@ def fake_rewrite(prompt, model, max_output_tokens):
 
 def parse_rewrites(text, names):
     try:
-        data = json.loads(text, object_pairs_hook=unique_object)
+        data = json.loads(model_json(text), object_pairs_hook=unique_object)
         if not isinstance(data, dict) or set(data) != {"rewrites"} or not isinstance(data["rewrites"], list):
             raise ValueError("Invalid envelope")
         result = {}
