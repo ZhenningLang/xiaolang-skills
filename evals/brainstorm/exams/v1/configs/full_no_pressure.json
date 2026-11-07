@@ -19,7 +19,7 @@
     "round2"
   ],
   "max_batches": 1,
-  "max_output_tokens": 4096,
+  "max_output_tokens": 16000,
   "budget_usd": "50",
   "backend": {
     "kind": "claude",

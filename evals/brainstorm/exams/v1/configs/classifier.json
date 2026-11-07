@@ -1,7 +1,7 @@
 {
   "name": "classifier",
   "default_model": "claude-sonnet-5-5",
-  "max_output_tokens": 4096,
+  "max_output_tokens": 16000,
   "budget_usd": "50",
   "backend": {
     "kind": "claude",

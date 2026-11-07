@@ -78,9 +78,22 @@ class ClaudeTests(unittest.TestCase):
                 self.assertEqual(result.usd, Decimal("0.031"))
 
     @patch("evals.brainstorm.backends.subprocess.Popen")
+    def test_reply_cut_at_the_output_limit_is_a_paid_error(self, run):
+        # Real call, 2026-11-07: 5146 output tokens against a 4096 cap; the CLI continued and returned only the tail.
+        for updates in ({"usage": {"input_tokens": 1, "cache_creation_input_tokens": 2, "cache_read_input_tokens": 3,
+                                   "output_tokens": 5}}, {"num_turns": 2}):
+            with self.subTest(updates=updates):
+                run.return_value = self.response(**updates)
+                result = self.backend.call("p", "m", 5)
+                self.assertEqual(result.outcome, "paid_error")
+                self.assertEqual(result.usd, Decimal("0.031"))
+        run.return_value = self.response(num_turns=1)
+        self.assertEqual(self.backend.call("p", "m", 5).outcome, "ok")
+
+    @patch("evals.brainstorm.backends.subprocess.Popen")
     def test_missing_cost_is_not_zero(self, run):
         run.return_value = self.response(total_cost_usd=None)
-        self.assertIsNone(self.backend.call("p", "m", 1).usd)
+        self.assertIsNone(self.backend.call("p", "m", 100).usd)
 
     @patch("evals.brainstorm.backends.subprocess.Popen")
     def test_not_started_distinct_from_unknown(self, run):

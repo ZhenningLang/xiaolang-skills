@@ -180,6 +180,9 @@ class ClaudeCliBackend:
                 ("cache_read", "cache_read_input_tokens"), ("output", "output_tokens"))})
         except (ValueError, TypeError, KeyError):
             tokens, paid_error = {}, True
+        # At the cap the CLI continues on its own and returns only the last part, which can still parse.
+        if tokens.get("output", 0) >= max_output_tokens or payload.get("num_turns", 1) != 1:
+            paid_error = True
         if paid_error and usd is None:
             raise ResultUnknown("Failed model response has unknown billing")
         return CallResult(text=text, usd=usd, tokens=tokens,
