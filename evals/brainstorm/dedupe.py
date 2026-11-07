@@ -120,9 +120,10 @@ def export_outputs(path, state):
 
 
 def mechanism_prompt(batch, table, ideas):
+    # One representative per mechanism: sending every variant made each call grow with the whole run (2026-11-07 probe).
     visible = [{"mechanism_id": row["mechanism_id"], "label": row["label"],
-                "variants": [{key: ideas[item][key] for key in ("title", "text")}
-                             for item in row["idea_ids"]]} for row in table["mechanisms"]]
+                "example": {key: ideas[row["representative"]][key] for key in ("title", "text")}}
+               for row in table["mechanisms"]]
     return "\n".join([
         "Group ideas by mechanism: the actual way an idea works, not its wording. Only merge equivalent mechanisms.",
         'For example, "周六下午专场" and "周末青少年专属时段" describe the same mechanism.',
@@ -427,8 +428,7 @@ def fake_partition(prompt, model, max_output_tokens):
     lines = new_prompt.split("\n")
     new = json.loads("\n".join(lines[2:-1]))
     for row in existing:
-        for variant in row["variants"]:
-            existing_text[variant["text"]] = row["mechanism_id"]
+        existing_text[row["example"]["text"]] = row["mechanism_id"]
     for row in new:
         target = existing_text.get(row["text"])
         if target is None:

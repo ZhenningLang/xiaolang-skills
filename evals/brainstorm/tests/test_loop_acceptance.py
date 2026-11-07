@@ -17,7 +17,13 @@ from evals.brainstorm.config import validate_config
 from evals.brainstorm.dedupe import fake_partition
 from evals.brainstorm.exam import load_exams
 from evals.brainstorm.record import read_file, read_rows, record_batch
-from evals.brainstorm.tests.test_loop import response
+from evals.brainstorm.tests.test_loop import data_after, response
+
+
+def returned(prompt, text, **options):
+    """A bundled collision return answers once per original, in order."""
+    count = len(data_after(prompt, "Return exactly one replacement idea for each original, in the same order."))
+    return response(*[text] * count, **options)
 
 
 SAMPLES = Path(__file__).resolve().parents[1] / "exams/samples"
@@ -58,7 +64,7 @@ class LoopAcceptanceTests(unittest.TestCase):
         classifier = classifier or validate_config({"name": "fixed", "default_model": "classifier"})
         def generated(prompt, *_):
             if "Collision return:" in prompt:
-                return response("replacement")
+                return returned(prompt, "replacement")
             if "Generation level: baseline." in prompt:
                 return response("base")
             return response("base", "base")
@@ -105,10 +111,10 @@ class LoopAcceptanceTests(unittest.TestCase):
         reference = self.root / "reference"
         self.api(reference)
         expected = self.snapshot(reference)
-        # Before baseline generation, its grouping, ordinary generation and first rewrite.
+        # Before baseline generation, its grouping, ordinary generation, the bundled rewrite and its one grouping call.
         for limit, want_calls, want_stage in ((".01", 0, "generate"), (".02", 1, "dedupe"),
                                               (".07", 6, "generate"), (".08", 7, "dedupe"),
-                                              (".09", 8, "rewrite"), (".10", 9, "rewrite"), (".11", 10, "rewrite")):
+                                              (".09", 8, "rewrite"), (".10", 9, "rewrite")):
             with self.subTest(limit=limit):
                 root = self.root / ("budget_" + limit)
                 with self.assertRaises(BudgetExceeded):
@@ -202,7 +208,7 @@ class LoopAcceptanceTests(unittest.TestCase):
                 def generated(prompt, *_):
                     prompts.append(prompt)
                     if "Collision return:" in prompt:
-                        return response(name + "_REPLACEMENT", decomposition=[name + "_DIM"])
+                        return returned(prompt, name + "_REPLACEMENT", decomposition=[name + "_DIM"])
                     level = prompt.split("Generation level: ", 1)[1].split(".", 1)[0]
                     text = {"baseline": name + "_BASE", "round1": "A_ONLY" if name == "a" else "b_BASE",
                             "pressure3": name + "_LAST"}[level]
@@ -258,7 +264,7 @@ class LoopAcceptanceTests(unittest.TestCase):
         def generated(prompt, *_):
             prompts.append(prompt)
             if "Collision return:" in prompt:
-                return response("replacement")
+                return returned(prompt, "replacement")
             return response("last" if "Generation level: pressure1." in prompt else "base")
         def classified(prompt, *args):
             partition = json.loads(fake_partition(prompt, *args))
@@ -491,9 +497,11 @@ class LoopAcceptanceTests(unittest.TestCase):
     def test_second_agent_rewrite_budget_reports_one_pending_assignment(self):
         config = validate_config({"name": "unit", "default_model": "generator", "agents": 2,
                                   "return_collisions": True})
-        backend = FakeBackend(responses=lambda p, *_: response("replacement" if "Collision return:" in p else "base"))
+        backend = FakeBackend(responses=lambda p, *_: returned(p, "replacement") if "Collision return:" in p else response("base"))
+        # Each agent's return is its own call and both are grouped once afterwards, so the second agent's call is the one
+        # a .14 limit stops: .13 used plus its .02 reserve.
         with self.assertRaisesRegex(BudgetExceeded, "pending_agents=1;"):
-            self.api(self.root / "second_return", config=config, backend=backend, limit=".15")
+            self.api(self.root / "second_return", config=config, backend=backend, limit=".14")
 
     def test_pressure_two_and_four_resume_keep_frozen_assignments_and_charges(self):
         exam = {**load_exams(SAMPLES / "open")[0], "card_data": [
@@ -618,5 +626,5 @@ class LoopAcceptanceTests(unittest.TestCase):
                 with self.assertRaises(OSError):
                     self.api(root)
         self.api(root)
-        self.assertEqual(len([e for e in read_rows(root / "ledger") if e["event"] == "settle"]), 12)
+        self.assertEqual(len([e for e in read_rows(root / "ledger") if e["event"] == "settle"]), 10)
         self.assertEqual(read_rows(root / "open_sample/unit/rep-1/loop_batches.jsonl")[-1]["new_mechanisms"], 1)

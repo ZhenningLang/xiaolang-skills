@@ -78,15 +78,16 @@ class LoopTests(unittest.TestCase):
         self.assertEqual(self.ledger.status()["used"], before)
 
     def test_two_collisions_rewrite_once_with_original_agent_lineage(self):
+        # One agent's collided ideas go back in one call, and the whole level's returns are grouped once (cost, 2026-11-07).
         self.config.update(return_collisions=True)
-        self.run_loop([response("base")] * 3 + [response("base", "base"), response("base"), response("fresh")])
+        self.run_loop([response("base")] * 3 + [response("base", "base"), response("base", "fresh")])
         ideas = read_rows(self.unit / "ideas.jsonl")
         originals = [r for r in ideas if r["level"] == "round1" and not r["returned"]]
         children = [r for r in ideas if r["returned"]]
         self.assertEqual(len(originals), 2)
         self.assertEqual(len(children), 2)
-        self.assertEqual({r["returned_from"] for r in children}, {r["idea_id"] for r in originals})
-        self.assertEqual([r["purpose"] for r in read_rows(self.unit / "calls.jsonl")], ["generate"] * 4 + ["rewrite"] * 2)
+        self.assertEqual([r["returned_from"] for r in children], [r["idea_id"] for r in originals])
+        self.assertEqual([r["purpose"] for r in read_rows(self.unit / "calls.jsonl")], ["generate"] * 4 + ["rewrite"])
         for child in children:
             parent = next(r for r in originals if r["idea_id"] == child["returned_from"])
             for key in ("agent", "model", "method", "cards", "level"):
@@ -94,12 +95,19 @@ class LoopTests(unittest.TestCase):
             self.assertNotEqual(child["batch"], parent["batch"])
             self.assertNotEqual(child["call_key"], parent["call_key"])
         self.assertEqual(read_rows(self.unit / "loop_batches.jsonl")[-1]["new_mechanisms"], 1)
-        from evals.brainstorm.prompts import wrap_data
-        self.assertTrue(all(wrap_data({"title": "base", "text": "base"}) in p
-                            for p in self.prompts if "Collision return:" in p))
         rewrite_prompts = [p for p in self.prompts if "Collision return:" in p]
-        self.assertEqual(len(rewrite_prompts), 2)
+        self.assertEqual(len(rewrite_prompts), 1)
+        self.assertEqual(data_after(rewrite_prompts[0], "Return exactly one replacement idea for each original, in the same order."),
+                         [{"title": "base", "text": "base"}] * 2)
         self.assertTrue(all(data_after(p, "Avoid these already observed mechanisms:") for p in rewrite_prompts))
+        # Three baseline batches, the round-one batch, and one call for both returned ideas.
+        self.assertEqual(self.dedupe.calls, 5)
+
+    def test_a_bundled_return_with_the_wrong_number_of_ideas_is_a_parse_failure(self):
+        self.config.update(return_collisions=True)
+        with self.assertRaises(ValueError):
+            self.run_loop([response("base")] * 3 + [response("base", "base"), response("fresh"), response("fresh")])
+        self.assertFalse([r for r in read_rows(self.unit / "ideas.jsonl") if r["returned"]])
 
     def test_rewrites_preserve_diverse_lineage_and_original_context_at_every_level(self):
         levels = ["round1", "round2", "pressure1", "pressure2", "pressure3", "pressure4"]
@@ -112,8 +120,8 @@ class LoopTests(unittest.TestCase):
         def generated(prompt, *_):
             level = prompt.split("Generation level: ", 1)[1].split(".", 1)[0]
             if "Collision return:" in prompt:
-                original = data_after(prompt, "Return exactly one replacement idea for this original.")
-                return response("REPLACEMENT " + original["text"], decomposition=["child dimension"])
+                originals = data_after(prompt, "Return exactly one replacement idea for each original, in the same order.")
+                return response(*("REPLACEMENT " + row["text"] for row in originals), decomposition=["child dimension"])
             counters[level] = counters.get(level, 0) + 1
             return response(f"COLLIDE {level} {counters[level]}", decomposition=["dimension " + level])
         def classified(prompt, *_):
@@ -121,7 +129,7 @@ class LoopTests(unittest.TestCase):
             incoming = data_after(prompt, "New ideas:")
             def family(text):
                 return "COLLIDE" if text.startswith("COLLIDE ") else text
-            targets = {family(variant["text"]): row["mechanism_id"] for row in existing for variant in row["variants"]}
+            targets = {family(row["example"]["text"]): row["mechanism_id"] for row in existing}
             groups = {}
             for row in incoming:
                 key = family(row["text"])
@@ -152,8 +160,8 @@ class LoopTests(unittest.TestCase):
             self.assertEqual(calls[child["call_key"]]["purpose"], "rewrite")
             prompt = recording["batches"][f"{child['batch']}:{child['level']}"]["prompts"][str(child["agent"])]
             self.assertIn(f"Generation level: {parent['level']}.", prompt)
-            self.assertEqual(data_after(prompt, "Return exactly one replacement idea for this original."),
-                             {"title": parent["title"], "text": parent["text"]})
+            self.assertIn({"title": parent["title"], "text": parent["text"]},
+                          data_after(prompt, "Return exactly one replacement idea for each original, in the same order."))
             self.assertTrue(data_after(prompt, "Avoid these already observed mechanisms:"))
             if parent["level"] != "round1":
                 self.assertTrue(data_after(prompt, "Supplied decompositions:"))

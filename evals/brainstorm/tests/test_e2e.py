@@ -34,8 +34,8 @@ SECTION_TITLES = ("判定", "主分和噪声线", "护栏和成本", "贡献度"
 # If the fake scenario changes, work out a new set from the units in that run's comparison key.
 # The fake backend seeds on the whole prompt, so any prompt wording change reshuffles mechanism ids: re-pick
 # these so the candidate still wins clearly (search the score sheet's key["units"]; avoid repeat-check mechanisms).
-WINNERS = {"m-008", "m-013", "m-018", "m-020", "m-021"}
-ACCEPT_SCORES = {"cfg_plain": [2, 2, 1], "cfg_return": [3, 4, 3]}
+WINNERS = {"m-013", "m-015", "m-017", "m-018", "m-020", "m-022"}
+ACCEPT_SCORES = {"cfg_plain": [2, 2, 1], "cfg_return": [3, 3, 4]}
 
 
 def quiet(function, *args, **options):
@@ -565,7 +565,8 @@ class AcceptPathTests(Workspace):
         self.assertEqual(self.rebuild(self.copy())["matched_row"], 4)
 
     def test_cost_over_limit_turns_accept_into_reject(self):
-        decision = self.rebuild(self.copy(), cost_ratio="1.4")
+        # The candidate costs 0.16 against 0.12 (ratio 1.33) since returns are bundled; 1.3 sits just under it.
+        decision = self.rebuild(self.copy(), cost_ratio="1.3")
         self.assertEqual((decision["decision"], decision["matched_row"]), ("reject", 3), decision["reason"])
         self.assertIn("成本", decision["reason"])
 
@@ -579,7 +580,7 @@ class AcceptPathTests(Workspace):
     def test_cost_and_constraints_together_still_reject(self):
         target = self.copy()
         self.add_constraint_violation(target)
-        decision = self.rebuild(target, cost_ratio="1.4")
+        decision = self.rebuild(target, cost_ratio="1.3")
         self.assertEqual((decision["decision"], decision["matched_row"]), ("reject", 3), decision["reason"])
 
 

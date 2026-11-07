@@ -185,8 +185,9 @@ class DedupeTests(unittest.TestCase):
         self.run_dedupe(ideas=[next_row], backend=FakeBackend(responses=lambda p, *_: (
             captured.append(p) or response(group([next_row["idea_id"]], "m-001")))))
         self.assertIn(wrap_data([{k: rows[0][k] for k in ("idea_id", "title", "text")}]), captured[0])
+        # Each existing mechanism shows its label and one representative idea, not every variant (cost, 2026-11-07).
         self.assertIn(wrap_data([{"mechanism_id": "m-001", "label": "untrusted existing label",
-                                 "variants": [{k: rows[0][k] for k in ("title", "text")}]}]), captured[1])
+                                 "example": {k: rows[0][k] for k in ("title", "text")}}]), captured[1])
         self.assertIn("actual way an idea works", captured[0])
         self.assertIn("周六下午专场", captured[0])
         self.assertIn("周末青少年专属时段", captured[0])

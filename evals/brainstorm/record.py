@@ -308,8 +308,11 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
         raise ValueError("seed must be an integer")
     if level not in LEVELS:
         raise ValueError("Invalid generation level")
-    if returned_from is not None and (not isinstance(returned_from, str) or not returned_from):
-        raise ValueError("returned_from must be an original idea id or null")
+    # A bundled return lists one agent's collided originals; each child is traced to one of them by position.
+    if returned_from is not None and not (isinstance(returned_from, str) and returned_from or
+            isinstance(returned_from, list) and returned_from and len(set(returned_from)) == len(returned_from)
+            and all(isinstance(key, str) and key for key in returned_from)):
+        raise ValueError("returned_from must be an original idea id, a list of distinct ids, or null")
     if purpose not in ("generate", "rewrite") or (purpose == "rewrite" and returned_from is None):
         raise ValueError("purpose must be generate or a collision rewrite")
     if assignments is not None:
@@ -323,7 +326,9 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
         state = load_state(path, identity)
         state["guard_exam"] = {"planted": exam["planted"], "constraints": exam["constraints"]}
         if returned_from is not None and returned_idea is None:
-            returned_idea = next((idea for idea in state["ideas"] if idea["idea_id"] == returned_from), None)
+            find = lambda key: next((idea for idea in state["ideas"] if idea["idea_id"] == key), None)
+            returned_idea = [find(key) for key in returned_from] if isinstance(returned_from, list) else find(returned_from)
+        sources = returned_from if isinstance(returned_from, list) else [returned_from]
         persist = lambda: save_state(path, state)
         batch_key = f"{batch}:{level}"
         allocation_seed = int(digest([seed, rep, batch, level]), 16)
@@ -399,8 +404,8 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                 sync_call(state, key, ledger)
                 try:
                     rows = parse_ideas(result.text, assignment["cards"])
-                    if purpose == "rewrite" and len(rows) != 1:
-                        raise ValueError("A collision rewrite must return exactly one idea")
+                    if purpose == "rewrite" and len(rows) != len(sources):
+                        raise ValueError(f"A collision rewrite must return exactly {len(sources)} idea(s), one per original")
                 except ValueError as exc:
                     request["status"] = "parse_error"
                     add_failure(state, "parse", key, "invalid_output", str(exc))
@@ -411,7 +416,8 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                     state["ideas"].append({"idea_id": "i-" + hashlib.sha1((key + str(index)).encode()).hexdigest()[:12],
                                            "exam_id": exam["id"], "config": config["name"], "rep": rep,
                                            **assignment, "batch": batch, "level": level, "returned": returned_from is not None,
-                                           "returned_from": returned_from, **row, "call_key": key})
+                                           "returned_from": sources[index] if returned_from is not None else None,
+                                           **row, "call_key": key})
                 request["status"] = "ok"
                 persist()
                 export_outputs(path, state, exam)

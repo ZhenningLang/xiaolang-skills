@@ -279,11 +279,17 @@ def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, ded
                         recorded = {row["idea_id"]: row for row in record.load_state(path, None)["ideas"]}
                         local = unit_view(classifier_state(run_dir, exam, ledger, dedupe_backend, dedupe_config), config, rep)
                         context = generation_context(local, batch["level"], config, returned=True)
+                        # One call per agent: its collided ideas share one assignment, so they go back together.
+                        by_agent = {}
                         for key in collided:
-                            original = recorded[key]
+                            by_agent.setdefault(recorded[key]["agent"], []).append(key)
+                        for agent in sorted(by_agent):
+                            keys = by_agent[agent]
+                            first = recorded[keys[0]]
                             batch["rewrites"].append({"batch": state["next_batch"], "stage": "generate", "idea_ids": [],
-                                "inputs": {**deepcopy(context), "returned_from": key, "returned_idea": original,
-                                           "assignments": [{k: original[k] for k in ("agent", "model", "method", "cards")}],
+                                "inputs": {**deepcopy(context), "returned_from": keys,
+                                           "returned_idea": [recorded[key] for key in keys],
+                                           "assignments": [{k: first[k] for k in ("agent", "model", "method", "cards")}],
                                            "purpose": "rewrite"}})
                             state["next_batch"] += 1
                     batch["stage"] = "rewrite"
@@ -295,14 +301,18 @@ def run_loop(exam, config, run_dir, *, seed, backend, ledger, dedupe_config, ded
                             step["stage"] = "dedupe"
                             batch["returned_idea_ids"] = [key for row in batch["rewrites"] for key in row["idea_ids"]]
                             save_state(path, state)
-                        if step["stage"] == "dedupe":
-                            result = group_ids(step["idea_ids"], exam, run_dir, path, seed, dedupe_backend, ledger, dedupe_config)
-                            bad = set(step["idea_ids"]).intersection(result["fallback_ids"])
-                            batch["fallback_ids"] = sorted(set(batch["fallback_ids"]) | bad)
-                            if bad:
-                                raise ValueError("Incomplete rewrite grouping; growth not evaluated")
+                    # Every returned idea of this level is grouped in one call; regrouping known ideas costs nothing.
+                    waiting = [step for step in batch["rewrites"] if step["stage"] == "dedupe"]
+                    if waiting:
+                        ids = [key for step in waiting for key in step["idea_ids"]]
+                        result = group_ids(ids, exam, run_dir, path, seed, dedupe_backend, ledger, dedupe_config)
+                        bad = set(ids).intersection(result["fallback_ids"])
+                        batch["fallback_ids"] = sorted(set(batch["fallback_ids"]) | bad)
+                        if bad:
+                            raise ValueError("Incomplete rewrite grouping; growth not evaluated")
+                        for step in waiting:
                             step["stage"] = "done"
-                            save_state(path, state)
+                        save_state(path, state)
                     batch["stage"] = "finalize"
                     save_state(path, state)
                 if batch["stage"] == "finalize":

@@ -35,13 +35,17 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
              "Original question (preserve its meaning):", wrap_data(exam["question"]),
              "Hard constraints:", wrap_data(exam["constraints"]), "Assigned cards:",
              wrap_data([card for card in exam["card_data"] if card["id"] in assignment["cards"]])]
+    bundled = isinstance(returned_from, list)
     if config["three_step"]:
-        parts.append("Three steps: first propose one replacement title; then rewrite its mechanism to avoid the original; "
+        parts.append("Three steps for each original: first propose one replacement title; then rewrite its mechanism to avoid "
+                     "that original; finally expand the rewritten title into one complete idea." if bundled else
+                     "Three steps: first propose one replacement title; then rewrite its mechanism to avoid the original; "
                      "finally expand the rewritten title into one complete idea." if returned_from is not None else
                      "Three steps: first list 10 idea titles; then rewrite the titles to maximize differences "
                      "between their mechanisms; finally expand the rewritten titles into complete ideas.")
     else:
-        parts.append("Directly give one replacement idea." if returned_from is not None else "Directly give 10 ideas.")
+        parts.append("Directly give one replacement idea for each original." if bundled else
+                     "Directly give one replacement idea." if returned_from is not None else "Directly give 10 ideas.")
     method = assignment["method"]
     if level != "baseline" and method is not None:
         parts.extend(["Method instructions:", config["methods"][method]])
@@ -73,12 +77,15 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
                    for row in previous]
         parts.extend(["Earlier agents' ideas:", wrap_data(visible)])
     if returned_from is not None:
-        if not isinstance(returned_idea, dict) or any(not isinstance(returned_idea.get(key), str) or
-                not returned_idea[key].strip() for key in ("title", "text")):
+        originals = returned_idea if bundled else [returned_idea]
+        if (not isinstance(originals, list) or not originals or (bundled and len(originals) != len(returned_from)) or
+                any(not isinstance(row, dict) or any(not isinstance(row.get(key), str) or not row[key].strip()
+                                                     for key in ("title", "text")) for row in originals)):
             raise ValueError("Collision return requires the original title and text, not just an ID")
-        parts.extend(["Collision return: replace the mechanism, not just its wording.",
-                      "Return exactly one replacement idea for this original.",
-                      wrap_data({key: returned_idea[key] for key in ("title", "text")})])
+        shown = [{key: row[key] for key in ("title", "text")} for row in originals]
+        parts.extend(["Collision return: replace the mechanism, not just its wording."] +
+                     (["Return exactly one replacement idea for each original, in the same order.", wrap_data(shown)] if bundled else
+                      ["Return exactly one replacement idea for this original.", wrap_data(shown[0])]))
     parts.append('Return only JSON: {"ideas":[{"title":"...","text":"...",'
                   '"cards_used":["assigned card id"],"decomposition":null}]}. '
                   'For a decomposition use "decomposition":["subproblem 1","subproblem 2"], '

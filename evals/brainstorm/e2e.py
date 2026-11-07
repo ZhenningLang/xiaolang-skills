@@ -61,13 +61,16 @@ def scenario(prompt, model, max_output_tokens, *, marker=None):
     cards = [row["id"] for row in json.loads(data_block(prompt, "Assigned cards:"))]
     rng = random.Random(prompt)
     if "Collision return: replace" in prompt:
-        original = json.loads(data_block(prompt, "Return exactly one replacement idea for this original."))
-        # Half of the early rewrites only change wording, and the last level always does.
-        if level == "pressure1" or sized_hash(prompt) % 2 == 0:
-            ideas = [{"title": "换个说法" + str(sized_hash(prompt) % TITLE_VARIANTS), "text": original["text"],
-                      "cards_used": cards[:1], "decomposition": None}]
-        else:
-            ideas = [idea("back", rng.randrange(POOL_SIZES["back"]), prompt, cards[:1], 0)]
+        originals = json.loads(data_block(prompt, "Return exactly one replacement idea for each original, in the same order."))
+        ideas = []
+        for position, original in enumerate(originals):
+            salt = prompt + str(position)
+            # Half of the early rewrites only change wording, and the last level always does.
+            if level == "pressure1" or sized_hash(salt) % 2 == 0:
+                ideas.append({"title": "换个说法" + str(sized_hash(salt) % TITLE_VARIANTS), "text": original["text"],
+                              "cards_used": cards[:1], "decomposition": None})
+            else:
+                ideas.append(idea("back", rng.randrange(POOL_SIZES["back"]), salt, cards[:1], 0))
         return json.dumps({"ideas": ideas}, ensure_ascii=False)
     if level == "baseline":
         # The extra one is never picked later, so every run keeps a mechanism only the full view can show.
