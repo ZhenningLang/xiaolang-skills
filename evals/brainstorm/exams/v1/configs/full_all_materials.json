@@ -1,0 +1,38 @@
+{
+  "name": "full_all_materials",
+  "default_model": "claude-sonnet-5-5",
+  "agents": 3,
+  "method_mode": "different",
+  "methods": {
+    "analogy": "从一个不相关的领域找一个已经解决过类似问题的做法，把它搬过来用。",
+    "reverse": "把题目里默认成立的一个前提反过来，看反过来之后能做什么。",
+    "person": "完全站在受影响最大的那个人的位置，从那个人一天里实际遇到的时刻出发想办法。",
+    "resources": "先列出手头已有但没被利用的资源，每个点子都必须用上其中至少一种。"
+  },
+  "materials_mode": "all",
+  "materials_proportion": 1,
+  "three_step": true,
+  "return_collisions": true,
+  "decomposition_timing": "late",
+  "levels": [
+    "round1",
+    "round2",
+    "pressure1",
+    "pressure2",
+    "pressure3",
+    "pressure4"
+  ],
+  "max_batches": 1,
+  "max_output_tokens": 4096,
+  "budget_usd": "50",
+  "backend": {
+    "kind": "claude",
+    "pricing": {
+      "claude-sonnet-5-5": {
+        "fixed_tokens": 15000,
+        "input_per_million": "12",
+        "output_per_million": "60"
+      }
+    }
+  }
+}

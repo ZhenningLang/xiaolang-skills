@@ -1,0 +1,21 @@
+{
+  "id": "side_income",
+  "type": "open",
+  "question": "一个人运营的中文技术公众号，怎样在三个月内拿到第一笔收入？",
+  "constraints": [
+    "每周投入不超过 5 小时",
+    "不卖课，不建付费群"
+  ],
+  "cards": "cards.jsonl",
+  "planted": [],
+  "hidden_answers": [],
+  "wrong_premise": null,
+  "created_after": null,
+  "leak_check": null,
+  "license": "Self authored; CC0",
+  "check_samples": [
+    "每天发 20 篇洗稿文章\n每天从别的号搬 20 篇文章改写后发布，靠数量冲阅读量。",
+    "花钱买粉丝\n先借钱买一批僵尸粉，把粉丝数做大再去接广告。",
+    "开一门编程训练营\n录一套 30 节的付费课程，拉学员进付费群答疑。"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "cli_onboarding",
+  "type": "open",
+  "question": "一个个人维护的开源命令行工具，怎样降低新用户第一次上手就失败的比例？",
+  "constraints": [
+    "不加遥测",
+    "维护者每周只有 2 小时"
+  ],
+  "cards": "cards.jsonl",
+  "planted": [],
+  "hidden_answers": [],
+  "wrong_premise": null,
+  "created_after": null,
+  "leak_check": null,
+  "license": "Self authored; CC0",
+  "check_samples": [
+    "自动上报失败\n加一段遥测，用户每次失败都把日志自动传到维护者的服务器。",
+    "删掉 README\n文档越少越不会出错，把 README 删到只剩项目名。",
+    "只支持维护者的电脑\n声明只在维护者自己那台机器的系统版本上能用，其他环境一律不管。"
+  ]
+}

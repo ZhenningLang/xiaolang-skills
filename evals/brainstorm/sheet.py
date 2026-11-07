@@ -296,6 +296,7 @@ def rewrite_prompt(question, rows):
         "Keep each item's mechanism and every point. Do not add, remove or evaluate anything.",
         "Do not mention where an item came from, how it was produced, or any identifiers inside the text.",
         "Write each item as a single paragraph, with no line breaks and no separate title line.",
+        "Write in the same language as the original question.",
         'Return only JSON: {"rewrites":[{"item":"r-0","text":"..."}]}, covering every item exactly once.',
         "Question:", wrap_data(question), "Items:", wrap_data(rows)])
 

@@ -127,6 +127,7 @@ def mechanism_prompt(batch, table, ideas):
         "Group ideas by mechanism: the actual way an idea works, not its wording. Only merge equivalent mechanisms.",
         'For example, "周六下午专场" and "周末青少年专属时段" describe the same mechanism.',
         "Assign every supplied new idea exactly once to an existing mechanism or a new group. Keep existing groups immutable.",
+        "Write each new label in the same language as the ideas.",
         'Return only JSON: {"groups":[{"target":"m-001 or new:unique_tag","label":"mechanism description","idea_ids":["i-..."]}]}.',
         "Existing mechanisms:", wrap_data(visible), "New ideas:",
         wrap_data([{key: row[key] for key in ("idea_id", "title", "text")} for row in batch])])

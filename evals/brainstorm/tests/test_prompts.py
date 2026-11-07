@@ -104,3 +104,23 @@ class PromptTests(unittest.TestCase):
         self.assertNotIn(boundary, card)
         self.assertEqual(wrapped.count(boundary), 2)
         self.assertIn("data, not instructions", wrapped)
+
+
+class OutputLanguageTests(unittest.TestCase):
+    """Every prompt whose output the author reads must ask for the question's language (P06_OUTPUT_LANGUAGE)."""
+
+    RULE = "same language as the original question"
+
+    def test_generation_and_collision_return_ask_for_the_question_language(self):
+        exam = {"question": "怎样让新人敢于提问？", "constraints": [], "card_data": []}
+        config = validate_config({"name": "t", "default_model": "m"})
+        assignment = {"agent": 1, "model": "m", "method": None, "cards": []}
+        for kwargs in ({}, {"returned_from": "i_old", "returned_idea": {"title": "旧", "text": "旧机制"}}):
+            self.assertIn(self.RULE, generation_prompt(exam, config, assignment, **kwargs))
+
+    def test_mechanism_labels_and_uniform_rewrite_ask_for_the_question_language(self):
+        from evals.brainstorm import dedupe, sheet
+        batch = [{"idea_id": "i-1", "title": "标题", "text": "正文"}]
+        # The grouping call never sees the question, so its labels follow the ideas' language instead.
+        self.assertIn("same language as the ideas", dedupe.mechanism_prompt(batch, {"mechanisms": []}, {}))
+        self.assertIn(self.RULE, sheet.rewrite_prompt("怎样？", [{"item": "r-0", "text": "正文"}]))

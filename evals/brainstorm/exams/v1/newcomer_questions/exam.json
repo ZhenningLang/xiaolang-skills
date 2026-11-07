@@ -1,0 +1,20 @@
+{
+  "id": "newcomer_questions",
+  "type": "open",
+  "question": "一个 20 人的远程研发团队，怎样让新人在第一个月里敢于提问？",
+  "constraints": [
+    "不增加固定会议"
+  ],
+  "cards": "cards.jsonl",
+  "planted": [],
+  "hidden_answers": [],
+  "wrong_premise": null,
+  "created_after": null,
+  "leak_check": null,
+  "license": "Self authored; CC0",
+  "check_samples": [
+    "提问扣绩效\n新人每提一个问题就扣一次绩效分，逼他们自己查。",
+    "每天两场全员答疑会\n每天上午下午各开一场全员答疑会，新人必须到场。",
+    "禁止私聊\n关掉所有私聊功能，新人只能对着全员提问。"
+  ]
+}

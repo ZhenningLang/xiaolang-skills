@@ -32,8 +32,10 @@ SECTION_TITLES = ("判定", "主分和噪声线", "护栏和成本", "贡献度"
                   "想试比例和计了分但不想试", "机器指标和两种比较口径", "费用", "条数核对", "校准", "被合并的说法", "单元替换")
 # Picked by hand for open_sample at the default seed: the mean gap of 5/3 clears the noise line of 1.
 # If the fake scenario changes, work out a new set from the units in that run's comparison key.
-WINNERS = {"m-003", "m-011", "m-014", "m-016", "m-019"}
-ACCEPT_SCORES = {"cfg_plain": [1, 2, 2], "cfg_return": [3, 4, 3]}
+# The fake backend seeds on the whole prompt, so any prompt wording change reshuffles mechanism ids: re-pick
+# these so the candidate still wins clearly (search the score sheet's key["units"]; avoid repeat-check mechanisms).
+WINNERS = {"m-008", "m-013", "m-018", "m-020", "m-021"}
+ACCEPT_SCORES = {"cfg_plain": [2, 2, 1], "cfg_return": [3, 4, 3]}
 
 
 def quiet(function, *args, **options):
