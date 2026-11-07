@@ -1,0 +1,16 @@
+{
+  "name": "classifier",
+  "default_model": "claude-sonnet-5-5",
+  "max_output_tokens": 4096,
+  "budget_usd": "50",
+  "backend": {
+    "kind": "claude",
+    "pricing": {
+      "claude-sonnet-5-5": {
+        "fixed_tokens": 15000,
+        "input_per_million": "12",
+        "output_per_million": "60"
+      }
+    }
+  }
+}
