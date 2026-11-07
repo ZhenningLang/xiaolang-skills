@@ -179,3 +179,9 @@ class ClaudeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TimeoutDefaultTests(unittest.TestCase):
+    def test_claude_waits_long_enough_for_a_late_pressure_level(self):
+        # Real run, 2026-11-07: pressure-three calls took 92-107 s and one passed 120 s; prompts grow every level.
+        self.assertGreaterEqual(ClaudeCliBackend(pricing={}).timeout, 900)

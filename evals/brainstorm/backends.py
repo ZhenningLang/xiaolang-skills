@@ -120,7 +120,7 @@ class FakeBackend:
 class ClaudeCliBackend:
     name = "claude"
 
-    def __init__(self, *, pricing, executable="claude", timeout=120):
+    def __init__(self, *, pricing, executable="claude", timeout=900):
         self.pricing = pricing
         self.executable = executable
         self.timeout = timeout
