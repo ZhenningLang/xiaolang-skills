@@ -159,7 +159,8 @@ def parse_partition(text, batch, table):
             target, label = row.get("target"), row.get("label")
             valid = (set(row) == {"target", "label", "idea_ids"} and isinstance(target, str)
                      and (target in existing or target.startswith("new:") and len(target) > 4)
-                     and isinstance(label, str) and bool(label.strip()))
+                     # An existing mechanism keeps its own label, so only a new group must name itself.
+                     and isinstance(label, str) and (target in existing or bool(label.strip())))
             for key in row["idea_ids"]:
                 if not isinstance(key, str) or key not in ids:
                     errors.append(f"Unknown idea ID: {key!r}")

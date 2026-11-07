@@ -151,3 +151,19 @@ class FencedReplyTests(unittest.TestCase):
         idea = {"title": "标题", "text": "正文", "cards_used": [], "decomposition": None}
         with self.assertRaises(ValueError):
             record.parse_ideas("Here you go:\n" + self.fence({"ideas": [idea]}), [])
+
+
+class ExistingTargetLabelTests(unittest.TestCase):
+    """An existing mechanism keeps its own label, so a reply may leave it empty (real grouping call, 2026-11-07)."""
+
+    def test_empty_label_is_accepted_only_for_an_existing_mechanism(self):
+        from evals.brainstorm import dedupe
+        table = {"mechanisms": [{"mechanism_id": "m-001", "label": "已有机制", "idea_ids": ["i-0"],
+                                 "in_baseline": True, "representative": "i-0"}]}
+        batch = [{"idea_id": "i-1", "title": "标题", "text": "正文"}, {"idea_id": "i-2", "title": "标题二", "text": "正文二"}]
+        reply = json.dumps({"groups": [{"target": "m-001", "label": "", "idea_ids": ["i-1"]},
+                                       {"target": "new:b", "label": "", "idea_ids": ["i-2"]}]})
+        buckets, fallback, errors = dedupe.parse_partition(reply, batch, table)
+        self.assertEqual([b["idea_ids"] for b in buckets if b["target"] == "m-001"], [["i-1"]])
+        self.assertEqual(fallback, ["i-2"])
+        self.assertEqual(len(errors), 1)
