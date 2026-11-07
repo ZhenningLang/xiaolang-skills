@@ -192,7 +192,9 @@ def export_outputs(path, state, exam):
     return summary
 
 
-def parse_ideas(text, cards):
+def parse_ideas(text, cards, originals=None):
+    """originals=N reads a bundled collision return: each idea names the 1..N original it replaces, at most once."""
+    fields = {"title", "text", "cards_used", "decomposition"} | ({"replaces"} if originals is not None else set())
     try:
         payload = json.loads(model_json(text))
     except (ValueError, RecursionError) as exc:
@@ -200,8 +202,10 @@ def parse_ideas(text, cards):
     if not isinstance(payload, dict) or set(payload) != {"ideas"} or not isinstance(payload["ideas"], list) or not payload["ideas"]:
         raise ValueError("Generated response must contain a nonempty ideas array")
     for index, row in enumerate(payload["ideas"]):
-        if not isinstance(row, dict) or set(row) != {"title", "text", "cards_used", "decomposition"}:
-            raise ValueError(f"Idea {index}: expected only title/text/cards_used/decomposition")
+        if not isinstance(row, dict) or set(row) != fields:
+            raise ValueError(f"Idea {index}: expected only {'/'.join(sorted(fields))}")
+        if originals is not None and (type(row["replaces"]) is not int or not 1 <= row["replaces"] <= originals):
+            raise ValueError(f"Idea {index}: replaces must be an original number from 1 to {originals}")
         for field in ("title", "text"):
             if not isinstance(row[field], str) or not row[field].strip():
                 raise ValueError(f"Idea {index}: missing {field}")
@@ -210,6 +214,8 @@ def parse_ideas(text, cards):
             raise ValueError(f"Idea {index}: cards_used contains unassigned or duplicate cards")
         if row["decomposition"] is not None:
             text_list(row["decomposition"], "decomposition")
+    if originals is not None and len({row["replaces"] for row in payload["ideas"]}) != len(payload["ideas"]):
+        raise ValueError("Two replacements name the same original")
     return payload["ideas"]
 
 
@@ -403,21 +409,27 @@ def record_batch(exam, config, run_dir, *, seed, backend, ledger, rep=1, batch=1
                 request["receipt"] = asdict(result)
                 sync_call(state, key, ledger)
                 try:
-                    rows = parse_ideas(result.text, assignment["cards"])
-                    if purpose == "rewrite" and len(rows) != len(sources):
-                        raise ValueError(f"A collision rewrite must return exactly {len(sources)} idea(s), one per original")
+                    bundled = isinstance(returned_from, list)
+                    rows = parse_ideas(result.text, assignment["cards"], len(sources) if bundled else None)
+                    if purpose == "rewrite" and not bundled and len(rows) != 1:
+                        raise ValueError("A collision rewrite must return exactly one idea")
                 except ValueError as exc:
                     request["status"] = "parse_error"
                     add_failure(state, "parse", key, "invalid_output", str(exc))
                     persist()
                     export_outputs(path, state, exam)
                     continue
+                if bundled and len(rows) < len(sources):
+                    # Kept, not retried: the model may judge two originals one mechanism; the gap stays visible.
+                    add_failure(state, "parse", key, "partial_return",
+                                f"{len(sources) - len(rows)} of {len(sources)} originals got no replacement")
                 for index, row in enumerate(rows):
+                    row = dict(row)
+                    source = sources[row.pop("replaces") - 1] if bundled else returned_from
                     state["ideas"].append({"idea_id": "i-" + hashlib.sha1((key + str(index)).encode()).hexdigest()[:12],
                                            "exam_id": exam["id"], "config": config["name"], "rep": rep,
                                            **assignment, "batch": batch, "level": level, "returned": returned_from is not None,
-                                           "returned_from": sources[index] if returned_from is not None else None,
-                                           **row, "call_key": key})
+                                           "returned_from": source, **row, "call_key": key})
                 request["status"] = "ok"
                 persist()
                 export_outputs(path, state, exam)

@@ -84,7 +84,9 @@ def generation_prompt(exam, config, assignment, *, level="round1", forbidden=Non
             raise ValueError("Collision return requires the original title and text, not just an ID")
         shown = [{key: row[key] for key in ("title", "text")} for row in originals]
         parts.extend(["Collision return: replace the mechanism, not just its wording."] +
-                     (["Return exactly one replacement idea for each original, in the same order.", wrap_data(shown)] if bundled else
+                     (["Return exactly one replacement idea for each original, in the same order.", wrap_data(shown),
+                       f'The originals are numbered 1 to {len(shown)} in the order shown. Give every replacement a '
+                       '"replaces" field holding its original\'s number, in addition to the four fields below.'] if bundled else
                       ["Return exactly one replacement idea for this original.", wrap_data(shown[0])]))
     parts.append('Return only JSON: {"ideas":[{"title":"...","text":"...",'
                   '"cards_used":["assigned card id"],"decomposition":null}]}. '

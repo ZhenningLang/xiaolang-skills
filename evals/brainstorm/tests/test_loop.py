@@ -18,9 +18,10 @@ from evals.brainstorm.record import read_file, read_rows
 SAMPLES = Path(__file__).resolve().parents[1] / "exams/samples"
 
 
-def response(*texts, decomposition=None):
-    return json.dumps({"ideas": [{"title": text, "text": text, "cards_used": [],
-                                  "decomposition": decomposition} for text in texts]})
+def response(*texts, decomposition=None, replaces=False):
+    """replaces=True numbers the ideas 1..n, the form a bundled collision return must use."""
+    return json.dumps({"ideas": [{"title": text, "text": text, "cards_used": [], "decomposition": decomposition,
+                                  **({"replaces": n} if replaces else {})} for n, text in enumerate(texts, 1)]})
 
 
 def data_after(prompt, heading):
@@ -80,7 +81,7 @@ class LoopTests(unittest.TestCase):
     def test_two_collisions_rewrite_once_with_original_agent_lineage(self):
         # One agent's collided ideas go back in one call, and the whole level's returns are grouped once (cost, 2026-11-07).
         self.config.update(return_collisions=True)
-        self.run_loop([response("base")] * 3 + [response("base", "base"), response("base", "fresh")])
+        self.run_loop([response("base")] * 3 + [response("base", "base"), response("base", "fresh", replaces=True)])
         ideas = read_rows(self.unit / "ideas.jsonl")
         originals = [r for r in ideas if r["level"] == "round1" and not r["returned"]]
         children = [r for r in ideas if r["returned"]]
@@ -103,10 +104,26 @@ class LoopTests(unittest.TestCase):
         # Three baseline batches, the round-one batch, and one call for both returned ideas.
         self.assertEqual(self.dedupe.calls, 5)
 
-    def test_a_bundled_return_with_the_wrong_number_of_ideas_is_a_parse_failure(self):
+    def test_a_bundled_return_maps_by_replaces_and_tolerates_a_missing_replacement(self):
+        # Real call, 2026-11-07: four originals came back as three replacements; order alone cannot say which is which.
         self.config.update(return_collisions=True)
+        reply = json.dumps({"ideas": [{"title": "fresh", "text": "fresh", "cards_used": [], "decomposition": None,
+                                       "replaces": 2}]})
+        self.run_loop([response("base")] * 3 + [response("base", "base"), reply])
+        ideas = read_rows(self.unit / "ideas.jsonl")
+        originals = [r for r in ideas if r["level"] == "round1" and not r["returned"]]
+        children = [r for r in ideas if r["returned"]]
+        self.assertEqual([c["returned_from"] for c in children], [originals[1]["idea_id"]])
+        self.assertNotIn("replaces", children[0])
+        failures = read_rows(self.unit / "failures.jsonl")
+        self.assertIn("partial_return", [f["reason"] for f in failures])
+
+    def test_a_bundled_return_with_a_bad_or_repeated_position_is_a_parse_failure(self):
+        self.config.update(return_collisions=True)
+        row = lambda n: {"title": "fresh", "text": "fresh", "cards_used": [], "decomposition": None, "replaces": n}
+        bad = [json.dumps({"ideas": [row(1), row(1)]}), json.dumps({"ideas": [row(3)]})]
         with self.assertRaises(ValueError):
-            self.run_loop([response("base")] * 3 + [response("base", "base"), response("fresh"), response("fresh")])
+            self.run_loop([response("base")] * 3 + [response("base", "base")] + bad)
         self.assertFalse([r for r in read_rows(self.unit / "ideas.jsonl") if r["returned"]])
 
     def test_rewrites_preserve_diverse_lineage_and_original_context_at_every_level(self):
@@ -121,7 +138,8 @@ class LoopTests(unittest.TestCase):
             level = prompt.split("Generation level: ", 1)[1].split(".", 1)[0]
             if "Collision return:" in prompt:
                 originals = data_after(prompt, "Return exactly one replacement idea for each original, in the same order.")
-                return response(*("REPLACEMENT " + row["text"] for row in originals), decomposition=["child dimension"])
+                return response(*("REPLACEMENT " + row["text"] for row in originals), decomposition=["child dimension"],
+                                replaces=True)
             counters[level] = counters.get(level, 0) + 1
             return response(f"COLLIDE {level} {counters[level]}", decomposition=["dimension " + level])
         def classified(prompt, *_):
@@ -241,7 +259,7 @@ class LoopTests(unittest.TestCase):
         self.config.update(levels=["round1", "pressure1"], return_collisions=True)
         self.dedupe = FakeBackend(responses=lambda p, *a: "{}" if '"text": "REWRITE_ONLY"' in p else fake_partition(p, *a))
         with self.assertRaisesRegex(ValueError, "Incomplete rewrite grouping"):
-            self.run_loop([response("base")] * 4 + [response("REWRITE_ONLY"), response("must_not_run")])
+            self.run_loop([response("base")] * 4 + [response("REWRITE_ONLY", replaces=True), response("must_not_run")])
         ideas = read_rows(self.unit / "ideas.jsonl")
         children = [row for row in ideas if row["returned"]]
         self.assertEqual(len(children), 1)

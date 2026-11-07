@@ -35,7 +35,7 @@ SECTION_TITLES = ("判定", "主分和噪声线", "护栏和成本", "贡献度"
 # The fake backend seeds on the whole prompt, so any prompt wording change reshuffles mechanism ids: re-pick
 # these so the candidate still wins clearly (search the score sheet's key["units"]; avoid repeat-check mechanisms).
 WINNERS = {"m-013", "m-015", "m-017", "m-018", "m-020", "m-022"}
-ACCEPT_SCORES = {"cfg_plain": [2, 2, 1], "cfg_return": [3, 3, 4]}
+ACCEPT_SCORES = {"cfg_plain": [2, 2, 1], "cfg_return": [3, 3, 3]}
 
 
 def quiet(function, *args, **options):

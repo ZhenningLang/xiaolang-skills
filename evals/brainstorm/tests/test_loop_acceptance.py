@@ -23,7 +23,7 @@ from evals.brainstorm.tests.test_loop import data_after, response
 def returned(prompt, text, **options):
     """A bundled collision return answers once per original, in order."""
     count = len(data_after(prompt, "Return exactly one replacement idea for each original, in the same order."))
-    return response(*[text] * count, **options)
+    return response(*[text] * count, replaces=True, **options)
 
 
 SAMPLES = Path(__file__).resolve().parents[1] / "exams/samples"
@@ -39,7 +39,7 @@ class LoopAcceptanceTests(unittest.TestCase):
         self.config.write_text(json.dumps({"name": "cli", "default_model": "generator", "agents": 1,
             "levels": ["round1", "round2", "pressure1"], "return_collisions": True,
             "backend": {"kind": "fake", "responses": [response("base")] * 4 +
-                        [response("replacement"), response("second"), response("third")]}}))
+                        [response("replacement", replaces=True), response("second"), response("third")]}}))
         self.classifier.write_text(json.dumps({"name": "classifier", "default_model": "fixed"}))
         self.addCleanup(patch.stopall)
         for target in ("evals.brainstorm.backends.ClaudeCliBackend.call",

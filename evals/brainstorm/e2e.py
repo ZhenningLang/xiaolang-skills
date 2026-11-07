@@ -68,9 +68,9 @@ def scenario(prompt, model, max_output_tokens, *, marker=None):
             # Half of the early rewrites only change wording, and the last level always does.
             if level == "pressure1" or sized_hash(salt) % 2 == 0:
                 ideas.append({"title": "换个说法" + str(sized_hash(salt) % TITLE_VARIANTS), "text": original["text"],
-                              "cards_used": cards[:1], "decomposition": None})
+                              "cards_used": cards[:1], "decomposition": None, "replaces": position + 1})
             else:
-                ideas.append(idea("back", rng.randrange(POOL_SIZES["back"]), salt, cards[:1], 0))
+                ideas.append({**idea("back", rng.randrange(POOL_SIZES["back"]), salt, cards[:1], 0), "replaces": position + 1})
         return json.dumps({"ideas": ideas}, ensure_ascii=False)
     if level == "baseline":
         # The extra one is never picked later, so every run keeps a mechanism only the full view can show.
