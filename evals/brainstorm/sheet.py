@@ -195,16 +195,19 @@ def lineage_hits(text, patterns):
     return sorted({kind for _, _, kind in lineage_spans(text, patterns)})
 
 
+def mask_text(text, patterns):
+    # Overlaps merge, so a longer name is never left half cut by a shorter name inside it.
+    result, cursor = "", 0
+    for start, end, _ in sorted(lineage_spans(text, patterns)):
+        if start >= cursor:
+            result += text[cursor:start] + MASK
+        cursor = max(cursor, end)
+    return result + text[cursor:]
+
+
 def mask_wordings(shown, variants, patterns):
     """The full and group views are not rewritten, so source terms are cut out instead of reaching the page."""
-    def mask(text):
-        # Overlaps merge, so a longer name is never left half cut by a shorter name inside it.
-        result, cursor = "", 0
-        for start, end, _ in sorted(lineage_spans(text, patterns)):
-            if start >= cursor:
-                result += text[cursor:start] + MASK
-            cursor = max(cursor, end)
-        return result + text[cursor:]
+    mask = lambda text: mask_text(text, patterns)
     shown = mask(shown)
     return shown, [text for text in dict.fromkeys(mask(text) for text in variants) if text != shown]
 
@@ -292,6 +295,11 @@ def check_conservation(view, items, counts, reused):
             raise ValueError("Conservation failed: a mechanism is presented twice")
 
 
+def rewrite_rows(names, patterns):
+    """Source terms are cut before the model sees them: a rewrite that copies one refuses the whole sheet."""
+    return [{"item": name, "text": mask_text(slot["original"], patterns)} for name, slot in names.items()]
+
+
 def rewrite_prompt(question, rows):
     return "\n".join([
         "Rewrite every item below into one plain, uniform style.",
@@ -299,6 +307,7 @@ def rewrite_prompt(question, rows):
         "Do not mention where an item came from, how it was produced, or any identifiers inside the text.",
         "Write each item as a single paragraph, with no line breaks and no separate title line.",
         "Write in the same language as the original question.",
+        "Drop every " + MASK + " placeholder and any wording that only pointed at it.",
         'Return only JSON: {"rewrites":[{"item":"r-0","text":"..."}]}, covering every item exactly once.',
         "Question:", wrap_data(question), "Items:", wrap_data(rows)])
 
@@ -368,7 +377,7 @@ def rewrite_all(path, exam, slots, identity, *, sheet_id, seed, backend, ledger,
         export_rewrite(path, state)
     for number, batch in enumerate(rewrite_batches(slots, seed=seed, batch_size=batch_size)):
         names = {f"r-{i}": slot for i, slot in enumerate(batch)}
-        prompt = rewrite_prompt(question, [{"item": name, "text": slot["original"]} for name, slot in names.items()])
+        prompt = rewrite_prompt(question, rewrite_rows(names, patterns))
         key = "rewrite_" + digest([exam["id"], sheet_id, number, digest(prompt), model, backend.name, max_output_tokens, attempt])
         request = state["requests"].setdefault(key, {
             "call_key": key, "exam_id": exam["id"], "config": "sheet", "rep": 1, "agent": number + 1,

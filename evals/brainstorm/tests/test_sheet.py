@@ -287,6 +287,16 @@ class RewriteTests(SheetCase):
         for row in public_of(self.run_dir, "s_cmp")["items"]:
             self.assertNotIn("\n", row["text"])
 
+    def test_rewrite_input_masks_card_ids_so_the_model_cannot_copy_them(self):
+        # Real sheet, 2026-11-07: an idea cited "(c03)" and the rewrite kept it, so the whole sheet was refused.
+        patterns = sheet.term_patterns({"card": {"c03"}, "config": set(), "model": set(), "method": set(),
+                                        "level": set(), "field": set()})
+        rows = sheet.rewrite_rows({"r-0": {"original": "只展示一条根因（c03），其余折叠"}}, patterns)
+        self.assertEqual(len(rows), 1)
+        self.assertNotIn("c03", rows[0]["text"])
+        self.assertIn(sheet.MASK, rows[0]["text"])
+        self.assertIn(sheet.MASK, sheet.rewrite_prompt("q", rows))
+
     def test_rewrite_prompt_asks_for_one_paragraph(self):
         self.assertIn("single paragraph", sheet.rewrite_prompt("q", [{"item": "r-0", "text": "t"}]))
 
