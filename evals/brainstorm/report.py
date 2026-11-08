@@ -615,7 +615,7 @@ def load_receipts(root):
             # Calibration and replay share the directory; a partition is named after its run plus a suffix.
             scope = "calibration" if (root / "replay" / parts[1].split("__")[0] / "calibration.json").is_file() else "replay"
         else:
-            scope = ("sheet_rewrite" if parts[0] == "sheets" else "constraint" if "judges" in parts
+            scope = ("sheet_rewrite" if parts[0] in ("sheets", "sheets_withdrawn") else "constraint" if "judges" in parts
                      else "dedupe" if "dedupe" in parts else "recording")
         rows.extend({**row, "_scope": scope} for row in read_rows(path))
     return rows

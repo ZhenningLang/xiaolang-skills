@@ -142,8 +142,8 @@ class FencedReplyTests(unittest.TestCase):
         reply = self.fence({"groups": [{"target": "new:a", "label": "机制", "idea_ids": ["i-1"]}]})
         buckets, fallback, errors = dedupe.parse_partition(reply, batch, {"mechanisms": []})
         self.assertEqual((errors, fallback, [b["idea_ids"] for b in buckets]), ([], [], [["i-1"]]))
-        self.assertEqual(sheet.parse_rewrites(self.fence({"rewrites": [{"item": "r-0", "text": "改写"}]}), ["r-0"]),
-                         {"r-0": "改写"})
+        reply = {"rewrites": [{"item": "r-0", "gist": "做什么", "how": "怎么做", "benefit": "为什么"}]}
+        self.assertEqual(sheet.parse_rewrites(self.fence(reply), ["r-0"]), {"r-0": "一句话：做什么\n怎么做：怎么做\n好处：为什么"})
         self.assertNotIn("Invalid", str(judge.parse_response(self.fence({"verdicts": []}), [], "constraint")))
 
     def test_text_outside_the_block_is_still_rejected(self):

@@ -300,15 +300,25 @@ def rewrite_rows(names, patterns):
     return [{"item": name, "text": mask_text(slot["original"], patterns)} for name, slot in names.items()]
 
 
+# Labels are Chinese because every v1 exam is; a non-Chinese exam needs labels in its own language.
+REWRITE_PARTS = {"gist": "一句话", "how": "怎么做", "benefit": "好处"}
+
+
 def rewrite_prompt(question, rows):
     return "\n".join([
-        "Rewrite every item below into one plain, uniform style.",
-        "Keep each item's mechanism and every point. Do not add, remove or evaluate anything.",
+        "Rewrite every item below so a reader understands it at a glance, in plain everyday words.",
+        "Split each item into three short parts:",
+        '"gist": one sentence, at most 30 characters, saying what the idea does.',
+        '"how": at most two short sentences with the concrete steps.',
+        '"benefit": one sentence on why it helps, keeping any point that shows it respects the constraints.',
+        "Keep each item's mechanism and every detail needed to judge it. Do not add, evaluate, or invent anything.",
+        "Drop repetition of the question and filler. Avoid jargon; when a term is needed, say what it means in a few words.",
+        "Write the same way for every item, with no line breaks inside a part.",
         "Do not mention where an item came from, how it was produced, or any identifiers inside the text.",
-        "Write each item as a single paragraph, with no line breaks and no separate title line.",
         "Write in the same language as the original question.",
         "Drop every " + MASK + " placeholder and any wording that only pointed at it.",
-        'Return only JSON: {"rewrites":[{"item":"r-0","text":"..."}]}, covering every item exactly once.',
+        'Return only JSON: {"rewrites":[{"item":"r-0","gist":"...","how":"...","benefit":"..."}]}, '
+        'covering every item exactly once.',
         "Question:", wrap_data(question), "Items:", wrap_data(rows)])
 
 
@@ -316,7 +326,8 @@ def fake_rewrite(prompt, model, max_output_tokens):
     """Deterministic wiring fixture, not evidence of rewriting quality."""
     block = prompt.rsplit("\nItems:\n", 1)[1].split("\n")
     rows = json.loads("\n".join(block[2:-1]))
-    return dumps({"rewrites": [{"item": row["item"], "text": "平实版：" + row["text"]} for row in rows]})
+    return dumps({"rewrites": [{"item": row["item"], "gist": "平实版：" + row["text"], "how": "做法", "benefit": "好处"}
+                               for row in rows]})
 
 
 def parse_rewrites(text, names):
@@ -326,11 +337,12 @@ def parse_rewrites(text, names):
             raise ValueError("Invalid envelope")
         result = {}
         for row in data["rewrites"]:
-            if (not isinstance(row, dict) or set(row) != {"item", "text"} or row["item"] not in names
-                    or row["item"] in result or not isinstance(row["text"], str) or not row["text"].strip()):
+            if (not isinstance(row, dict) or set(row) != {"item", *REWRITE_PARTS} or row["item"] not in names
+                    or row["item"] in result
+                    or any(not isinstance(row[part], str) or not row[part].strip() for part in REWRITE_PARTS)):
                 raise ValueError("Invalid row")
-            # Enforced here too: a check sample must not stand out by a structure the model happened to keep.
-            result[row["item"]] = " ".join(row["text"].split())
+            # The layout is ours, not the model's: a check sample must not stand out by a structure the model happened to keep.
+            result[row["item"]] = "\n".join(f"{label}：{' '.join(row[part].split())}" for part, label in REWRITE_PARTS.items())
         if set(result) != set(names):
             raise ValueError("Missing items")
         return result
@@ -891,6 +903,34 @@ def write_human_groups(run_dir, key, groups):
         atomic_write(path, text)
 
 
+WITHDRAWN_DIR = "sheets_withdrawn"
+
+
+def withdraw(run_dir, sheet_id, *, reason):
+    """Retire an unanswered sheet so another can be issued; it keeps its files and its cost on the ledger."""
+    if not isinstance(reason, str) or not reason.strip():
+        raise ValueError("Withdrawing a sheet needs a reason; it is kept next to the sheet")
+    path = sheet_path(run_dir, sheet_id)
+    sheet = load_public_sheet(run_dir, sheet_id)
+    target = safe_output(Path(run_dir).resolve() / WITHDRAWN_DIR / safe_segment(sheet_id), ())
+    with recording_lock(path.parent), recording_lock(path):
+        if (path / "revealed.json").exists():
+            raise ValueError("This sheet was revealed; its verdicts are in use and it cannot be withdrawn")
+        if load_answers(run_dir, sheet):
+            raise ValueError("This sheet already has answers; finish and reveal it instead of withdrawing it")
+        if target.exists():
+            raise ValueError(f"A withdrawn sheet named {sheet_id} already exists")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        atomic_write(path / "withdrawn.json", dumps({"sheet_id": sheet_id, "reason": reason.strip(),
+                                                     "ts": datetime.now(timezone.utc).isoformat()}) + "\n")
+        path.rename(target)
+    return {"sheet_id": sheet_id, "withdrawn_to": str(target)}
+
+
+def run_withdraw(args):
+    print(dumps(withdraw(args.run_dir, args.sheet_id, reason=args.reason)))
+
+
 def reveal(run_dir, sheet_id):
     """Merge lineage back only after every item is answered; conservation is verified a second time."""
     path = sheet_path(run_dir, sheet_id)
@@ -1016,6 +1056,11 @@ def register(subparsers):
     parser.add_argument("--limit")
     parser.add_argument("--max-output-tokens", type=int)
     parser.set_defaults(func=lambda args: cli_boundary(run_sheet, args))
+    parser = subparsers.add_parser("withdraw", help="Retire an unanswered sheet; files and cost stay")
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--sheet-id", required=True)
+    parser.add_argument("--reason", required=True)
+    parser.set_defaults(func=lambda args: cli_boundary(run_withdraw, args))
     parser = subparsers.add_parser("reveal", help="Merge lineage back after every item is answered")
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--sheet-id", required=True)

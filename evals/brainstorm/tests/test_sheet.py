@@ -254,7 +254,8 @@ class RewriteTests(SheetCase):
         self.assertEqual(list(key["items"]), [item["item_id"] for item in public["items"]])
         for row in public["items"]:
             item = key["items"][row["item_id"]]
-            self.assertEqual(item["rewritten_text"], "平实版：" + " ".join(item["original_text"].split()))
+            self.assertEqual(item["rewritten_text"], "一句话：平实版：" + " ".join(item["original_text"].split())
+                             + "\n怎么做：做法\n好处：好处")
             self.assertEqual(row["text"], item["rewritten_text"])
             self.assertEqual(row["variants"], [])
 
@@ -281,11 +282,21 @@ class RewriteTests(SheetCase):
         def structured(prompt, model, maximum):
             data = json.loads(sheet.fake_rewrite(prompt, model, maximum))
             for row in data["rewrites"]:
-                row["text"] = "一个标题\n\n" + row["text"] + "\n第二段"
+                row["gist"] = "一个标题\n\n" + row["gist"] + "\n第二段"
+                row["how"] = "先这样\n再那样"
             return json.dumps(data)
         self.compare_sheet(respond=structured)
         for row in public_of(self.run_dir, "s_cmp")["items"]:
-            self.assertNotIn("\n", row["text"])
+            lines = row["text"].split("\n")
+            self.assertEqual([line.split("：", 1)[0] for line in lines], ["一句话", "怎么做", "好处"])
+
+    def test_old_single_text_reply_is_refused(self):
+        def single(prompt, model, maximum):
+            data = json.loads(sheet.fake_rewrite(prompt, model, maximum))
+            return json.dumps({"rewrites": [{"item": row["item"], "text": row["gist"]} for row in data["rewrites"]]})
+        with self.assertRaises(ValueError):
+            self.compare_sheet(respond=single)
+        self.assertNoSheet("s_cmp")
 
     def test_rewrite_input_masks_card_ids_so_the_model_cannot_copy_them(self):
         # Real sheet, 2026-11-07: an idea cited "(c03)" and the rewrite kept it, so the whole sheet was refused.
@@ -297,8 +308,44 @@ class RewriteTests(SheetCase):
         self.assertIn(sheet.MASK, rows[0]["text"])
         self.assertIn(sheet.MASK, sheet.rewrite_prompt("q", rows))
 
-    def test_rewrite_prompt_asks_for_one_paragraph(self):
-        self.assertIn("single paragraph", sheet.rewrite_prompt("q", [{"item": "r-0", "text": "t"}]))
+    def test_rewrite_prompt_asks_for_three_short_parts(self):
+        prompt = sheet.rewrite_prompt("q", [{"item": "r-0", "text": "t"}])
+        for field in ('"gist"', '"how"', '"benefit"', "glance"):
+            self.assertIn(field, prompt)
+
+
+class WithdrawTests(SheetCase):
+    """An unanswered sheet can be withdrawn so a better-written one replaces it; files and cost stay."""
+
+    def test_withdrawn_sheet_frees_the_exam_and_keeps_its_receipts(self):
+        self.compare_sheet("s_first")
+        with self.assertRaisesRegex(ValueError, "not been revealed"):
+            self.compare_sheet("s_second")
+        receipts = read_rows(self.run_dir / "sheets/s_first/calls.jsonl")
+        self.assertTrue(receipts)
+        sheet.withdraw(self.run_dir, "s_first", reason="texts too dense")
+        self.assertFalse((self.run_dir / "sheets/s_first").exists())
+        moved = self.run_dir / "sheets_withdrawn/s_first"
+        self.assertEqual(read_rows(moved / "calls.jsonl"), receipts)
+        self.assertEqual(json.loads((moved / "withdrawn.json").read_text(encoding="utf-8"))["reason"], "texts too dense")
+        self.compare_sheet("s_second")
+        from evals.brainstorm import report
+        scopes = {row["_scope"] for row in report.load_receipts(self.run_dir) if row["call_key"] in {r["call_key"] for r in receipts}}
+        self.assertEqual(scopes, {"sheet_rewrite"})
+
+    def test_answered_or_revealed_sheets_cannot_be_withdrawn(self):
+        self.compare_sheet("s_first")
+        items = public_of(self.run_dir, "s_first")["items"]
+        sheet.merge_answers(self.run_dir, "s_first", {"sheet_id": "s_first", "answers": [{"item_id": items[0]["item_id"], **ANSWER}]})
+        self.assertRaisesRegex(ValueError, "answer", sheet.withdraw, self.run_dir, "s_first", reason="x")
+        answer_all(self.run_dir, "s_first")
+        sheet.reveal(self.run_dir, "s_first")
+        self.assertRaisesRegex(ValueError, "revealed", sheet.withdraw, self.run_dir, "s_first", reason="x")
+        self.assertTrue((self.run_dir / "sheets/s_first/sheet.json").exists())
+
+    def test_a_reason_is_required(self):
+        self.compare_sheet("s_first")
+        self.assertRaisesRegex(ValueError, "reason", sheet.withdraw, self.run_dir, "s_first", reason=" ")
 
     def test_comparison_refuses_to_skip_rewriting(self):
         with self.assertRaisesRegex(ValueError, "require a rewrite backend"):
@@ -354,7 +401,7 @@ class BudgetAndResumeTests(SheetCase):
     def test_rerun_replays_the_cached_rejection_and_only_a_new_attempt_pays(self):
         def tainted(prompt, model, maximum):
             data = json.loads(sheet.fake_rewrite(prompt, model, maximum))
-            data["rewrites"][0]["text"] += " method_canary_y"
+            data["rewrites"][0]["how"] += " method_canary_y"
             return json.dumps(data)
         backend = FakeBackend(responses=tainted)
         for _ in range(2):
@@ -396,7 +443,7 @@ class RewriteScanTests(SheetCase):
     def taint(self, term):
         def respond(prompt, model, maximum):
             data = json.loads(sheet.fake_rewrite(prompt, model, maximum))
-            data["rewrites"][-1]["text"] += f" 来自 {term}。"
+            data["rewrites"][-1]["how"] += f" 来自 {term}。"
             return json.dumps(data)
         return respond
 
@@ -738,7 +785,8 @@ class CheckSampleTests(SheetCase):
 
     def test_comparison_items_have_one_structure(self):
         self.compare_sheet()
-        self.assertFalse(any("\n" in row["text"] for row in public_of(self.run_dir, "s_cmp")["items"]))
+        labels = {tuple(line.split("：", 1)[0] for line in row["text"].split("\n")) for row in public_of(self.run_dir, "s_cmp")["items"]}
+        self.assertEqual(labels, {("一句话", "怎么做", "好处")})
 
     def test_full_view_mixes_samples_only_when_they_cannot_be_told_apart(self):
         self.all_sheet()
