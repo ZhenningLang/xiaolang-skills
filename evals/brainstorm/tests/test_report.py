@@ -271,6 +271,29 @@ class MainScoreTests(unittest.TestCase):
             self.assertIsNone(key)
             self.assertIn("2 张", reason)
 
+    def test_a_sheet_covering_more_units_supersedes_the_one_it_extends(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+
+            def issue(name, reps):
+                path = root / "sheets" / name
+                path.mkdir(parents=True)
+                (path / "sheet.key.json").write_text(json.dumps({
+                    "exam_id": "e1", "view": "compare", "kind": "score",
+                    "units": {f"{config}/rep-{rep}": [] for config in (OLD, NEW) for rep in reps}}))
+                (path / "revealed.json").write_text("{}")
+
+            issue("first", (1, 2))
+            issue("more", (1, 2, 3))
+            key, reason = report.find_compare_sheet(root, "e1", (OLD, NEW))
+            self.assertIsNone(reason)
+            self.assertEqual(set(key["units"]), {f"{config}/rep-{rep}" for config in (OLD, NEW) for rep in (1, 2, 3)})
+            # Two sheets that each cover something the other lacks are still a real conflict.
+            issue("other", (1, 2, 4))
+            key, reason = report.find_compare_sheet(root, "e1", (OLD, NEW))
+            self.assertIsNone(key)
+            self.assertIn("2 张", reason)
+
 
 def idea(key, level="round1", *, config=OLD, returned=False, method=None, cards_used=("c1",), cards=("c1",), model="m", origin=None):
     return {"idea_id": key, "config": config, "rep": 1, "level": level, "returned": returned, "method": method,

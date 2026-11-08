@@ -144,6 +144,9 @@ def receipts_usd(root, row, rep, *, shared_keys=()):
 def describe(root, row, events):
     """What a reader needs to know about one replacement, from the files as they are now."""
     keys = set(row["call_keys"]) if row["stage"] == "grouping" else set()
+    if row["new_rep"] is None:
+        return {key: row[key] for key in ("exam_id", "config", "failed_rep", "new_rep", "stage", "cause", "ungrouped_ideas", "reason")} | {
+            "failed_usd": receipts_usd(root, row, row["failed_rep"], shared_keys=keys), "new_usd": None, "status": "abandoned"}
     state = unit_status(root, row["exam_id"], row["config"], row["new_rep"], events)["state"]
     return {key: row[key] for key in ("exam_id", "config", "failed_rep", "new_rep", "stage", "cause", "ungrouped_ideas", "reason")} | {
         "failed_usd": receipts_usd(root, row, row["failed_rep"], shared_keys=keys),
@@ -204,6 +207,8 @@ def replace_unit(exam, config, run_dir, *, failed_rep, new_rep, backend, ledger,
                    "ts": datetime.now(timezone.utc).isoformat()}
             new_path.mkdir(parents=True, exist_ok=True)
             replacements.append(root, exam_id, row)
+        elif row["new_rep"] is None:
+            raise ValueError(f"{exam_id}/{name} rep {failed_rep} was abandoned; it cannot be replaced or run again")
         elif row["new_rep"] != new_rep:
             raise ValueError(f"{exam_id}/{name} rep {failed_rep} was already replaced by rep {row['new_rep']}; "
                              "each failed unit is replaced once")
@@ -238,6 +243,46 @@ def run_new_unit(exam, config, root, row, *, seed, backend, ledger, dedupe_confi
     return describe(root, row, last_events(ledger.path))
 
 
+def abandon_unit(exam, config_name, run_dir, *, rep, ledger, reason):
+    """Drop a replacement that also failed. Files and cost stay; no call is made; the exam's sheet stops waiting for it."""
+    positive_int(rep, "rep")
+    if not isinstance(reason, str) or not reason.strip():
+        raise ValueError("Abandoning a unit needs a reason; it is kept in the record and the report")
+    root, exam_id = Path(run_dir).resolve(), exam["id"]
+    ledger.status()
+    with record.recording_lock(root / exam_id):
+        rows = replacements.load(root, exam_id)
+        if rep in replacements.abandoned_reps(rows, config_name):
+            raise ValueError(f"{exam_id}/{config_name} rep {rep} is already abandoned")
+        if rep not in replacements.new_reps(rows, config_name):
+            raise ValueError(f"{exam_id}/{config_name} rep {rep} is not a replacement; only a replacement that failed can be "
+                             "abandoned. A first failure goes through replace-unit")
+        status = unit_status(root, exam_id, config_name, rep, last_events(ledger.path))
+        if status["state"] == "open":
+            raise ValueError(f"Reconcile these calls first with ledger settle or ledger release: {', '.join(status['call_keys'])}")
+        if status["state"] != "failed":
+            raise ValueError(f"{exam_id}/{config_name} rep {rep} did not fail ({status['state']}); only a replacement that failed "
+                             "can be abandoned")
+        settle_failed_unit(root, exam, config_name, rep, ledger)
+        stored = record.read_rows(unit_path(root, exam_id, config_name, rep) / "ideas.jsonl")
+        row = {"exam_id": exam_id, "config": config_name, "failed_rep": rep, "new_rep": None, "stage": status["stage"],
+               "cause": status["cause"], "call_keys": status["call_keys"], "reason": reason.strip(),
+               "ungrouped_ideas": len({entry["idea_id"] for entry in stored} - grouped_ids(root, exam_id)),
+               "ts": datetime.now(timezone.utc).isoformat()}
+        replacements.append(root, exam_id, row)
+    return describe(root, row, last_events(ledger.path))
+
+
+def run_abandon_cli(args):
+    config = load_config(args.config)
+    exam = next((row for row in load_exams(args.exam_dir) if row["id"] == args.exam_id), None)
+    if exam is None:
+        raise ValueError("exam-id was not found")
+    backend = record.make_backend(config)
+    ledger = BudgetLedger(args.ledger or default_ledger_path(backend.name, args.run_dir), args.limit or config["budget_usd"])
+    print(dumps(abandon_unit(exam, config["name"], args.run_dir, rep=args.rep, ledger=ledger, reason=args.reason)))
+
+
 def run_cli(args):
     config, classifier = load_config(args.config), load_config(args.dedupe_config)
     if args.run_dir.resolve().is_relative_to(args.exam_dir.resolve()):
@@ -270,3 +315,13 @@ def register(subparsers):
     parser.add_argument("--limit")
     parser.add_argument("--reason", help="Kept in the replacement record")
     parser.set_defaults(func=lambda args: cli_boundary(run_cli, args))
+    abandon = subparsers.add_parser("abandon-unit", help="Drop a replacement that also failed; files and cost stay, no call is made")
+    abandon.add_argument("--run-dir", type=Path, required=True)
+    abandon.add_argument("--exam-dir", type=Path, required=True)
+    abandon.add_argument("--exam-id", required=True)
+    abandon.add_argument("--config", type=Path, required=True, help="The failed replacement's config")
+    abandon.add_argument("--rep", type=int, required=True, help="The replacement repetition that failed")
+    abandon.add_argument("--ledger", type=Path, help="Must be the ledger the unit used")
+    abandon.add_argument("--limit")
+    abandon.add_argument("--reason", required=True, help="Kept in the record and the report")
+    abandon.set_defaults(func=lambda args: cli_boundary(run_abandon_cli, args))

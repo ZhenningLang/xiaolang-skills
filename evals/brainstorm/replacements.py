@@ -23,6 +23,13 @@ def load(run_dir, exam_id):
         if set(row) != FIELDS or row["exam_id"] != exam_id:
             raise ValueError(f"Invalid replacement record for {exam_id}: unexpected fields")
         before, after = (row["config"], row["failed_rep"]), (row["config"], row["new_rep"])
+        if row["new_rep"] is None:
+            # Abandoned: only a replacement that also failed, and only once; nothing stands in for it.
+            if before not in new or before in failed:
+                raise ValueError(f"Invalid replacement record for {exam_id}: {row['config']} rep {row['failed_rep']} "
+                                 "is abandoned but is not a replacement, or is abandoned twice")
+            failed.add(before)
+            continue
         if before in failed or before in new or after in failed or after in new or before == after:
             raise ValueError(f"Invalid replacement record for {exam_id}: {row['config']} rep {row['failed_rep']} "
                              "appears in more than one replacement")
@@ -42,7 +49,11 @@ def retired_reps(rows, config):
 
 
 def new_reps(rows, config):
-    return {row["new_rep"] for row in rows if row["config"] == config}
+    return {row["new_rep"] for row in rows if row["config"] == config and row["new_rep"] is not None}
+
+
+def abandoned_reps(rows, config):
+    return {row["failed_rep"] for row in rows if row["config"] == config and row["new_rep"] is None}
 
 
 def slot(rows, config, rep):
@@ -51,5 +62,8 @@ def slot(rows, config, rep):
 
 
 def refuse_if_retired(run_dir, exam_id, config, rep):
-    if rep in retired_reps(load(run_dir, exam_id), config):
+    rows = load(run_dir, exam_id)
+    if rep in abandoned_reps(rows, config):
+        raise ValueError(f"{exam_id}/{config} rep {rep} was abandoned; it keeps its files and cost but cannot run again")
+    if rep in retired_reps(rows, config):
         raise ValueError(f"{exam_id}/{config} rep {rep} was replaced; it keeps its files and cost but cannot run again")

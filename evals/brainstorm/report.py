@@ -250,6 +250,8 @@ def find_compare_sheet(root, exam_id, configs, retired=()):
             matches.append(key)
         else:
             unrevealed += 1
+    # A later sheet over more units reuses the earlier verdicts, so the earlier sheet is part of it, not a rival.
+    matches = [key for key in matches if not any(set(key["units"]) < set(other["units"]) for other in matches)]
     if len(matches) == 1:
         return matches[0], None
     if matches:
@@ -1005,7 +1007,7 @@ def section_metrics(report):
             lines.extend(["", f"**{exam_id} / {config}**", "", *md_table(["指标", *(f"重复 {rep}" for rep in sorted(reps))], rows)])
         for rep, comparison in sorted(entry["comparisons"].items()):
             stand_ins = [f"{row['config']} 用替换后的重复 {row['new_rep']}" for row in report.get("replacements", [])
-                         if row["exam_id"] == exam_id and str(row["failed_rep"]) == str(rep)]
+                         if row["exam_id"] == exam_id and str(row["failed_rep"]) == str(rep) and row["new_rep"] is not None]
             note = f"（{'；'.join(stand_ins)}）" if stand_ins else ""
             lines.extend(["", f"**{exam_id} 重复 {rep} 的两种比较口径{note}**", ""])
             for mode, label in (("same_ideas", "相同点子数"), ("same_tokens", "相同 token")):
@@ -1249,6 +1251,9 @@ def trust_line(report):
 
 
 def replacement_sentence(row):
+    if row["new_rep"] is None:
+        return (f"题 {row['exam_id']} 配置 `{row['config']}` 的第 {row['failed_rep']} 次重复是替换，也失败了，已放弃，不再补跑；"
+                f"它花了 {money(row['failed_usd'])} 美元，这个配置在这道题上少一次重复。")
     head = f"题 {row['exam_id']} 配置 `{row['config']}` 的第 {row['failed_rep']} 次重复失败，换成第 {row['new_rep']} 次"
     money_text = f"失败那次花了 {money(row['failed_usd'])} 美元，替换那次花了 {money(row['new_usd'])} 美元"
     status = {"complete": "", "failed": "；替换也失败了，不能再替换，要人来决定", "unfinished": "；替换还没跑完"}[row["status"]]

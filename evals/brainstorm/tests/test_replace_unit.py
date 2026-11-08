@@ -531,3 +531,97 @@ class ReadmeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AbandonTests(Flow):
+    """A replacement that also failed can be dropped by name: files and cost stay, the sheet stops waiting for it."""
+
+    def abandon(self, rep=4, reason="replacement hit the same output cap"):
+        return quiet(replace_unit.abandon_unit, self.exam, "cfg_return", self.root, rep=rep, ledger=self.ledger, reason=reason)
+
+    def failed_replacement(self):
+        for config in (self.plain, self.returned):
+            for rep in (1, 2, 3):
+                if config is self.returned and rep == 1:
+                    self.fail_unit(rep)
+                else:
+                    self.run_unit(config, rep)
+        with self.assertRaises(ReplacementFailed):
+            self.replace(generation=FakeBackend(failure="paid_error"))
+
+    def test_only_a_failed_replacement_can_be_abandoned(self):
+        self.fail_unit()
+        self.assertRaisesRegex(ValueError, "only a replacement that failed", self.abandon, 1)
+        self.assertEqual(self.replace()["status"], "complete")
+        self.assertRaisesRegex(ValueError, "did not fail", self.abandon, 4)
+        self.assertEqual(len(replacements.load(self.root, self.exam["id"])), 1)
+
+    def test_a_reason_is_required(self):
+        self.failed_replacement()
+        self.assertRaisesRegex(ValueError, "reason", self.abandon, 4, "  ")
+
+    def test_abandoning_spends_nothing_and_keeps_the_files(self):
+        self.failed_replacement()
+        unit = self.root / self.exam["id"] / "cfg_return/rep-4"
+        before_files = sorted(path.relative_to(unit) for path in unit.rglob("*") if path.is_file())
+        before = self.events()
+        row = self.abandon()
+        self.assertEqual(self.events(), before)
+        self.assertEqual(sorted(path.relative_to(unit) for path in unit.rglob("*") if path.is_file()), before_files)
+        self.assertEqual((row["failed_rep"], row["new_rep"], row["status"]), (4, None, "abandoned"))
+        self.assertGreater(row["failed_usd"], 0)
+
+    def test_abandoned_unit_leaves_the_sheet_and_the_report_counts_two(self):
+        self.failed_replacement()
+        with self.assertRaises(ValueError):
+            self.compare_sheet("blocked", ["cfg_plain", "cfg_return"])
+        self.abandon()
+        self.assertEqual(discover_units(self.root, self.exam["id"], "cfg_return"), [("cfg_return", 2), ("cfg_return", 3)])
+        self.compare_sheet("after_abandon", ["cfg_plain", "cfg_return"])
+        units = read_file(self.root / "sheets/after_abandon/sheet.key.json")["units"]
+        self.assertEqual(set(units), {f"cfg_plain/rep-{rep}" for rep in (1, 2, 3)} | {"cfg_return/rep-2", "cfg_return/rep-3"})
+        built = quiet(report.build_report, self.root, [self.exam], [self.plain, self.returned], baseline="cfg_plain",
+                      candidate="cfg_return", decision_exam_ids=[self.exam["id"]], ledger_path=self.ledger.path)
+        evidence = built["exams"][self.exam["id"]]["evidence"]
+        self.assertTrue(evidence["answers_present"], evidence["answers_reason"])
+        self.assertEqual(len(evidence["scores"]["cfg_return"]), 2)
+        self.assertEqual(sorted(built["exams"][self.exam["id"]]["units"]["cfg_return"]), [2, 3])
+        # Two repetitions cannot give a noise line, so this exam cannot decide on its own.
+        self.assertFalse(built["decision"]["exams"][self.exam["id"]]["judgeable"])
+        self.assertEqual([row["status"] for row in built["replacements"]], ["failed", "abandoned"])
+        summary = "\n".join(built["summary"])
+        self.assertIn("放弃", summary)
+        self.assertNotIn("None", summary)
+        text = (self.root / "report.md").read_text(encoding="utf-8")
+        self.assertIn("replacement hit the same output cap", text.split("<summary>14. 单元替换</summary>", 1)[1])
+
+    def test_abandoned_unit_cannot_run_be_replaced_or_abandoned_again(self):
+        self.failed_replacement()
+        self.abandon()
+        before = self.events()
+        fresh = FakeBackend(responses=e2e.scenario)
+        with self.assertRaises(ValueError):
+            self.run_unit(self.returned, 4, generation=fresh)
+        self.assertRaisesRegex(ValueError, "abandoned", self.replace, failed=4, new=5, generation=fresh)
+        self.assertRaisesRegex(ValueError, "already abandoned", self.abandon)
+        self.assertEqual((fresh.calls, self.events()), (0, before))
+
+    def test_record_refuses_an_abandon_row_for_a_unit_that_is_not_a_replacement(self):
+        path = replacements.record_path(self.root, self.exam["id"])
+        path.parent.mkdir(parents=True, exist_ok=True)
+        row = {"exam_id": self.exam["id"], "config": "cfg_return", "failed_rep": 2, "new_rep": None, "stage": "recording",
+               "cause": "paid_error", "call_keys": [], "ungrouped_ideas": 0, "reason": "x", "ts": "t"}
+        path.write_text(json.dumps(row) + "\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Invalid replacement record"):
+            replacements.load(self.root, self.exam["id"])
+
+    def test_command_line_abandons_by_config_file(self):
+        self.failed_replacement()
+        config_path = self.root / "cfg_return.json"
+        config_path.write_text(json.dumps(self.returned), encoding="utf-8")
+        result = subprocess.run([sys.executable, "-m", "evals.brainstorm", "abandon-unit", "--run-dir", str(self.root),
+                                 "--exam-dir", str(e2e.EXAM_DIR), "--exam-id", self.exam["id"], "--config", str(config_path),
+                                 "--rep", "4", "--ledger", str(self.ledger.path), "--reason", "same cap twice"],
+                                cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["status"], "abandoned")
