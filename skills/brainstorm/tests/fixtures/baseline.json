@@ -1,0 +1,5 @@
+{"ideas": [
+ {"title": "Better README quick start", "text": "Put a three-line quick start at the top of the README.", "cards_used": [], "decomposition": null},
+ {"title": "Friendlier error messages", "text": "Replace stack traces with a one-line cause and the next command to run.", "cards_used": [], "decomposition": ["errors"]},
+ {"title": "One-line installer", "text": "Ship a single install script that checks dependencies first.", "cards_used": [], "decomposition": ["install"]}
+]}

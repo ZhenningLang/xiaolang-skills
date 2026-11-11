@@ -1,0 +1,4 @@
+{"ideas": [
+ {"title": "round2 idea A {agent}", "text": "Agent {agent} at round2: first distinct mechanism.", "cards_used": [], "decomposition": ["round2"]},
+ {"title": "round2 idea B {agent}", "text": "Agent {agent} at round2: second distinct mechanism.", "cards_used": [], "decomposition": null}
+]}

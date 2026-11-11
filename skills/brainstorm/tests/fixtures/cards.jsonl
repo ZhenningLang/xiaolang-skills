@@ -1,0 +1,4 @@
+{"id": "c01", "text": "Most first-run failures happen during install: a missing dependency, a wrong version, or the binary not on PATH."}
+{"id": "c02", "text": "Many people read only the first lines of the README and start copying commands."}
+{"id": "c03", "text": "An error that only prints a stack trace does not tell the user what to do next."}
+{"id": "c04", "text": "Most users who fail on the first try give up quietly; few open an issue."}

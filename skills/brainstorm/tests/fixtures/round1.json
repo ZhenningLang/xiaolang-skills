@@ -1,0 +1,5 @@
+{"ideas": [
+ {"title": "Quick start first", "text": "Put a three-line quick start at the top of the README.", "cards_used": [], "decomposition": ["docs"]},
+ {"title": "Doctor command {agent}", "text": "Agent {agent}: add a doctor subcommand that diagnoses the local setup and prints fixes.", "cards_used": [], "decomposition": ["install", "diagnosis"]},
+ {"title": "Failure replay {agent}", "text": "Agent {agent}: let users paste a failed command into a page that explains it offline.", "cards_used": [], "decomposition": ["errors"]}
+]}

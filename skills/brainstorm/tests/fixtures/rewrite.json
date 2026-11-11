@@ -1,0 +1,5 @@
+{"ideas": [
+ {"title": "Docs that run {agent}", "text": "Agent {agent}: make every README command a tested script that fails in CI when the docs drift.", "cards_used": [], "decomposition": ["docs"]},
+ {"title": "Second replacement {agent}", "text": "Agent {agent}: a spare replacement used only when two originals come back.", "cards_used": [], "decomposition": null},
+ {"title": "Third replacement {agent}", "text": "Agent {agent}: a spare replacement used only when three originals come back.", "cards_used": [], "decomposition": null}
+]}
