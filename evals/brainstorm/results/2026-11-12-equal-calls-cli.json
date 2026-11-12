@@ -1,0 +1,115 @@
+{
+ "control": {
+  "idea_calls": 30,
+  "idea_calls_dropped": 0,
+  "ideas": 300,
+  "mechanisms": 27,
+  "curve": [
+   {
+    "batch": 1,
+    "calls_so_far": 3,
+    "new_mechanisms": 13,
+    "mechanisms_so_far": 13
+   },
+   {
+    "batch": 2,
+    "calls_so_far": 6,
+    "new_mechanisms": 4,
+    "mechanisms_so_far": 17
+   },
+   {
+    "batch": 3,
+    "calls_so_far": 9,
+    "new_mechanisms": 1,
+    "mechanisms_so_far": 18
+   },
+   {
+    "batch": 4,
+    "calls_so_far": 12,
+    "new_mechanisms": 1,
+    "mechanisms_so_far": 19
+   },
+   {
+    "batch": 5,
+    "calls_so_far": 15,
+    "new_mechanisms": 0,
+    "mechanisms_so_far": 19
+   },
+   {
+    "batch": 6,
+    "calls_so_far": 18,
+    "new_mechanisms": 1,
+    "mechanisms_so_far": 20
+   },
+   {
+    "batch": 7,
+    "calls_so_far": 21,
+    "new_mechanisms": 3,
+    "mechanisms_so_far": 23
+   },
+   {
+    "batch": 8,
+    "calls_so_far": 24,
+    "new_mechanisms": 1,
+    "mechanisms_so_far": 24
+   },
+   {
+    "batch": 9,
+    "calls_so_far": 27,
+    "new_mechanisms": 3,
+    "mechanisms_so_far": 27
+   },
+   {
+    "batch": 10,
+    "calls_so_far": 30,
+    "new_mechanisms": 0,
+    "mechanisms_so_far": 27
+   }
+  ]
+ },
+ "queued_for_grouping": 0,
+ "failures": [],
+ "skill": {
+  "ideas": 252,
+  "mechanisms": 135,
+  "beyond_its_own_baseline": 112,
+  "idea_calls": 31,
+  "idea_calls_dropped": 2,
+  "merge_finished": true
+ },
+ "same_grouper": {
+  "control_only": 4,
+  "skill_only": 101,
+  "both": 23,
+  "skill_only_by_first_level": {
+   "baseline": 5,
+   "round1": 15,
+   "round2": 21,
+   "pressure1": 24,
+   "pressure2": 16,
+   "pressure3": 20
+  },
+  "skill_ideas_that_landed_in_a_control_mechanism_by_level": {
+   "baseline": 75,
+   "round1": 28,
+   "round2": 2,
+   "pressure1": 1,
+   "pressure2": 6,
+   "pressure3": 5
+  }
+ },
+ "notes": {
+  "date": "2026-11-12",
+  "question": "exams/v1 CLI onboarding question, same two hard constraints",
+  "model": "Sonnet sub-agents dispatched by a coding agent",
+  "control": "10 batches x 3 agents, no cards, no method, three-step prompt",
+  "skill": "full profile, 10 cards; 2 pressure-3 rewrite tasks were dropped by a host error",
+  "audit": {
+   "by": "one Opus sub-agent, one pass",
+   "skill_only_sampled": 25,
+   "judged_same_as_a_control_mechanism": 2,
+   "control_ideas_sampled_from_4_largest_mechanisms": 32,
+   "judged_misplaced": 1
+  }
+ }
+}
