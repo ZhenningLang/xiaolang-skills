@@ -182,6 +182,9 @@ def assignments_for(card_ids, seed, batch, level, used_cards=()):
 
 # ---------- prompts ----------
 
+PREVIOUS_HEADER = "Earlier agents' ideas that no one else had (titles only; the full text of each is in the avoid list above):"
+
+
 def generation_prompt(state, assignment, level, output_path, *, forbidden=None, decompositions=None,
                       previous=None, premises=None, originals=None):
     parts = ["Generate ideas using only the supplied data. " + TOOL_RULE,
@@ -213,7 +216,7 @@ def generation_prompt(state, assignment, level, output_path, *, forbidden=None, 
                       wrap_data(premises)])
     parts.append("Generate first, then self-report a decomposition; do not assign peers yet.")
     if previous is not None and level not in ("baseline", "round1"):
-        parts.extend(["Earlier agents' ideas:", wrap_data(previous)])
+        parts.extend([PREVIOUS_HEADER, wrap_data(previous)])
     if originals is not None:
         shown = [{key: row[key] for key in ("title", "text")} for row in originals]
         parts.extend(["Collision return: replace the mechanism, not just its wording.",
@@ -361,7 +364,8 @@ def generation_context(state, level, *, returned=False):
         if visible or returned else None,
         "decompositions": [{"idea_id": row["idea_id"], "decomposition": row["decomposition"]}
                            for row in ordered if row["level"] != "baseline" and row["decomposition"]] if visible else None,
-        "previous": [{key: ideas[row["first"]][key] for key in ("title", "text")} for row in table
+        # Every singleton is also in "forbidden" with its full text, so only its title is repeated here.
+        "previous": [{"title": ideas[row["first"]]["title"]} for row in table
                      if len(row["idea_ids"]) == 1 and ideas[row["first"]]["level"] != "baseline"] if visible else None,
     }
     if level == "pressure3":
@@ -384,6 +388,12 @@ def collisions(state, batch_ids):
 
 
 # ---------- task issuing and ingestion ----------
+
+WAIT_TEXT = ("Nothing was changed. These dispatched tasks have no answer file yet. If their sub-agents are still "
+             "running, wait for them. If one was never started or died, start a fresh isolated sub-agent for it with: "
+             "'Read the file <prompt> and do exactly what it says.' Then run next again. Only if a task cannot be "
+             "completed, run next with --give-up: its output is then dropped and recorded.")
+
 
 def task_paths(run_dir, task_id):
     base = Path(run_dir).resolve() / "tasks"
@@ -576,7 +586,8 @@ def dispatch(run_dir, state, task_ids, purpose):
     return {"action": "dispatch", "purpose": purpose, "level": steps_of(state)[state["step"]["index"]]
             if state["step"]["index"] < len(steps_of(state)) else None, "tasks": tasks,
             "instructions": "Start one fresh isolated sub-agent per task, all in one reply. Send each exactly: "
-                            "'Read the file <prompt> and do exactly what it says.' Wait for every task, then run next again."}
+                            "'Read the file <prompt> and do exactly what it says.' Wait for every task, then run next once. "
+                            "Running next while an answer file is missing changes nothing and lists the missing tasks."}
 
 
 def level_summary(state, level):
@@ -650,6 +661,13 @@ def cmd_next(args):
         if state["pressure"] not in (None, args.pressure):
             raise RunError(f"pressure was already set to {state['pressure']}")
         state["pressure"] = args.pressure
+    missing = [key for key in state["pending"] if not Path(state["tasks"][key]["output"]).is_file()]
+    if missing and not args.give_up:
+        # A host that calls next too early must not lose work: nothing is read or dropped until every answer exists.
+        print(json.dumps({"action": "wait", "missing": [
+            {"id": key, "prompt": state["tasks"][key]["prompt"], "output": state["tasks"][key]["output"]}
+            for key in missing], "instructions": WAIT_TEXT}, ensure_ascii=False, indent=1))
+        return
     ingest_pending(state)
     check_partition(state)
     result = advance(args.dir, state)
@@ -714,7 +732,7 @@ def idea_entry(state, idea, returned_ids):
     return lines
 
 
-def mechanism_block(state, row, number, returned_ids):
+def mechanism_heading(state, row):
     levels = []
     for key in row["idea_ids"]:
         level = state["ideas"][key]["level"]
@@ -722,8 +740,17 @@ def mechanism_block(state, row, number, returned_ids):
             levels.append(level)
     levels.sort(key=LEVEL_ORDER.index)
     label = one_line(row["label"]) + (" (not grouped: the grouping answer was unusable)" if row.get("ungrouped") else "")
-    lines = [f"### {number}. {label}", "", "Sources: " + " ".join(f"`{level}`" for level in levels)
-             + f" · {len(row['idea_ids'])} phrasing(s)", ""]
+    return label, " ".join(f"`{level}`" for level in levels) + f" · {len(row['idea_ids'])} phrasing(s)"
+
+
+def contents_line(state, row, number):
+    label, sources = mechanism_heading(state, row)
+    return f"- {number}. {label} · {sources}"
+
+
+def mechanism_block(state, row, number, returned_ids):
+    label, sources = mechanism_heading(state, row)
+    lines = [f"### {number}. {label}", "", "Sources: " + sources, ""]
     for key in row["idea_ids"]:
         lines += idea_entry(state, state["ideas"][key], returned_ids)
     return lines + [""]
@@ -744,6 +771,11 @@ def render_report(state):
     lines += ["| Level | Ideas | New mechanisms beyond baseline | Failed agents |", "|:---|---:|---:|---:|"]
     lines += [f"| {row['level']} | {row['ideas']} | {row['new_mechanisms_beyond_baseline']} | {row['failed_agents']} |"
               for row in state["summary"] if "ideas" in row]
+    lines += ["", "## Contents", "", "One line per mechanism, same numbers as the sections below. Beyond the baseline:", ""]
+    lines += [contents_line(state, row, number) for number, row in enumerate(beyond, 1)]
+    lines += ["", "<details>", f"<summary>{len(common)} mechanisms the plain baseline already produced</summary>", ""]
+    lines += [contents_line(state, row, number) for number, row in enumerate(common, len(beyond) + 1)]
+    lines += ["", "</details>"]
     lines += ["", f"## Beyond the baseline ({len(beyond)})", ""]
     for number, row in enumerate(beyond, 1):
         lines += mechanism_block(state, row, number, returned_ids)
@@ -787,6 +819,8 @@ def main(argv=None):
     step = commands.add_parser("next", help="Read finished task outputs, then print the next action")
     step.add_argument("--dir", required=True)
     step.add_argument("--pressure", choices=["go", "stop"])
+    step.add_argument("--give-up", action="store_true",
+                      help="Drop the dispatched tasks that still have no answer file, instead of waiting for them")
     step.set_defaults(func=cmd_next)
     status = commands.add_parser("status", help="Print progress without changing anything")
     status.add_argument("--dir", required=True)

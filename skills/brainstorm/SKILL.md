@@ -34,10 +34,11 @@ The script is `scripts/brainstorm.py` in this skill's folder. It needs only Pyth
 3. **Init.** Pick a new, empty run directory (for example `brainstorm-runs/<short-slug>` in the working directory) and run:
    `BS init --dir <run-dir> --question-file <file> [--constraint "..."]... [--cards <file>] [--profile economy] [--ideas-per-agent N]`
 4. **Loop.** Run `BS next --dir <run-dir>` and act on the JSON it prints:
-   - `"action": "dispatch"`: start one sub-agent per entry in `tasks`, **all in a single reply so they run in parallel**. Send each one only this message, with the path filled in: `Read the file <prompt> and do exactly what it says.` Wait until every one of them has finished, then run `next` again.
+   - `"action": "dispatch"`: start one sub-agent per entry in `tasks`, **all in a single reply so they run in parallel**. Send each one only this message, with the path filled in: `Read the file <prompt> and do exactly what it says.` Wait until every one of them has finished, then run `next` once. Never run `next` twice in one command.
+   - `"action": "wait"`: you ran `next` before every answer file existed. Nothing was changed. Wait for the sub-agents listed in `missing`, or start the ones that never ran, then run `next` again. Only when a task cannot be completed (its sub-agent failed twice, say), run `BS next --dir <run-dir> --give-up`: the missing outputs are dropped and recorded.
    - `"action": "confirm_pressure"`: show the user the `message`, ask whether to continue, then run `BS next --dir <run-dir> --pressure go` or `--pressure stop`.
    - `"action": "done"`: go to step 5.
-5. **Report.** Give the user the path of `report.md` and a short summary: how many mechanisms, how many are beyond the baseline, and any dropped agents. Then show the report's "Beyond the baseline" section, or the whole file if the user asks. Do not reorder, filter, score or merge anything.
+5. **Report.** Give the user the path of `report.md` and a short summary: how many mechanisms, how many are beyond the baseline, and any dropped agents. Then show the "beyond the baseline" part of the report's contents list, and the full text of whichever mechanisms the user picks, or the whole file if they ask. Do not reorder, filter, score or merge anything.
 
 If you lose track, `BS status --dir <run-dir>` prints progress without changing anything. Running `next` again resumes from the saved state.
 
@@ -46,7 +47,7 @@ If you lose track, `BS status --dir <run-dir>` prints progress without changing 
 - Each sub-agent must be fresh and isolated: no access to this conversation. Never use a fork-style sub-agent that inherits the parent conversation; seeing the user's chat or other agents' answers defeats the design.
 - Use a sub-agent type that can read and write files. If a sub-agent replies with the JSON instead of writing it, save its reply to the task's `output` path unchanged. Never write or edit an answer file yourself in any other way.
 - Do not paste extra context, hints or examples into the sub-agent message. Everything an agent should see is already in its prompt file.
-- An agent that writes nothing, or writes something malformed, is dropped for that step and recorded; the run continues. A grouping answer that cannot be read at all is retried once; after that, the affected ideas each keep their own mechanism and are marked as not grouped.
+- An agent that writes something malformed is dropped for that step and recorded; the run continues. An agent that writes nothing blocks the run until you restart it or pass `--give-up`. A grouping answer that cannot be read at all is retried once; after that, the affected ideas each keep their own mechanism and are marked as not grouped.
 
 ## Settings that leave the evaluated flow
 
@@ -56,4 +57,4 @@ If you lose track, `BS status --dir <run-dir>` prints progress without changing 
 
 ## Output
 
-`report.md` in the run directory lists every mechanism once, with all phrasings that were merged into it. Each phrasing shows its source level (`baseline`, `round1`, `round1 rewrite`, `round2`, `pressure1` to `pressure3`), agent, method and the cards it used. Mechanisms beyond the baseline come first, in order of first appearance; those the baseline already produced are folded at the end. The script refuses to write a report whose mechanism or idea count does not match the run state.
+`report.md` in the run directory opens with a contents list, one line per mechanism, so the user can scan before reading. Below it, every mechanism appears once, with all phrasings that were merged into it. Each phrasing shows its source level (`baseline`, `round1`, `round1 rewrite`, `round2`, `pressure1` to `pressure3`), agent, method and the cards it used. Mechanisms beyond the baseline come first, in order of first appearance; those the baseline already produced are folded at the end. The script refuses to write a report whose mechanism or idea count does not match the run state.

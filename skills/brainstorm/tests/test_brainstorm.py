@@ -98,6 +98,9 @@ class FakeHost:
             if action["action"] == "confirm_pressure":
                 extra = ["--pressure", self.pressure]
                 continue
+            if action["action"] == "wait":
+                extra = ["--give-up"]
+                continue
             for task in action["tasks"]:
                 (self.group if action["purpose"] == "group" else self.generate)(task)
         raise AssertionError("run did not finish")
@@ -219,8 +222,9 @@ class RunTests(RunCase):
         report = Path(done["report"]).read_text(encoding="utf-8")
         headings = re.findall(r"^### (\d+)\. ", report, re.M)
         self.assertEqual(len(headings), done["mechanisms"])
-        self.assertLess(report.index("## Beyond the baseline"), report.index("<details>"))
-        self.assertLess(report.index("<details>"), report.index("Better README quick start"))
+        body = report[report.index("## Beyond the baseline"):]  # the contents list above has its own fold
+        self.assertLess(body.index("<details>"), body.index("**Better README quick start**"))
+        self.assertEqual(report.count("<details>"), 2)
         self.assertIn("`round1 rewrite`", report)
         self.assertIn("`pressure3`", report)
         self.assertIn("collided with the baseline", report)
@@ -228,7 +232,12 @@ class RunTests(RunCase):
         round2 = next(a for a in host.actions if a.get("level") == "round2" and a["purpose"] == "generate")
         prompt = Path(round2["tasks"][0]["prompt"]).read_text(encoding="utf-8")
         self.assertIn("Supplied decompositions:", prompt)
-        self.assertIn("Earlier agents' ideas:", prompt)
+        earlier = data_block(prompt, bs.PREVIOUS_HEADER)
+        avoid = data_block(prompt, "Avoid these already observed mechanisms:")
+        self.assertTrue(earlier)
+        self.assertTrue(all(set(row) == {"title"} for row in earlier))  # full text is not repeated
+        self.assertLessEqual({row["title"] for row in earlier}, {row["title"] for row in avoid})
+        self.assertTrue(all(set(row) == {"title", "text"} for row in avoid))
         self.assertIn("Avoid these already observed mechanisms:", prompt)
         p3 = next(a for a in host.actions if a.get("level") == "pressure3" and a["purpose"] == "generate")
         self.assertIn("question these observations", Path(p3["tasks"][0]["prompt"]).read_text(encoding="utf-8"))
@@ -250,6 +259,46 @@ class RunTests(RunCase):
         self.assertIn("## Dropped or partial sub-agent outputs", report)
         summary = {row["level"]: row for row in state["summary"] if "ideas" in row}
         self.assertEqual(summary["round1"]["failed_agents"], 2)
+
+    def test_next_waits_while_answers_are_missing(self):
+        self.init()
+        host = FakeHost(self.dir)
+        first = host.cli("next", "--dir", str(self.dir))
+        before = (self.dir / "state.json").read_text(encoding="utf-8")
+        waiting = host.cli("next", "--dir", str(self.dir))
+        self.assertEqual(waiting["action"], "wait")
+        self.assertEqual([t["id"] for t in waiting["missing"]], [t["id"] for t in first["tasks"]])
+        self.assertEqual(waiting["missing"][0]["prompt"], first["tasks"][0]["prompt"])
+        self.assertEqual((self.dir / "state.json").read_text(encoding="utf-8"), before)  # nothing dropped
+        for task in first["tasks"][1:]:
+            host.generate(task)
+        waiting = host.cli("next", "--dir", str(self.dir))
+        self.assertEqual([t["id"] for t in waiting["missing"]], [first["tasks"][0]["id"]])
+        host.generate(first["tasks"][0])
+        self.assertEqual(host.cli("next", "--dir", str(self.dir))["action"], "dispatch")
+        self.assertEqual(self.state()["failures"], [])
+
+    def test_give_up_drops_only_the_missing_answers(self):
+        self.init()
+        host = FakeHost(self.dir)
+        first = host.cli("next", "--dir", str(self.dir))
+        for task in first["tasks"][1:]:
+            host.generate(task)
+        host.cli("next", "--dir", str(self.dir), "--give-up")
+        self.assertEqual([(row["task"], row["reason"]) for row in self.state()["failures"]],
+                         [(first["tasks"][0]["id"], "missing_output")])
+
+    def test_report_opens_with_one_line_per_mechanism(self):
+        self.init("--profile", "economy")
+        done = FakeHost(self.dir).run()
+        report = Path(done["report"]).read_text(encoding="utf-8")
+        contents = report[report.index("## Contents"):report.index("## Beyond the baseline")]
+        numbers = [int(n) for n in re.findall(r"^- (\d+)\. ", contents, re.M)]
+        self.assertEqual(numbers, list(range(1, done["mechanisms"] + 1)))
+        heading = re.search(r"^### 1\. (.*)$", report, re.M).group(1)
+        self.assertIn(f"- 1. {heading} ·", contents)
+        self.assertLess(contents.index(f"- {done['beyond_baseline']}. "), contents.index("<details>"))
+        self.assertLess(contents.index("<details>"), contents.index(f"- {done['beyond_baseline'] + 1}. "))
 
     def test_unreadable_grouping_is_retried_once_then_kept_ungrouped(self):
         self.init("--profile", "economy")
