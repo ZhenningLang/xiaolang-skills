@@ -318,6 +318,40 @@ unverified. Real cost fidelity and personal-context contamination require a
 separate explicitly authorized, budgeted smoke test. No real smoke is part of
 the automated suite, and a reservation is not a vendor-enforced spending cap.
 
+## Testing The Shipped Skill
+
+Everything above measures the flow through direct model calls. `skill_budget.py` measures the shipped
+skill itself, where a host agent dispatches sub-agents. It calls no model: the host dispatches the tasks
+it prints, the same way it does for the skill.
+
+**Smoke check, before a release.** Run the skill once on any exam question, then:
+
+```sh
+python3 -m evals.brainstorm.skill_budget check --dir <skill run dir>
+```
+
+It fails if the run is unfinished, an idea agent was dropped, ideas were left ungrouped, a level is
+missing, or a level added fewer than `--min-new` mechanisms beyond the baseline.
+
+**Same number of calls, plain asking.** The control asks the same question again and again with no
+cards, no methods and no rounds, for as many idea calls as the skill run used:
+
+```sh
+python3 -m evals.brainstorm.skill_budget direct-init --dir <control dir> --question-file q.txt --batches 10
+python3 -m evals.brainstorm.skill_budget next --dir <control dir>      # dispatch, repeat until done
+python3 -m evals.brainstorm.skill_budget merge --dir <control dir> --from <skill run dir>
+python3 -m evals.brainstorm.skill_budget next --dir <control dir>      # dispatch, repeat until done
+python3 -m evals.brainstorm.skill_budget compare --dir <control dir>
+```
+
+`merge` puts every idea of the skill run through the control run's grouper, so both sides are counted
+by one grouping. `compare` reports the mechanisms only the skill reached, only the control reached, and
+both, plus how fast the control stops finding new mechanisms.
+
+Limits: calls are equal, tokens are not (the skill's later prompts are far longer). The control ideas are
+grouped first, so a borderline skill idea is more likely to be merged into a control mechanism than the
+other way round. Mechanism counts depend on the grouping model. None of this measures usefulness.
+
 ## Tests
 
 ```sh
