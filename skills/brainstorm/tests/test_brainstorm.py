@@ -357,5 +357,68 @@ class RunTests(RunCase):
             self.assertEqual(bs.main(["init", "--dir", str(self.dir), "--question", "q"]), 1)
 
 
+class MethodLibraryTests(RunCase):
+    def write_methods(self, rows):
+        path = Path(self.tmp.name) / "methods.jsonl"
+        path.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in rows), encoding="utf-8")
+        return path
+
+    def method_tasks(self):
+        return [task for task in self.state()["tasks"].values() if task["kind"] == "generate" and task["method"]]
+
+    def test_default_run_keeps_the_four_evaluated_methods(self):
+        made = self.init()
+        self.assertEqual(self.state()["methods"], bs.METHODS)
+        self.assertEqual((made["methods"], made["evaluated_settings"]), (4, True))
+
+    def test_bundled_library_extends_the_evaluated_methods_without_changing_them(self):
+        library = {row["id"]: row["text"] for row in bs.read_methods(bs.METHOD_LIBRARY)}
+        self.assertGreaterEqual(len(library), 16)
+        for name, text in bs.METHODS.items():
+            self.assertEqual(library[name], text)
+
+    def test_library_run_gives_each_agent_a_method_no_one_had_before(self):
+        made = self.init("--methods", "library", "--profile", "economy")
+        self.assertEqual(made["evaluated_settings"], False)
+        FakeHost(self.dir).run()
+        state = self.state()
+        tasks = self.method_tasks()
+        self.assertEqual(len(tasks), 6)
+        self.assertEqual(len({task["method"] for task in tasks}), 6)
+        for task in tasks:
+            prompt = Path(task["prompt"]).read_text(encoding="utf-8")
+            lines = prompt.split("\n")
+            self.assertEqual(lines[lines.index("Method instructions:") + 1], state["methods"][task["method"]])
+        self.assertIn("method " + tasks[0]["method"], (self.dir / "report.md").read_text(encoding="utf-8"))
+
+    def test_small_library_reuses_methods_only_after_all_were_used(self):
+        rows = [{"id": f"m{n}", "text": f"method text {n}"} for n in range(1, 5)]
+        self.init("--methods", str(self.write_methods(rows)), "--profile", "economy")
+        FakeHost(self.dir).run()
+        used = [task["method"] for task in sorted(self.method_tasks(), key=lambda task: task["batch"])]
+        self.assertEqual(len(used), 6)
+        self.assertEqual(set(used[:3]) | set(used[3:]), {"m1", "m2", "m3", "m4"})
+        self.assertEqual(len(set(used[3:])), 3)
+
+    def test_same_seed_and_library_reproduce_the_methods(self):
+        self.init("--methods", "library", "--profile", "economy")
+        FakeHost(self.dir).run()
+        first = [(task["batch"], task["agent"], task["method"]) for task in self.method_tasks()]
+        self.dir = Path(self.tmp.name) / "again"
+        self.init("--methods", "library", "--profile", "economy")
+        FakeHost(self.dir).run()
+        self.assertEqual(first, [(task["batch"], task["agent"], task["method"]) for task in self.method_tasks()])
+
+    def test_init_refuses_a_broken_method_file(self):
+        good = {"id": "a", "text": "x"}
+        for rows in ([good, {"id": "b", "text": "y"}],                       # fewer than one method per agent
+                     [good, good, {"id": "c", "text": "z"}],                 # repeated id
+                     [good, {"id": "b", "text": " "}, {"id": "c", "text": "z"}]):
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(bs.main(["init", "--dir", str(self.dir), "--question", "q",
+                                          "--methods", str(self.write_methods(rows))]), 1)
+            self.assertFalse(self.dir.exists())
+
+
 if __name__ == "__main__":
     unittest.main()

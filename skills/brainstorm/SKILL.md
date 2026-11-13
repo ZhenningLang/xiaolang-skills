@@ -32,7 +32,7 @@ The script is `scripts/brainstorm.py` in this skill's folder. It needs only Pyth
 1. **Question.** Write the user's question to a file exactly as they gave it. Do not rephrase, translate, summarise or fix it; agents see the original question on purpose. Collect hard constraints (things an idea must never violate) only if the user stated them.
 2. **Cards (optional).** If the user supplied material, cut it into short self-contained cards, one fact or observation each, keeping their wording. Save them as a `.jsonl` file of `{"id": "c01", "text": "..."}` rows, or as a plain text file with one card per paragraph. No material is fine: run without `--cards`. You may also gather material yourself, but say so to the user. Both the no-card case and host-gathered cards are untested: the evaluation used 10 cards the author wrote in advance.
 3. **Init.** Pick a new, empty run directory (for example `brainstorm-runs/<short-slug>` in the working directory) and run:
-   `BS init --dir <run-dir> --question-file <file> [--constraint "..."]... [--cards <file>] [--profile economy] [--ideas-per-agent N]`
+   `BS init --dir <run-dir> --question-file <file> [--constraint "..."]... [--cards <file>] [--methods library] [--profile economy] [--ideas-per-agent N]`
 4. **Loop.** Run `BS next --dir <run-dir>` and act on the JSON it prints:
    - `"action": "dispatch"`: start one sub-agent per entry in `tasks`, **all in a single reply so they run in parallel**. Send each one only this message, with the path filled in: `Read the file <prompt> and do exactly what it says.` Wait until every one of them has finished, then run `next` once. Never run `next` twice in one command.
    - `"action": "wait"`: you ran `next` before every answer file existed. Nothing was changed. Wait for the sub-agents listed in `missing`, or start the ones that never ran, then run `next` again. Only when a task cannot be completed (its sub-agent failed twice, say), run `BS next --dir <run-dir> --give-up`: the missing outputs are dropped and recorded.
@@ -53,7 +53,12 @@ If you lose track, `BS status --dir <run-dir>` prints progress without changing 
 
 - `--ideas-per-agent` (default 10, the evaluated value): lowering it keeps sub-agent output short enough for hosts that cut long replies, but the run then differs from what was evaluated.
 - Running some agents on other models, or letting agents search the web, is off by default and has not been evaluated; do it only if the user explicitly asks.
-- The four method instructions are kept word for word from the evaluated run, which was in Chinese. Agents still answer in the language of the question.
+- The four method instructions (analogy, reverse a premise, stand in the affected person's place, use idle resources) are kept word for word from the evaluated run, which was in Chinese. Agents still answer in the language of the question.
+- `--methods library` uses the larger set in `methods/library.jsonl` (the four above plus more, such as substitute, eliminate, contradiction, first principles). `--methods <file>` uses the user's own set. In both cases every agent of a batch gets a different method, and a method is reused only after every other method was used. One trial run showed no gain that the repository's comparison could detect (see README, Evidence and limits): use it only when the user asks for more thinking methods, and say so in your summary.
+
+## Adding thinking methods
+
+A method is one line in a `.jsonl` file: `{"id": "short-name", "text": "the instruction"}`. To extend the bundled set, add lines to `methods/library.jsonl`; no code changes. Keep a method only if it forces the agent to start from a different place: it must name an operation to perform (replace a part, drop a step, resolve a named contradiction), not a way to judge ideas. Methods that only rate or sort ideas (SWOT, cost-benefit, decision matrices) do not belong here.
 
 ## Output
 

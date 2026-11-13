@@ -1,0 +1,131 @@
+{
+ "date": "2026-11-13",
+ "question_id": "side_income",
+ "what": "Same question, cards and seed as 2026-11-13-equal-calls-side-income.json; only the methods changed, from the four evaluated ones to --methods library (18). Merged into a fresh copy of the same control run.",
+ "methods_used": "15 non-baseline idea agents, 15 different methods",
+ "compare": {
+  "control": {
+   "idea_calls": 30,
+   "idea_calls_dropped": 0,
+   "ideas": 293,
+   "mechanisms": 21,
+   "curve": [
+    {
+     "batch": 1,
+     "calls_so_far": 3,
+     "new_mechanisms": 11,
+     "mechanisms_so_far": 11
+    },
+    {
+     "batch": 2,
+     "calls_so_far": 6,
+     "new_mechanisms": 3,
+     "mechanisms_so_far": 14
+    },
+    {
+     "batch": 3,
+     "calls_so_far": 9,
+     "new_mechanisms": 1,
+     "mechanisms_so_far": 15
+    },
+    {
+     "batch": 4,
+     "calls_so_far": 12,
+     "new_mechanisms": 1,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 5,
+     "calls_so_far": 15,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 6,
+     "calls_so_far": 18,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 7,
+     "calls_so_far": 21,
+     "new_mechanisms": 2,
+     "mechanisms_so_far": 18
+    },
+    {
+     "batch": 8,
+     "calls_so_far": 24,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 18
+    },
+    {
+     "batch": 9,
+     "calls_so_far": 27,
+     "new_mechanisms": 3,
+     "mechanisms_so_far": 21
+    },
+    {
+     "batch": 10,
+     "calls_so_far": 30,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 21
+    }
+   ]
+  },
+  "queued_for_grouping": 0,
+  "failures": [],
+  "skill": {
+   "ideas": 246,
+   "mechanisms": 134,
+   "beyond_its_own_baseline": 106,
+   "idea_calls": 29,
+   "idea_calls_dropped": 0,
+   "merge_finished": true
+  },
+  "same_grouper": {
+   "control_only": 1,
+   "skill_only": 38,
+   "both": 20,
+   "skill_only_by_first_level": {
+    "baseline": 6,
+    "round1": 2,
+    "round2": 2,
+    "pressure1": 9,
+    "pressure2": 12,
+    "pressure3": 7
+   },
+   "skill_ideas_that_landed_in_a_control_mechanism_by_level": {
+    "baseline": 65,
+    "round1": 43,
+    "pressure1": 13,
+    "pressure3": 18,
+    "round2": 20,
+    "pressure2": 17
+   }
+  }
+ },
+ "audit_fixed_rule": {
+  "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
+  "repeats": {
+   "sampled": 25,
+   "judged_same": 10,
+   "skill_only_by_grouper": 38,
+   "estimated_new": 23
+  },
+  "constraints": {
+   "checked": 59,
+   "violations": {
+    "skill_only": 0,
+    "control_only": 0,
+    "both": 1
+   }
+  },
+  "judge": "Claude Opus sub-agent, one pass",
+  "sample_seed": 1
+ },
+ "reading": [
+  "Skill-only by the grouper fell from 91 to 38, but the grouper formed 59 mechanisms in this merge and 112 in the earlier one from a similar number of ideas. The grouper's granularity is not stable between merges, so grouper counts from different merges cannot be compared.",
+  "Discounted estimate: 23 here, 36 with the four methods. Each estimate inherits its merge's granularity, so this does not show the library is worse. It shows no gain that this instrument can detect.",
+  "One run on each side."
+ ]
+}
