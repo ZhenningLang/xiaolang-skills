@@ -1,0 +1,142 @@
+{
+ "date": "2026-11-13",
+ "question_id": "side_income",
+ "question": "一个人运营的中文技术公众号，怎样在三个月内拿到第一笔收入？",
+ "constraints": [
+  "每周投入不超过 5 小时",
+  "不卖课，不建付费群"
+ ],
+ "models": {
+  "idea_and_grouping_agents": "Claude Sonnet sub-agents",
+  "audit": "Claude Opus sub-agent, one pass"
+ },
+ "compare": {
+  "control": {
+   "idea_calls": 30,
+   "idea_calls_dropped": 0,
+   "ideas": 293,
+   "mechanisms": 21,
+   "curve": [
+    {
+     "batch": 1,
+     "calls_so_far": 3,
+     "new_mechanisms": 11,
+     "mechanisms_so_far": 11
+    },
+    {
+     "batch": 2,
+     "calls_so_far": 6,
+     "new_mechanisms": 3,
+     "mechanisms_so_far": 14
+    },
+    {
+     "batch": 3,
+     "calls_so_far": 9,
+     "new_mechanisms": 1,
+     "mechanisms_so_far": 15
+    },
+    {
+     "batch": 4,
+     "calls_so_far": 12,
+     "new_mechanisms": 1,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 5,
+     "calls_so_far": 15,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 6,
+     "calls_so_far": 18,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 16
+    },
+    {
+     "batch": 7,
+     "calls_so_far": 21,
+     "new_mechanisms": 2,
+     "mechanisms_so_far": 18
+    },
+    {
+     "batch": 8,
+     "calls_so_far": 24,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 18
+    },
+    {
+     "batch": 9,
+     "calls_so_far": 27,
+     "new_mechanisms": 3,
+     "mechanisms_so_far": 21
+    },
+    {
+     "batch": 10,
+     "calls_so_far": 30,
+     "new_mechanisms": 0,
+     "mechanisms_so_far": 21
+    }
+   ]
+  },
+  "queued_for_grouping": 0,
+  "failures": [
+   {
+    "task": "g014",
+    "reason": "ungrouped",
+    "detail": "1 ideas kept as their own mechanisms: Unknown idea ID: 'x-i-cc22dc85488'; Missing, duplicate, or invalid assignment for x-i-cc22dec85488"
+   }
+  ],
+  "skill": {
+   "ideas": 258,
+   "mechanisms": 126,
+   "beyond_its_own_baseline": 107,
+   "idea_calls": 31,
+   "idea_calls_dropped": 0,
+   "merge_finished": true
+  },
+  "same_grouper": {
+   "control_only": 3,
+   "skill_only": 91,
+   "both": 18,
+   "skill_only_by_first_level": {
+    "baseline": 4,
+    "round1": 12,
+    "round2": 11,
+    "pressure1": 18,
+    "pressure2": 25,
+    "pressure3": 21
+   },
+   "skill_ideas_that_landed_in_a_control_mechanism_by_level": {
+    "baseline": 74,
+    "round1": 40,
+    "pressure1": 5,
+    "round2": 11,
+    "pressure3": 4,
+    "pressure2": 2
+   }
+  }
+ },
+ "audit": {
+  "sampled_skill_only": 25,
+  "judged_same_as_a_control_mechanism": 15,
+  "rule": "same if the income source, payer and way of closing the sale are the same; different channel or packaging alone counts as same; unsure counts as different",
+  "note": "The grouper splits finer than this rule. On the first question a similar audit judged 2 of 25 as repeats."
+ },
+ "hard_constraints": {
+  "mechanisms_checked": 112,
+  "violations": 0,
+  "by_source": {
+   "skill": 91,
+   "both": 18,
+   "control": 3
+  },
+  "note": "blind to source, one pass, unsure counts as no violation"
+ },
+ "limits": [
+  "one run per side",
+  "calls equal, tokens not",
+  "counts different mechanisms, not useful ones",
+  "one merged idea was left ungrouped by a grouper ID typo and counts as its own mechanism"
+ ]
+}
