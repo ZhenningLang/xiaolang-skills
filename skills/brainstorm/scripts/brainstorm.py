@@ -31,6 +31,8 @@ METHODS = {
     "person": "完全站在受影响最大的那个人的位置，从那个人一天里实际遇到的时刻出发想办法。",
     "resources": "先列出手头已有但没被利用的资源，每个点子都必须用上其中至少一种。",
 }
+# A larger set that keeps the four above word for word. A run uses it only when asked: --methods library.
+METHOD_LIBRARY = Path(__file__).resolve().parents[1] / "methods" / "library.jsonl"
 PROFILES = {"full": ["round1", "round2", "pressure1", "pressure2", "pressure3"],
             "economy": ["round1", "round2"]}
 LEVEL_ORDER = ["baseline", "round1", "round2", "pressure1", "pressure2", "pressure3"]
@@ -137,6 +139,21 @@ def read_cards(path):
     return cards
 
 
+def read_methods(source):
+    """Methods use the card file formats. Each needs an id and one instruction that changes where an agent starts."""
+    try:
+        methods = read_cards(source)
+    except RunError as exc:
+        raise RunError(str(exc).replace("card", "method")) from None
+    if len(methods) < AGENTS:
+        raise RunError(f"methods: need at least {AGENTS}, one for each agent of a batch")
+    return methods
+
+
+def methods_of(state):
+    return state.get("methods", METHODS)
+
+
 # ---------- assignment ----------
 
 def allocation_seed(seed, batch, level):
@@ -144,11 +161,14 @@ def allocation_seed(seed, batch, level):
     return int(digest([seed, 1, batch, level]), 16)
 
 
-def allocate(card_ids, seed):
+def allocate(card_ids, seed, method_ids=None, used_methods=None):
     rng = random.Random(seed)
     cards = sorted(card_ids)
-    methods = sorted(METHODS)
+    methods = sorted(METHODS if method_ids is None else method_ids)
     rng.shuffle(methods)
+    if used_methods is not None:
+        # Stable sort: methods used least often so far come first, in the shuffled order.
+        methods.sort(key=lambda name: used_methods.get(name, 0))
     rows = []
     for index in range(AGENTS):
         selected = sorted(rng.sample(cards, int(len(cards) * MATERIALS_PROPORTION)))
@@ -157,10 +177,14 @@ def allocate(card_ids, seed):
     return rows
 
 
-def assignments_for(card_ids, seed, batch, level, used_cards=()):
-    """Methods and cards for one generation batch; pressure2 prefers cards no earlier agent received."""
+def assignments_for(card_ids, seed, batch, level, used_cards=(), method_ids=None, used_methods=None):
+    """Methods and cards for one generation batch; pressure2 prefers cards no earlier agent received.
+
+    With used_methods (a count per method), the batch takes the methods used least often so far. The
+    evaluated four are assigned without it, so a seed still reproduces the evaluated assignments.
+    """
     alloc = allocation_seed(seed, batch, level)
-    rows = allocate(card_ids, alloc)
+    rows = allocate(card_ids, alloc, method_ids, used_methods)
     if level == "baseline":
         for row in rows:
             row["method"] = None
@@ -201,7 +225,7 @@ def generation_prompt(state, assignment, level, output_path, *, forbidden=None, 
         parts.append(f"Three steps: first list {state['ideas_per_agent']} idea titles; then rewrite the titles to maximize "
                      "differences between their mechanisms; finally expand the rewritten titles into complete ideas.")
     if level != "baseline" and assignment["method"] is not None:
-        parts.extend(["Method instructions:", METHODS[assignment["method"]]])
+        parts.extend(["Method instructions:", methods_of(state)[assignment["method"]]])
     if level == "round2":
         parts.append("Second round: follow the supplied decomposition assignment, explore uncovered subproblems, "
                      "and use supplied singleton ideas as starting points.")
@@ -406,12 +430,21 @@ def issue_generation(run_dir, state, level):
     used = {card for task in state["tasks"].values() if task["kind"] != "group" for card in task["cards"]}
     card_ids = [card["id"] for card in state["cards"]]
     context = generation_context(state, level)
+    methods = methods_of(state)
+    used_methods = None
+    if methods != METHODS:
+        used_methods = {}
+        for task in state["tasks"].values():
+            if task["kind"] == "generate" and task["method"]:
+                used_methods[task["method"]] = used_methods.get(task["method"], 0) + 1
     batch_numbers = []
     for _ in batches:
         batch = state["next_batch"]
         state["next_batch"] += 1
         batch_numbers.append(batch)
-        for row in assignments_for(card_ids, state["seed"], batch, level, used):
+        for row in assignments_for(card_ids, state["seed"], batch, level, used, sorted(methods), used_methods):
+            if used_methods is not None and row["method"]:
+                used_methods[row["method"]] = used_methods.get(row["method"], 0) + 1
             task_id = f"b{batch:03d}-a{row['agent']}"
             prompt_path, output_path = task_paths(run_dir, task_id)
             atomic_write(prompt_path, generation_prompt(state, row, level, output_path, **context))
@@ -688,19 +721,25 @@ def cmd_init(args):
     if args.constraints_file:
         constraints += [line for line in Path(args.constraints_file).read_text(encoding="utf-8").splitlines() if line.strip()]
     cards = read_cards(args.cards) if args.cards else []
+    if args.methods == "evaluated":
+        methods = dict(METHODS)
+    else:
+        rows = read_methods(METHOD_LIBRARY if args.methods == "library" else args.methods)
+        methods = {row["id"]: row["text"] for row in rows}
     if args.ideas_per_agent < 1:
         raise RunError("--ideas-per-agent must be positive")
     seed = args.seed if args.seed is not None else secrets.randbelow(2 ** 31)
     state = {"version": STATE_VERSION, "question": question, "constraints": constraints, "cards": cards,
-             "seed": seed, "profile": args.profile, "ideas_per_agent": args.ideas_per_agent,
+             "methods": methods, "seed": seed, "profile": args.profile, "ideas_per_agent": args.ideas_per_agent,
              "pressure": None, "next_batch": 1, "group_counter": 0, "step": {"index": 0, "phase": "start"},
              "tasks": {}, "pending": [], "queue": [], "ideas": {}, "mechanisms": [], "failures": [],
              "summary": [], "complete": False}
     run_dir.mkdir(parents=True, exist_ok=True)
     save_state(run_dir, state)
     print(json.dumps({"dir": str(run_dir.resolve()), "seed": seed, "profile": args.profile, "cards": len(cards),
-                      "constraints": len(constraints), "ideas_per_agent": args.ideas_per_agent,
-                      "evaluated_settings": args.ideas_per_agent == DEFAULT_IDEAS_PER_AGENT}, ensure_ascii=False))
+                      "methods": len(methods), "constraints": len(constraints),
+                      "ideas_per_agent": args.ideas_per_agent,
+                      "evaluated_settings": args.ideas_per_agent == DEFAULT_IDEAS_PER_AGENT and methods == METHODS}, ensure_ascii=False))
 
 
 def cmd_status(args):
@@ -812,6 +851,9 @@ def main(argv=None):
     init.add_argument("--constraint", action="append", help="One hard constraint; repeat for more")
     init.add_argument("--constraints-file", help="One hard constraint per line")
     init.add_argument("--cards", help="Cards as .jsonl or .json ({id, text}), or plain text split by blank lines")
+    init.add_argument("--methods", default="evaluated",
+                      help="'evaluated' (the four evaluated methods), 'library' (the bundled larger set), "
+                           "or a file in the same formats as --cards")
     init.add_argument("--seed", type=int)
     init.add_argument("--profile", choices=sorted(PROFILES), default="full")
     init.add_argument("--ideas-per-agent", type=int, default=DEFAULT_IDEAS_PER_AGENT)
