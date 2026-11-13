@@ -54,7 +54,7 @@ If you lose track, `BS status --dir <run-dir>` prints progress without changing 
 - `--ideas-per-agent` (default 10, the evaluated value): lowering it keeps sub-agent output short enough for hosts that cut long replies, but the run then differs from what was evaluated.
 - Running some agents on other models, or letting agents search the web, is off by default and has not been evaluated; do it only if the user explicitly asks.
 - The four method instructions (analogy, reverse a premise, stand in the affected person's place, use idle resources) are kept word for word from the evaluated run, which was in Chinese. Agents still answer in the language of the question.
-- `--methods library` uses the larger set in `methods/library.jsonl` (the four above plus more, such as substitute, eliminate, contradiction, first principles). `--methods <file>` uses the user's own set. In both cases every agent of a batch gets a different method, and a method is reused only after every other method was used. This has not been evaluated: use it only when the user asks for more thinking methods, and say so in your summary.
+- `--methods library` uses the larger set in `methods/library.jsonl` (the four above plus more, such as substitute, eliminate, contradiction, first principles). `--methods <file>` uses the user's own set. In both cases every agent of a batch gets a different method, and a method is reused only after every other method was used. One trial run showed no gain that the repository's comparison could detect (see README, Evidence and limits): use it only when the user asks for more thinking methods, and say so in your summary.
 
 ## Adding thinking methods
 
