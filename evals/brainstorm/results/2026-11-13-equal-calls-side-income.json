@@ -138,5 +138,24 @@
   "calls equal, tokens not",
   "counts different mechanisms, not useful ones",
   "one merged idea was left ungrouped by a grouper ID typo and counts as its own mechanism"
- ]
+ ],
+ "audit_fixed_rule": {
+  "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
+  "repeats": {
+   "sampled": 25,
+   "judged_same": 15,
+   "skill_only_by_grouper": 91,
+   "estimated_new": 36
+  },
+  "constraints": {
+   "checked": 112,
+   "violations": {
+    "skill_only": 3,
+    "control_only": 0,
+    "both": 1
+   }
+  },
+  "judge": "Claude Opus sub-agent, one pass",
+  "sample_seed": 1
+ }
 }

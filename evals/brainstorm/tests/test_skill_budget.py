@@ -119,5 +119,66 @@ class SkillBudgetTests(unittest.TestCase):
         self.assertEqual(len(result["problems"]), 2)
 
 
+    def merged_run(self):
+        call("direct-init", "--dir", str(self.control), "--question-file", str(QUESTION), "--batches", "2",
+             "--constraint", "no paid tools", "--constraint", "two hours a week")
+        self.drive()
+        done = self.skill_run()
+        call("merge", "--dir", str(self.control), "--from", str(self.skill))
+        self.drive()
+        return done
+
+    def test_audit_prompt_is_blind_and_samples_only_what_the_skill_alone_reached(self):
+        self.assertEqual(call("audit-init", "--dir", str(self.control))[0], 1)  # nothing to audit before a merge
+        done = self.merged_run()
+        code, made = call("audit-init", "--dir", str(self.control), "--sample", "4", "--seed", "3")
+        self.assertEqual(code, 0)
+        prompt = Path(made["prompt"]).read_text(encoding="utf-8")
+        key = json.loads((self.control / "audit" / "key.json").read_text(encoding="utf-8"))
+        state = json.loads((self.control / "state.json").read_text(encoding="utf-8"))
+        by_id = {row["mechanism_id"]: row for row in state["mechanisms"]}
+        self.assertEqual((len(key["A"]), len(key["B"]), len(key["C"])), (3, 4, 3 + done["beyond_baseline"]))
+        for mechanism_id in key["B"].values():
+            self.assertTrue(all(idea.startswith("x-") for idea in by_id[mechanism_id]["idea_ids"]))
+        self.assertEqual(made["skill_only"], done["beyond_baseline"])
+        body = prompt.replace(made["answer"], "")  # the run directory's own name is not a source label
+        for word in ("x-i-", "m-0", "skill", "control", "import"):
+            self.assertNotIn(word, body)
+        self.assertIn(sb.SAME_RULE, prompt)
+        self.assertIn("1. no paid tools", prompt)
+        self.assertIn(made["answer"], prompt)
+        again = call("audit-init", "--dir", str(self.control), "--sample", "4", "--seed", "3")[1]
+        self.assertEqual(json.loads((self.control / "audit" / "key.json").read_text(encoding="utf-8")), key)
+        self.assertEqual(again["prompt"], made["prompt"])
+        self.assertEqual(call("audit-init", "--dir", str(self.control), "--sample", "999")[1]["sampled"],
+                         done["beyond_baseline"])
+
+    def test_audit_result_counts_repeats_and_violations_and_refuses_a_partial_answer(self):
+        done = self.merged_run()
+        made = call("audit-init", "--dir", str(self.control), "--sample", "4", "--seed", "3")[1]
+        self.assertEqual(call("audit-read", "--dir", str(self.control))[0], 1)  # no answer yet
+        key = json.loads((self.control / "audit" / "key.json").read_text(encoding="utf-8"))
+        skill_side = next(label for label, row in key["C"].items() if row["side"] == "skill_only")
+        answer = {"repeats": [{"b": label, "same_as": "A2" if label == "B1" else None, "note": ""} for label in key["B"]],
+                  "constraints": [{"c": label, "violated": [2] if label == skill_side else [], "note": ""}
+                                  for label in key["C"]]}
+        Path(made["answer"]).write_text(json.dumps(answer), encoding="utf-8")
+        code, result = call("audit-read", "--dir", str(self.control))
+        self.assertEqual(code, 0)
+        self.assertEqual((result["repeats"]["sampled"], result["repeats"]["judged_same"]), (4, 1))
+        self.assertEqual(result["repeats"]["skill_only_by_grouper"], done["beyond_baseline"])
+        self.assertEqual(result["repeats"]["estimated_new"], round(done["beyond_baseline"] * 3 / 4))
+        self.assertEqual(result["constraints"]["checked"], 3 + done["beyond_baseline"])
+        self.assertEqual(result["constraints"]["violations"], {"skill_only": 1, "control_only": 0, "both": 0})
+        self.assertEqual(result["rule"], sb.SAME_RULE)
+        answer["repeats"][0]["same_as"] = "A9"
+        answer["constraints"].pop()
+        answer["constraints"][0]["violated"] = [3]
+        Path(made["answer"]).write_text(json.dumps(answer), encoding="utf-8")
+        code, result = call("audit-read", "--dir", str(self.control))
+        self.assertEqual(code, 1)
+        self.assertEqual(len(result["problems"]), 3)
+
+
 if __name__ == "__main__":
     unittest.main()

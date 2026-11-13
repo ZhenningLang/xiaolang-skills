@@ -344,6 +344,22 @@ python3 -m evals.brainstorm.skill_budget next --dir <control dir>      # dispatc
 python3 -m evals.brainstorm.skill_budget compare --dir <control dir>
 ```
 
+**Audit of the comparison.** The grouper may split one mechanism into several, which inflates the
+skill-only count. After the merge:
+
+```bash
+python3 -m evals.brainstorm.skill_budget audit-init --dir <control dir> --sample 25
+# give the printed prompt file to one judge agent of a different model than the grouper
+python3 -m evals.brainstorm.skill_budget audit-read --dir <control dir>
+```
+
+`audit-init` writes one prompt with two parts. Part 1 lists every mechanism plain asking reached and a
+random sample of skill-only mechanisms; the judge names repeats under one fixed rule (`SAME_RULE` in the
+script, the same for every question). Part 2 lists all mechanisms in random order with the source hidden;
+the judge names the hard constraints each one breaks. `audit-read` refuses a partial answer and reports
+the repeats, the discounted skill-only estimate, and violations by side. The judge runs one pass: treat
+a difference of one or two as noise.
+
 `merge` puts every idea of the skill run through the control run's grouper, so both sides are counted
 by one grouping. `compare` reports the mechanisms only the skill reached, only the control reached, and
 both, plus how fast the control stops finding new mechanisms.
