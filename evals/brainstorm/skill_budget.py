@@ -8,10 +8,14 @@ The host dispatches the sub-agent tasks, exactly as it does for the skill.
   merge        add every idea of a finished skill run to the control run and group them by the same grouper
   compare      print how many mechanisms each side reached and how many only one side reached
   check        machine-checkable pass/fail for a finished skill run (the pre-release smoke check)
+  audit-init   write a blind prompt for a judge: repeats under one fixed rule, and hard-constraint violations
+  audit-read   read the judge's answer
+  repeat       compare two or more groupings of the same merged skill run: how far the counts move
 """
 
 import argparse
 import importlib.util
+import itertools
 import json
 from pathlib import Path
 import random
@@ -109,7 +113,7 @@ def cmd_merge(args):
         "idea_calls_dropped": sum(1 for task in source["tasks"].values()
                                   if task["kind"] != "group" and task["status"] == "failed")}}
     bs.save_state(args.dir, state)
-    emit({"merged_ideas": len(ids), "grouping_chunks": len(state["queue"]), "next": "run next and dispatch as usual"})
+    emit({"merged_ideas": len(ids), "grouping_chunks": len(state["queue"]), "next": "run next and dispatch as usual; group with the strongest model you have"})
 
 
 def comparison(state):
@@ -277,6 +281,41 @@ def cmd_audit_read(args):
     return 0 if not problems else 1
 
 
+def cmd_repeat(args):
+    """Compare separate groupings of the same merged ideas: how far the counts move with the grouping alone."""
+    if len(args.dir) < 2:
+        raise bs.RunError("give --dir at least twice: one control run per grouping of the same skill run")
+    runs = []
+    for run_dir in args.dir:
+        state = bs.load_state(run_dir)
+        if not state.get("merge", {}).get("done"):
+            raise bs.RunError(f"{run_dir}: merge a skill run and finish its grouping first")
+        sides = [mechanism_side(state, row) for row in state["mechanisms"]]
+        new = {key: side == "skill_only" for row, side in zip(state["mechanisms"], sides)
+               for key in row["idea_ids"] if state["ideas"][key]["level"].startswith(IMPORT_PREFIX)}
+        runs.append({"dir": str(run_dir), "question": state["question"], "new": new,
+                     "counts": {side: sides.count(side) for side in SIDES}})
+    first = runs[0]
+    for run in runs[1:]:
+        if run["question"] != first["question"] or set(run["new"]) != set(first["new"]):
+            raise bs.RunError(f"{run['dir']} does not hold the same merged ideas as {first['dir']}")
+    keys = sorted(first["new"])
+    pairs = []
+    for a, b in itertools.combinations(runs, 2):
+        same = sum(a["new"][key] == b["new"][key] for key in keys)
+        pairs.append({"first": a["dir"], "second": b["dir"], "ideas": len(keys), "same_verdict": same,
+                      "rate": round(same / len(keys), 3),
+                      "new_in_first_only": sum(a["new"][key] and not b["new"][key] for key in keys),
+                      "new_in_second_only": sum(b["new"][key] and not a["new"][key] for key in keys)})
+    votes = [sum(run["new"][key] for run in runs) for key in keys]
+    counts = [run["counts"]["skill_only"] for run in runs]
+    emit({"runs": [{"dir": run["dir"], **run["counts"], "ideas_outside_control": sum(run["new"].values())}
+                   for run in runs],
+          "skill_only_range": [min(counts), max(counts)], "pairs": pairs,
+          "ideas": {"total": len(keys), "new_in_every_grouping": votes.count(len(runs)),
+                    "new_in_none": votes.count(0), "split": sum(0 < vote < len(runs) for vote in votes)}})
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -313,6 +352,9 @@ def main(argv=None):
     read = commands.add_parser("audit-read")
     read.add_argument("--dir", required=True)
     read.set_defaults(func=cmd_audit_read)
+    repeat = commands.add_parser("repeat", help="Compare two or more groupings of the same merged skill run")
+    repeat.add_argument("--dir", action="append", required=True, help="Control run with a finished merge; repeat")
+    repeat.set_defaults(func=cmd_repeat)
     args = parser.parse_args(argv)
     try:
         return args.func(args) or 0

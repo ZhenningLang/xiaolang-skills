@@ -5,6 +5,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 
@@ -34,10 +35,10 @@ class SkillBudgetTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.addCleanup(setattr, sb.bs, "BASELINE_BATCHES", sb.bs.BASELINE_BATCHES)
 
-    def drive(self, limit=100):
+    def drive(self, limit=100, run=None):
         actions = []
         for _ in range(limit):
-            code, action = call("next", "--dir", str(self.control))
+            code, action = call("next", "--dir", str(run or self.control))
             self.assertEqual(code, 0)
             actions.append(action)
             if action["action"] == "done":
@@ -178,6 +179,59 @@ class SkillBudgetTests(unittest.TestCase):
         code, result = call("audit-read", "--dir", str(self.control))
         self.assertEqual(code, 1)
         self.assertEqual(len(result["problems"]), 3)
+
+    def two_groupings(self):
+        call("direct-init", "--dir", str(self.control), "--question-file", str(QUESTION), "--batches", "2")
+        self.drive()
+        done = self.skill_run()
+        second = Path(self.tmp.name) / "second"
+        shutil.copytree(self.control, second)
+        for run in (self.control, second):
+            call("merge", "--dir", str(run), "--from", str(self.skill))
+            self.drive(run=run)
+        return second, done
+
+    def test_repeat_compares_groupings_of_the_same_ideas(self):
+        second, done = self.two_groupings()
+        code, result = call("repeat", "--dir", str(self.control), "--dir", str(second))
+        self.assertEqual(code, 0)
+        self.assertEqual([row["skill_only"] for row in result["runs"]], [done["beyond_baseline"]] * 2)
+        self.assertEqual(result["skill_only_range"], [done["beyond_baseline"]] * 2)
+        pair = result["pairs"][0]
+        self.assertEqual((pair["ideas"], pair["same_verdict"], pair["rate"]), (done["ideas"], done["ideas"], 1.0))
+        new = result["runs"][0]["ideas_outside_control"]
+        self.assertEqual(result["ideas"], {"total": done["ideas"], "new_in_every_grouping": new,
+                                           "new_in_none": done["ideas"] - new, "split": 0})
+        # Move one idea that only the skill reached into a mechanism the control also reached.
+        state = json.loads((second / "state.json").read_text(encoding="utf-8"))
+        ideas = state["ideas"]
+        alone = next(row for row in state["mechanisms"] if all(key.startswith("x-") for key in row["idea_ids"]))
+        shared = next(row for row in state["mechanisms"] if ideas[row["idea_ids"][0]]["level"] == "baseline")
+        moved = len(alone["idea_ids"])
+        shared["idea_ids"] += alone["idea_ids"]
+        state["mechanisms"].remove(alone)
+        (second / "state.json").write_text(json.dumps(state), encoding="utf-8")
+        code, result = call("repeat", "--dir", str(self.control), "--dir", str(second))
+        self.assertEqual(code, 0)
+        self.assertEqual(result["skill_only_range"], [done["beyond_baseline"] - 1, done["beyond_baseline"]])
+        self.assertEqual(result["pairs"][0]["same_verdict"], done["ideas"] - moved)
+        self.assertEqual((result["pairs"][0]["new_in_first_only"], result["pairs"][0]["new_in_second_only"]), (moved, 0))
+        self.assertEqual(result["ideas"]["split"], moved)
+
+    def test_repeat_refuses_one_run_an_unfinished_merge_or_another_skill_run(self):
+        second, _ = self.two_groupings()
+        self.assertEqual(call("repeat", "--dir", str(self.control))[0], 1)
+        state = json.loads((second / "state.json").read_text(encoding="utf-8"))
+        state["merge"]["done"] = False
+        (second / "state.json").write_text(json.dumps(state), encoding="utf-8")
+        self.assertEqual(call("repeat", "--dir", str(self.control), "--dir", str(second))[0], 1)
+        state["merge"]["done"] = True
+        key = next(key for key in state["ideas"] if key.startswith("x-"))
+        state["ideas"]["x-other"] = {**state["ideas"].pop(key), "idea_id": "x-other"}
+        for row in state["mechanisms"]:
+            row["idea_ids"] = ["x-other" if item == key else item for item in row["idea_ids"]]
+        (second / "state.json").write_text(json.dumps(state), encoding="utf-8")
+        self.assertEqual(call("repeat", "--dir", str(self.control), "--dir", str(second))[0], 1)
 
 
 if __name__ == "__main__":

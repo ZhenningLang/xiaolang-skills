@@ -1,0 +1,134 @@
+{
+ "date": "2026-11-14",
+ "question_id": "side_income",
+ "what": "The same plain-asking run (293 ideas, 21 mechanisms) and the same skill run (258 ideas) as 2026-11-13-equal-calls-side-income.json. Only the grouping of the 258 skill ideas was repeated.",
+ "sonnet_groupings": {
+  "runs": [
+   {
+    "dir": "sonnet-1 (the grouping in 2026-11-13-equal-calls-side-income.json)",
+    "skill_only": 91,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 122
+   },
+   {
+    "dir": "sonnet-2",
+    "skill_only": 76,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 106
+   },
+   {
+    "dir": "sonnet-3",
+    "skill_only": 58,
+    "control_only": 2,
+    "both": 19,
+    "ideas_outside_control": 89
+   }
+  ],
+  "skill_only_range": [
+   58,
+   91
+  ],
+  "pairs": [
+   {
+    "first": "sonnet-1 (the grouping in 2026-11-13-equal-calls-side-income.json)",
+    "second": "sonnet-2",
+    "ideas": 258,
+    "same_verdict": 234,
+    "rate": 0.907,
+    "new_in_first_only": 20,
+    "new_in_second_only": 4
+   },
+   {
+    "first": "sonnet-1 (the grouping in 2026-11-13-equal-calls-side-income.json)",
+    "second": "sonnet-3",
+    "ideas": 258,
+    "same_verdict": 217,
+    "rate": 0.841,
+    "new_in_first_only": 37,
+    "new_in_second_only": 4
+   },
+   {
+    "first": "sonnet-2",
+    "second": "sonnet-3",
+    "ideas": 258,
+    "same_verdict": 233,
+    "rate": 0.903,
+    "new_in_first_only": 21,
+    "new_in_second_only": 4
+   }
+  ],
+  "ideas": {
+   "total": 258,
+   "new_in_every_grouping": 84,
+   "new_in_none": 129,
+   "split": 45
+  }
+ },
+ "opus_groupings": {
+  "runs": [
+   {
+    "dir": "opus-1",
+    "skill_only": 76,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 112
+   },
+   {
+    "dir": "opus-2",
+    "skill_only": 74,
+    "control_only": 4,
+    "both": 17,
+    "ideas_outside_control": 113
+   }
+  ],
+  "skill_only_range": [
+   74,
+   76
+  ],
+  "pairs": [
+   {
+    "first": "opus-1",
+    "second": "opus-2",
+    "ideas": 258,
+    "same_verdict": 247,
+    "rate": 0.957,
+    "new_in_first_only": 5,
+    "new_in_second_only": 6
+   }
+  ],
+  "ideas": {
+   "total": 258,
+   "new_in_every_grouping": 107,
+   "new_in_none": 140,
+   "split": 11
+  }
+ },
+ "audit_of_opus_1": {
+  "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
+  "repeats": {
+   "sampled": 25,
+   "judged_same": 5,
+   "skill_only_by_grouper": 76,
+   "estimated_new": 61
+  },
+  "constraints": {
+   "checked": 97,
+   "violations": {
+    "skill_only": 2,
+    "control_only": 0,
+    "both": 2
+   }
+  },
+  "judge": "a Claude model other than Sonnet and Opus, one pass",
+  "sample_seed": 0,
+  "note": "The 2026-11-13 audit of sonnet-1 used an Opus judge and found 15 repeats in 25. The judge differs here, so the two repeat counts are not directly comparable."
+ },
+ "limits": [
+  "one question",
+  "two or three groupings per model",
+  "one audit pass",
+  "one idea in opus-2 was left ungrouped by a grouper ID error and counts as its own mechanism"
+ ]
+}
