@@ -339,6 +339,7 @@ cards, no methods and no rounds, for as many idea calls as the skill run used:
 ```sh
 python3 -m evals.brainstorm.skill_budget direct-init --dir <control dir> --question-file q.txt --batches 10
 python3 -m evals.brainstorm.skill_budget next --dir <control dir>      # dispatch, repeat until done
+cp -R <control dir> <second control dir>                               # for `repeat`, below
 python3 -m evals.brainstorm.skill_budget merge --dir <control dir> --from <skill run dir>
 python3 -m evals.brainstorm.skill_budget next --dir <control dir>      # dispatch, repeat until done
 python3 -m evals.brainstorm.skill_budget compare --dir <control dir>
@@ -359,6 +360,18 @@ script, the same for every question). Part 2 lists all mechanisms in random orde
 the judge names the hard constraints each one breaks. `audit-read` refuses a partial answer and reports
 the repeats, the discounted skill-only estimate, and violations by side. The judge runs one pass: treat
 a difference of one or two as noise.
+
+**How far the grouping alone moves the counts.** Group with the strongest model you have, and group
+twice. Copy the finished control run before the merge, merge the same skill run into each copy, then:
+
+```bash
+python3 -m evals.brainstorm.skill_budget repeat --dir <control dir> --dir <second control dir>
+```
+
+`repeat` reports the skill-only count of each grouping and its range, and for each idea of the skill
+run whether the groupings agree that plain asking did or did not reach it. Report the range, not one
+count. Measured once on 258 ideas: three Sonnet groupings gave 58, 76 and 91 skill-only mechanisms
+(84% to 91% of ideas with the same verdict); two Opus groupings gave 74 and 76 (96%).
 
 `merge` puts every idea of the skill run through the control run's grouper, so both sides are counted
 by one grouping. `compare` reports the mechanisms only the skill reached, only the control reached, and
