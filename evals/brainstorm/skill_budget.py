@@ -14,6 +14,7 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
+import random
 import sys
 
 SKILL_SCRIPT = Path(__file__).resolve().parents[2] / "skills" / "brainstorm" / "scripts" / "brainstorm.py"
@@ -180,6 +181,102 @@ def cmd_check(args):
     return 0 if not problems else 1
 
 
+SAME_RULE = ("Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, "
+             "and why that produces the result. A different channel, audience, wording, scale or packaging alone "
+             "is still the same mechanism. If you cannot decide, answer that they are different.")
+SIDES = ("skill_only", "control_only", "both")
+
+
+def mechanism_side(state, mechanism):
+    imported = [state["ideas"][key]["level"].startswith(IMPORT_PREFIX) for key in mechanism["idea_ids"]]
+    return "skill_only" if all(imported) else "both" if any(imported) else "control_only"
+
+
+def audit_paths(run_dir):
+    folder = Path(run_dir).resolve() / "audit"
+    return folder, folder / "prompt.md", folder / "key.json", folder / "answer.json"
+
+
+def cmd_audit_init(args):
+    state = bs.load_state(args.dir)
+    if not state.get("merge", {}).get("done"):
+        raise bs.RunError("merge a skill run and finish its grouping first")
+    rng = random.Random(args.seed)
+    sides = {row["mechanism_id"]: mechanism_side(state, row) for row in state["mechanisms"]}
+    known = [row for row in state["mechanisms"] if sides[row["mechanism_id"]] != "skill_only"]
+    alone = [row for row in state["mechanisms"] if sides[row["mechanism_id"]] == "skill_only"]
+    sample = rng.sample(alone, min(args.sample, len(alone)))
+    mixed = rng.sample(state["mechanisms"], len(state["mechanisms"]))
+    folder, prompt_path, key_path, answer_path = audit_paths(args.dir)
+
+    def lines(prefix, rows):
+        out = []
+        for number, row in enumerate(rows, 1):
+            idea = state["ideas"][row["representative"]]
+            out.extend([f"{prefix}{number}. {row['label']}", f"   Example: {idea['title']} - {idea['text']}", ""])
+        return out
+
+    constraints = [f"{number}. {text}" for number, text in enumerate(state["constraints"], 1)]
+    parts = ["# Audit", "", "Read only this file. Do not search or read anything else.",
+             f"Write one JSON object to {answer_path} and change no other file.", "",
+             "Question:", state["question"], "", "Hard constraints:", *(constraints or ["(none)"]), "",
+             "# Part 1: repeats", "", SAME_RULE, "",
+             "For each B item, name the one A item it is the same as, or null.", "",
+             f"## A: {len(known)} known mechanisms", "", *lines("A", known),
+             f"## B: {len(sample)} mechanisms to check", "", *lines("B", sample),
+             "# Part 2: hard constraints", "",
+             "For each C item, list the numbers of the hard constraints that its example breaks. "
+             "Use an empty list when it breaks none or when you cannot decide.", "",
+             f"## C: {len(mixed)} mechanisms", "", *lines("C", mixed),
+             "# Output", "",
+             '{"repeats": [{"b": "B1", "same_as": "A3" or null, "note": "one sentence"}, ...one per B item], '
+             '"constraints": [{"c": "C1", "violated": [], "note": "one sentence when not empty"}, ...one per C item]}']
+    key = {"rule": SAME_RULE, "skill_only": len(alone),
+           "A": {f"A{n}": row["mechanism_id"] for n, row in enumerate(known, 1)},
+           "B": {f"B{n}": row["mechanism_id"] for n, row in enumerate(sample, 1)},
+           "C": {f"C{n}": {"mechanism_id": row["mechanism_id"], "side": sides[row["mechanism_id"]]}
+                 for n, row in enumerate(mixed, 1)}}
+    folder.mkdir(exist_ok=True)
+    prompt_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
+    key_path.write_text(json.dumps(key, ensure_ascii=False, indent=1), encoding="utf-8")
+    emit({"prompt": str(prompt_path), "answer": str(answer_path), "sampled": len(sample), "skill_only": len(alone),
+          "known": len(known), "next": "give the prompt file to one judge agent of a different model, then run audit-read"})
+
+
+def cmd_audit_read(args):
+    state = bs.load_state(args.dir)
+    _, _, key_path, answer_path = audit_paths(args.dir)
+    if not key_path.exists() or not answer_path.exists():
+        raise bs.RunError("run audit-init and have the judge write its answer first")
+    key = json.loads(key_path.read_text(encoding="utf-8"))
+    answer = json.loads(answer_path.read_text(encoding="utf-8"))
+    problems = []
+    repeats = {row.get("b"): row.get("same_as") for row in answer.get("repeats", []) if isinstance(row, dict)}
+    for label in key["B"]:
+        if label not in repeats:
+            problems.append(f"no answer for {label}")
+        elif repeats[label] is not None and repeats[label] not in key["A"]:
+            problems.append(f"{label} names an unknown item: {repeats[label]}")
+    judged = {row.get("c"): row.get("violated") for row in answer.get("constraints", []) if isinstance(row, dict)}
+    allowed = set(range(1, len(state["constraints"]) + 1))
+    violations = dict.fromkeys(SIDES, 0)
+    for label, row in key["C"].items():
+        value = judged.get(label)
+        if label not in judged:
+            problems.append(f"no answer for {label}")
+        elif not isinstance(value, list) or not set(value) <= allowed:
+            problems.append(f"{label} lists something that is not a constraint number: {value}")
+        elif value:
+            violations[row["side"]] += 1
+    same = sum(1 for label in key["B"] if repeats.get(label) in key["A"])
+    sampled = len(key["B"])
+    emit({"ok": not problems, "problems": problems, "rule": key["rule"],
+          "repeats": {"sampled": sampled, "judged_same": same, "skill_only_by_grouper": key["skill_only"],
+                      "estimated_new": round(key["skill_only"] * (sampled - same) / sampled) if sampled else 0},
+          "constraints": {"checked": len(key["C"]), "violations": violations}})
+    return 0 if not problems else 1
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -208,6 +305,14 @@ def main(argv=None):
     check.add_argument("--min-new", type=int, default=10,
                        help="Floor for new mechanisms beyond the baseline at each level (observed so far: 13 to 28)")
     check.set_defaults(func=cmd_check)
+    audit = commands.add_parser("audit-init", help="Write a blind prompt for one judge agent of a different model")
+    audit.add_argument("--dir", required=True, help="Control run with a merged skill run")
+    audit.add_argument("--sample", type=int, default=25, help="Skill-only mechanisms to check for repeats")
+    audit.add_argument("--seed", type=int, default=0)
+    audit.set_defaults(func=cmd_audit_init)
+    read = commands.add_parser("audit-read")
+    read.add_argument("--dir", required=True)
+    read.set_defaults(func=cmd_audit_read)
     args = parser.parse_args(argv)
     try:
         return args.func(args) or 0

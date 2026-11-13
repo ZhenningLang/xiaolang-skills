@@ -111,5 +111,24 @@
    "control_ideas_sampled_from_4_largest_mechanisms": 32,
    "judged_misplaced": 1
   }
+ },
+ "audit_fixed_rule": {
+  "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
+  "repeats": {
+   "sampled": 25,
+   "judged_same": 2,
+   "skill_only_by_grouper": 101,
+   "estimated_new": 93
+  },
+  "constraints": {
+   "checked": 128,
+   "violations": {
+    "skill_only": 0,
+    "control_only": 0,
+    "both": 1
+   }
+  },
+  "judge": "Claude Opus sub-agent, one pass",
+  "sample_seed": 1
  }
 }
