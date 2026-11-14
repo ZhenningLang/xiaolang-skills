@@ -349,17 +349,24 @@ python3 -m evals.brainstorm.skill_budget compare --dir <control dir>
 skill-only count. After the merge:
 
 ```bash
-python3 -m evals.brainstorm.skill_budget audit-init --dir <control dir> --sample 25
+python3 -m evals.brainstorm.skill_budget audit-init --dir <control dir> --sample 500
 # give the printed prompt file to one judge agent of a different model than the grouper
 python3 -m evals.brainstorm.skill_budget audit-read --dir <control dir>
 ```
+
+`--sample` larger than the skill-only count checks every skill-only mechanism. Do that, and run the
+judge twice on the same prompt (keep the first answer file under another name): report both results.
 
 `audit-init` writes one prompt with two parts. Part 1 lists every mechanism plain asking reached and a
 random sample of skill-only mechanisms; the judge names repeats under one fixed rule (`SAME_RULE` in the
 script, the same for every question). Part 2 lists all mechanisms in random order with the source hidden;
 the judge names the hard constraints each one breaks. `audit-read` refuses a partial answer and reports
-the repeats, the discounted skill-only estimate, and violations by side. The judge runs one pass: treat
-a difference of one or two as noise.
+the repeats, the discounted skill-only estimate, and violations by side.
+
+The judge is the least steady part of this tool. Measured once: a sample of 25 gave 5 and 16 repeats on
+two groupings that agree on 96% of ideas, and two passes of one judge over the same 99 mechanisms called
+17 and then 60 of them repeats. A difference between two runs counts only when it is larger than the
+difference between two judge passes over one run.
 
 **How far the grouping alone moves the counts.** Group with the strongest model you have, and group
 twice. Copy the finished control run before the merge, merge the same skill run into each copy, then:
