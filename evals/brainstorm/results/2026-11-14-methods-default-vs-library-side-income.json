@@ -1,0 +1,153 @@
+{
+ "date": "2026-11-14",
+ "question_id": "side_income",
+ "what": "The four default methods against --methods library (18 methods), under the convention of 2026-11-14-grouper-repeat-side-income.json: the same plain-asking run (293 ideas, 21 mechanisms), each skill run merged into two fresh copies of it and grouped twice by Opus. default-opus-1 and default-opus-2 are opus-1 and opus-2 of that file (258 ideas). The library run is the one of 2026-11-13-method-library-side-income.json (246 ideas); only its grouping was repeated.",
+ "library_opus_groupings": {
+  "runs": [
+   {
+    "dir": "library-opus-1",
+    "skill_only": 99,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 132
+   },
+   {
+    "dir": "library-opus-2",
+    "skill_only": 109,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 137
+   }
+  ],
+  "skill_only_range": [
+   99,
+   109
+  ],
+  "pairs": [
+   {
+    "first": "library-opus-1",
+    "second": "library-opus-2",
+    "ideas": 246,
+    "same_verdict": 233,
+    "rate": 0.947,
+    "new_in_first_only": 4,
+    "new_in_second_only": 9
+   }
+  ],
+  "ideas": {
+   "total": 246,
+   "new_in_every_grouping": 128,
+   "new_in_none": 105,
+   "split": 13
+  }
+ },
+ "default_opus_groupings": {
+  "skill_only": [
+   76,
+   74
+  ],
+  "see": "2026-11-14-grouper-repeat-side-income.json"
+ },
+ "library_sonnet_grouping": {
+  "skill_only": 38,
+  "same_verdict_rate_against_the_two_opus_groupings": [
+   0.748,
+   0.711
+  ],
+  "see": "2026-11-13-method-library-side-income.json"
+ },
+ "audit": {
+  "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
+  "judge": "a Claude model other than Sonnet and Opus; two separate passes over each prompt",
+  "scope": "every skill-only mechanism of each grouping, not a sample",
+  "by_grouping": {
+   "default-opus-1": {
+    "skill_only": 76,
+    "checked": 76,
+    "repeats_pass1": 23,
+    "repeats_pass2": 14,
+    "left_pass1": 53,
+    "left_pass2": 62,
+    "same_verdict": 67,
+    "repeat_in_both": 14,
+    "repeat_in_neither": 53,
+    "constraint_violations_pass1": 1,
+    "constraint_violations_pass2": 2,
+    "mechanisms_checked_for_constraints": 97
+   },
+   "default-opus-2": {
+    "skill_only": 74,
+    "checked": 74,
+    "repeats_pass1": 23,
+    "repeats_pass2": 28,
+    "left_pass1": 51,
+    "left_pass2": 46,
+    "same_verdict": 65,
+    "repeat_in_both": 21,
+    "repeat_in_neither": 44,
+    "constraint_violations_pass1": 0,
+    "constraint_violations_pass2": 1,
+    "mechanisms_checked_for_constraints": 95
+   },
+   "library-opus-1": {
+    "skill_only": 99,
+    "checked": 99,
+    "repeats_pass1": 17,
+    "repeats_pass2": 60,
+    "left_pass1": 82,
+    "left_pass2": 39,
+    "same_verdict": 56,
+    "repeat_in_both": 17,
+    "repeat_in_neither": 39,
+    "constraint_violations_pass1": 0,
+    "constraint_violations_pass2": 0,
+    "mechanisms_checked_for_constraints": 120
+   },
+   "library-opus-2": {
+    "skill_only": 109,
+    "checked": 109,
+    "repeats_pass1": 78,
+    "repeats_pass2": 71,
+    "left_pass1": 31,
+    "left_pass2": 38,
+    "same_verdict": 94,
+    "repeat_in_both": 67,
+    "repeat_in_neither": 27,
+    "constraint_violations_pass1": 2,
+    "constraint_violations_pass2": 1,
+    "mechanisms_checked_for_constraints": 130
+   }
+  },
+  "fields": "left_passN = skill-only mechanisms the judge did not call a repeat of a plain-asking mechanism; same_verdict = mechanisms with the same answer in both passes"
+ },
+ "samples_of_25": {
+  "note": "Earlier audits of 25 randomly picked skill-only mechanisms per grouping (seed 0), one pass each, same judge model.",
+  "judged_repeats": {
+   "default-opus-1": 5,
+   "default-opus-2": 16,
+   "library-opus-1": 13,
+   "library-opus-2": 18
+  },
+  "same_prompt_judged_again": {
+   "grouping": "default-opus-1",
+   "judged_repeats": [
+    5,
+    6
+   ],
+   "same_verdict": "24 of 25"
+  }
+ },
+ "reading": [
+  "By the grouper alone the library run has more skill-only mechanisms: 99 and 109, against 74 and 76.",
+  "After the judge removes repeats the default methods keep 46 to 62 in four passes. The library keeps 31, 38 and 39 in three passes and 82 in one.",
+  "The judge is not steady on the library run: two passes over the same prompt called 17 and then 60 of 99 mechanisms repeats. On the default methods two passes agreed on 67 of 76 and 65 of 74.",
+  "A sample of 25 is too small: two groupings that agree on 96% of ideas gave 5 and 16 repeats in 25.",
+  "This does not show a gain from the library. Three of four passes put it below the default methods; one puts it above."
+ ],
+ "limits": [
+  "one question",
+  "one skill run on each side",
+  "two groupings and two judge passes per grouping",
+  "generation, grouping and judging all used models of one family"
+ ]
+}

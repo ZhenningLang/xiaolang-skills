@@ -60,7 +60,7 @@ The 258 skill ideas of the second question were grouped again, with nothing else
 
 - **The 91 in the table above is the high end of what one grouper gives.** The same ideas gave 58 on another pass.
 - **A stronger grouper is steadier.** The evaluation tool now says to group with the strongest model available and to group twice.
-- **Audit of one Opus grouping.** A judge of a third model found 5 repeats in 25, which gives an estimate of 61 skill-only mechanisms. The earlier audit used another judge and found 15 in 25 (estimate 36). So on this question the skill reached roughly 36 to 61 mechanisms that plain asking did not. The same judge flagged 4 of 97 mechanisms for the weekly time limit.
+- **Audit of one Opus grouping.** A judge of a third model found 5 repeats in 25, which gives an estimate of 61 skill-only mechanisms. The earlier audit used another judge and found 15 in 25 (estimate 36). So on this question the skill reached roughly 36 to 61 mechanisms that plain asking did not (a later check of every mechanism gave 46 to 62, see the last section). The same judge flagged 4 of 97 mechanisms for the weekly time limit.
 - **The first question was not regrouped.** Its 101 and 93 come from one Sonnet grouping.
 
 ### What this does and does not show
@@ -71,7 +71,23 @@ The 258 skill ideas of the second question were grouped again, with nothing else
 - The counts are of different mechanisms, not useful ones. The author read 10 skill-only mechanisms from the first question picked at random and said they would try about 7 or 8 (an overall impression, not marked item by item).
 - Each judge ran one pass; a difference of one or two is noise. All flagged constraint violations were about the weekly time limit.
 - The first skill run lost 2 of its 31 idea calls to a host error.
-- **The larger method library showed no gain.** One run with `--methods library` gave 38 skill-only mechanisms by one Sonnet grouping (10 of 25 judged repeats). That is below the 58 to 91 that three Sonnet groupings gave the four default methods. It was grouped once, so this is not proof that the library is worse.
+- **The larger method library showed no gain.** See the next section.
 - **No per-step evidence.** No single step (methods, cards, rewrites, rounds, pressure levels) has its own evidence for keeping or dropping it.
+
+### Four methods against the library of 18
+
+One run with `--methods library` on the second question, compared with the default run above. Both were grouped twice by Opus against the same plain-asking run. A judge of a third model then checked every skill-only mechanism for repeats, twice per grouping.
+
+| | Four methods (default) | Library of 18 |
+|:---|---:|---:|
+| Skill ideas | 258 | 246 |
+| Skill-only mechanisms by the grouper, two groupings | 76, 74 | 99, 109 |
+| Left after the judge removed repeats, four passes | 53, 62, 51, 46 | 82, 39, 31, 38 |
+
+- **The grouper counts more for the library, the judge removes more.** Three of four judge passes leave the library below the default methods; one leaves it above.
+- **The judge is not steady on the library run.** Two passes over the same 99 mechanisms called 17 and then 60 of them repeats. On the default run two passes agreed on 67 of 76 and on 65 of 74.
+- **So there is no evidence of a gain, and no proof of a loss.** The default stays at four methods.
+- **This replaces two earlier numbers.** The 38 that one Sonnet grouping gave the library was a low outlier of the grouper. The "36 to 61" above came from samples of 25; with every mechanism checked the default run keeps 46 to 62.
+- **One run on each side.** How much a second skill run would differ was not measured.
 
 Data: [evals/brainstorm/results](../../evals/brainstorm/results/). Tools: [evals/README.md](../../evals/README.md).
