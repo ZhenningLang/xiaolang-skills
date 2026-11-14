@@ -166,6 +166,18 @@ class AllocationTests(unittest.TestCase):
         rows = bs.assignments_for([], 3, 1, "round1")
         self.assertTrue(all(row["cards"] == [] for row in rows))
 
+    def test_a_single_card_reaches_every_agent(self):
+        for level in ("baseline", "round1", "pressure2"):
+            rows = bs.assignments_for(["c01"], 3, 1, level, {"c01"})
+            self.assertTrue(all(row["cards"] == ["c01"] for row in rows), level)
+
+    def test_pressure2_has_no_fresh_cards_once_the_baseline_used_them_all(self):
+        # Nine baseline agents each hold half the cards, so in a real run every card is used before pressure 2.
+        cards = [f"c{n:02d}" for n in range(1, 11)]
+        for row in bs.assignments_for(cards, 5, 11, "pressure2", set(cards)):
+            self.assertEqual(row["fresh_cards"], [])
+            self.assertEqual(len(row["cards"]), 5)
+
 
 class ValidationTests(unittest.TestCase):
     def test_parse_ideas_rejects_extra_fields_and_unassigned_cards(self):
@@ -309,6 +321,55 @@ class RunTests(RunCase):
         ungrouped = [row for row in state["mechanisms"] if row["ungrouped"]]
         self.assertEqual(len(ungrouped), 9)  # first baseline batch: 3 agents x 3 ideas, each kept on its own
         self.assertIn("not grouped", Path(done["report"]).read_text(encoding="utf-8"))
+
+    def test_not_grouped_mark_stays_and_says_only_the_first_idea_was_not_grouped(self):
+        # The first idea of such a mechanism was never compared with the mechanisms before it, whatever joins later.
+        self.init("--profile", "economy")
+        host = FakeHost(self.dir, grouping={"g001": "missing", "g002": "not_json.txt"})
+        done = host.run()
+        state = self.state()
+        marked = [row for row in state["mechanisms"] if row["ungrouped"]]
+        self.assertEqual(len(marked), 9)
+        self.assertTrue(any(len(row["idea_ids"]) > 1 for row in marked))
+        report = Path(done["report"]).read_text(encoding="utf-8")
+        headings = [line for line in report.splitlines() if line.startswith("### ") and "its first idea was not grouped" in line]
+        self.assertEqual(len(headings), 9)
+
+    def test_pressure2_of_a_real_run_has_no_fresh_card_left(self):
+        self.init()
+        FakeHost(self.dir).run()
+        tasks = [task for task in self.state()["tasks"].values()
+                 if task["kind"] == "generate" and task["level"] == "pressure2"]
+        self.assertEqual(len(tasks), 3)
+        for task in tasks:
+            self.assertEqual(task["fresh_cards"], [])
+            self.assertEqual(len(task["cards"]), len(self.state()["cards"]) // 2)
+
+    def test_done_counts_dropped_agents_apart_from_other_failures(self):
+        self.init("--profile", "economy")
+        host = FakeHost(self.dir, broken={"b004-a2": "not_json.txt", "b004-a3": "missing"},
+                        grouping={"g001": "missing", "g002": "not_json.txt"})
+        done = host.run()
+        self.assertEqual(done["dropped_agents"], 2)
+        self.assertGreater(done["failures"], done["dropped_agents"])
+
+    def test_next_after_the_end_repeats_the_full_summary(self):
+        self.init("--profile", "economy")
+        host = FakeHost(self.dir)
+        done = host.run()
+        self.assertEqual(host.cli("next", "--dir", str(self.dir)), done)
+
+    def test_card_errors_name_the_real_cause(self):
+        cases = {'{"id": "c01", "text": "x", "source": "y"}': "only the keys id and text",
+                 '{"id": "卡片", "text": "x"}': "id must be",
+                 '{"id": "c01", "text": " "}': "text must not be empty",
+                 '{"id": "c01", "text": "x"}\n{"id": "c01", "text": "y"}': "repeated id"}
+        for number, (body, expected) in enumerate(cases.items()):
+            path = Path(self.tmp.name) / f"cards{number}.jsonl"
+            path.write_text(body, encoding="utf-8")
+            with self.assertRaises(bs.RunError) as caught:
+                bs.read_cards(path)
+            self.assertIn(expected, str(caught.exception))
 
     def test_run_without_cards(self):
         self.init(cards=False)

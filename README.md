@@ -8,11 +8,19 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 
 | Skill | What it does | Status |
 |:---|:---|:---|
-| [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only; reaches mechanisms plain asking does not, how many is uncertain. See [evidence and limits](skills/brainstorm/README.md#evidence-and-limits) |
+| [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on two questions: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care. See [evidence and limits](skills/brainstorm/README.md#evidence-and-limits) |
 
 Each skill has its own README in its folder: what it does, when to use it, and how far it has been tested.
 
-Evaluation tools for these skills: [evals/README.md](evals/README.md). They measure; they are not a skill.
+## What is in this repository
+
+| Path | What it is |
+|:---|:---|
+| `skills/<name>/` | One skill: `SKILL.md` for the agent, `README.md` for people, its scripts and tests |
+| `evals/` | Tools that measure the skills, and the result files. They are not a skill. Start at [evals/README.md](evals/README.md) |
+| `docs/history/` | Design notes from before v1, kept as a record. They do not describe the skills as shipped |
+| `install.sh`, `.claude-plugin/` | The two ways to install |
+| `AGENTS.md` | Rules for agents that change this repository |
 
 ## Install
 

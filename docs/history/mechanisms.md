@@ -1,5 +1,7 @@
 # 头脑风暴流程：机制与假设
 
+> **历史文档，不代表现状。** 这是 2026-11 发布 v1 之前的设计稿，保留只为留痕。发布的技能没有照这份稿子做完，以 [skills/brainstorm](../../skills/brainstorm/README.zh.md) 为准。差别见本目录的 [README](README.md)。
+
 状态：草案，待作者 review。流程图见 [brainstorm-flow.png](brainstorm-flow.png)。
 
 每个机制都当成待验证的假设。考题测不出作用的机制，从默认流程删除。

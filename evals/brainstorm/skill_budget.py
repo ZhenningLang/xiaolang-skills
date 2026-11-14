@@ -8,12 +8,13 @@ The host dispatches the sub-agent tasks, exactly as it does for the skill.
   merge        add every idea of a finished skill run to the control run and group them by the same grouper
   compare      print how many mechanisms each side reached and how many only one side reached
   check        machine-checkable pass/fail for a finished skill run (the pre-release smoke check)
-  audit-init   write a blind prompt for a judge: repeats under one fixed rule, and hard-constraint violations
+  audit-init   write a prompt for a judge: repeats under one fixed rule, and hard-constraint violations
   audit-read   read the judge's answer
   repeat       compare two or more groupings of the same merged skill run: how far the counts move
 """
 
 import argparse
+import hashlib
 import importlib.util
 import itertools
 import json
@@ -98,6 +99,12 @@ def cmd_merge(args):
         raise bs.RunError("the skill run is not finished")
     if source["question"] != state["question"]:
         raise bs.RunError("the two runs answer different questions")
+    # Agents of both runs must have worked under the same rules, and the audit reads the constraints of this run.
+    if source["constraints"] != state["constraints"]:
+        raise bs.RunError("the two runs were not given the same hard constraints; "
+                          "start the control run again with the --constraint values of the skill run")
+    if source["ideas_per_agent"] != state["ideas_per_agent"]:
+        raise bs.RunError("the two runs asked for a different number of ideas per agent")
     order = bs.idea_order(source)
     ids = []
     for row in sorted(source["ideas"].values(), key=lambda row: order[row["idea_id"]]):
@@ -119,7 +126,8 @@ def cmd_merge(args):
 def comparison(state):
     ideas = state["ideas"]
     control = [row for row in ideas.values() if row["level"] == "baseline"]
-    batches = sorted({row["batch"] for row in control})
+    # From the tasks, not from the ideas: a batch whose agents were all dropped still used its calls.
+    batches = sorted({task["batch"] for task in state["tasks"].values() if task["kind"] == "generate"})
     first_batch = {}
     sides = {"control_only": 0, "skill_only": 0, "both": 0}
     skill_only_by_level, landed_in_control = {}, {}
@@ -152,9 +160,28 @@ def comparison(state):
               "failures": state["failures"]}
     if "merge" in state:
         result["skill"] = {**state["merge"]["source_summary"], "merge_finished": state["merge"]["done"]}
-        result["same_grouper"] = {**sides, "skill_only_by_first_level": skill_only_by_level,
+        result["same_grouper"] = {**sides, "ungrouped_mechanisms": ungrouped_mechanisms(state),
+                                  "skill_only_by_first_level": skill_only_by_level,
                                   "skill_ideas_that_landed_in_a_control_mechanism_by_level": landed_in_control}
     return result
+
+
+def ungrouped_mechanisms(state):
+    """By side, the mechanisms whose first idea no grouper placed, because a grouping answer was unusable.
+
+    Such an idea was never compared with the mechanisms before it, so it may repeat one of them. On the
+    skill-only side that inflates the count. Group again when there are more than a few."""
+    counts = dict.fromkeys(SIDES, 0)
+    for row in state["mechanisms"]:
+        if row.get("ungrouped"):
+            counts[mechanism_side(state, row)] += 1
+    return counts
+
+
+def ideas_fingerprint(state):
+    """Identity of the ideas of a run by content. Idea ids come from task ids, so equal ids do not prove equal ideas."""
+    rows = sorted((key, row["title"], row["text"]) for key, row in state["ideas"].items())
+    return hashlib.sha256(json.dumps(rows, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
 def cmd_compare(args):
@@ -241,10 +268,20 @@ def cmd_audit_init(args):
            "C": {f"C{n}": {"mechanism_id": row["mechanism_id"], "side": sides[row["mechanism_id"]]}
                  for n, row in enumerate(mixed, 1)}}
     folder.mkdir(exist_ok=True)
+    result = {"prompt": str(prompt_path), "answer": str(answer_path), "sampled": len(sample), "skill_only": len(alone),
+              "known": len(known), "ungrouped_mechanisms": ungrouped_mechanisms(state),
+              "next": "give the prompt file to one judge agent of a different model, then run audit-read"}
+    text = json.dumps(key, ensure_ascii=False, indent=1)
+    if answer_path.exists() and (not key_path.exists() or key_path.read_text(encoding="utf-8") != text):
+        # An answer written for another sample would be read against this key and give wrong counts.
+        number = 1
+        while (folder / f"answer.previous-{number}.json").exists():
+            number += 1
+        answer_path.rename(folder / f"answer.previous-{number}.json")
+        result["set_aside"] = str(folder / f"answer.previous-{number}.json")
     prompt_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
-    key_path.write_text(json.dumps(key, ensure_ascii=False, indent=1), encoding="utf-8")
-    emit({"prompt": str(prompt_path), "answer": str(answer_path), "sampled": len(sample), "skill_only": len(alone),
-          "known": len(known), "next": "give the prompt file to one judge agent of a different model, then run audit-read"})
+    key_path.write_text(text, encoding="utf-8")
+    emit(result)
 
 
 def cmd_audit_read(args):
@@ -255,28 +292,46 @@ def cmd_audit_read(args):
     key = json.loads(key_path.read_text(encoding="utf-8"))
     answer = json.loads(answer_path.read_text(encoding="utf-8"))
     problems = []
-    repeats = {row.get("b"): row.get("same_as") for row in answer.get("repeats", []) if isinstance(row, dict)}
+    if not isinstance(answer, dict):
+        raise bs.RunError("the audit answer must be one JSON object")
+
+    def rows_of(name, label_key):
+        """Rows of one answer list by label; anything that is not a row with a text label is a problem."""
+        rows = answer.get(name, [])
+        if not isinstance(rows, list):
+            problems.append(f"{name} must be a list")
+            return {}
+        out = {}
+        for row in rows:
+            if isinstance(row, dict) and isinstance(row.get(label_key), str):
+                out[row[label_key]] = row
+            else:
+                problems.append(f"{name}: a row without a text label was ignored")
+        return out
+
+    repeats = {label: row.get("same_as") for label, row in rows_of("repeats", "b").items()}
     for label in key["B"]:
         if label not in repeats:
             problems.append(f"no answer for {label}")
-        elif repeats[label] is not None and repeats[label] not in key["A"]:
+        elif repeats[label] is not None and (not isinstance(repeats[label], str) or repeats[label] not in key["A"]):
             problems.append(f"{label} names an unknown item: {repeats[label]}")
-    judged = {row.get("c"): row.get("violated") for row in answer.get("constraints", []) if isinstance(row, dict)}
+    judged = {label: row.get("violated") for label, row in rows_of("constraints", "c").items()}
     allowed = set(range(1, len(state["constraints"]) + 1))
     violations = dict.fromkeys(SIDES, 0)
     for label, row in key["C"].items():
         value = judged.get(label)
         if label not in judged:
             problems.append(f"no answer for {label}")
-        elif not isinstance(value, list) or not set(value) <= allowed:
+        # type() and not isinstance(): True would otherwise pass as constraint 1.
+        elif not isinstance(value, list) or not all(type(item) is int and item in allowed for item in value):
             problems.append(f"{label} lists something that is not a constraint number: {value}")
         elif value:
             violations[row["side"]] += 1
-    same = sum(1 for label in key["B"] if repeats.get(label) in key["A"])
+    same = sum(1 for label in key["B"] if isinstance(repeats.get(label), str) and repeats[label] in key["A"])
     sampled = len(key["B"])
     emit({"ok": not problems, "problems": problems, "rule": key["rule"],
           "repeats": {"sampled": sampled, "judged_same": same, "skill_only_by_grouper": key["skill_only"],
-                      "estimated_new": round(key["skill_only"] * (sampled - same) / sampled) if sampled else 0},
+                      "estimated_new": round(key["skill_only"] * (sampled - same) / sampled) if sampled else None},
           "constraints": {"checked": len(key["C"]), "violations": violations}})
     return 0 if not problems else 1
 
@@ -294,12 +349,17 @@ def cmd_repeat(args):
         new = {key: side == "skill_only" for row, side in zip(state["mechanisms"], sides)
                for key in row["idea_ids"] if state["ideas"][key]["level"].startswith(IMPORT_PREFIX)}
         runs.append({"dir": str(run_dir), "question": state["question"], "new": new,
+                     "ideas": ideas_fingerprint(state), "ungrouped": ungrouped_mechanisms(state),
                      "counts": {side: sides.count(side) for side in SIDES}})
     first = runs[0]
     for run in runs[1:]:
-        if run["question"] != first["question"] or set(run["new"]) != set(first["new"]):
-            raise bs.RunError(f"{run['dir']} does not hold the same merged ideas as {first['dir']}")
+        if (run["question"] != first["question"] or set(run["new"]) != set(first["new"])
+                or run["ideas"] != first["ideas"]):
+            raise bs.RunError(f"{run['dir']} does not hold the same ideas as {first['dir']}: "
+                              "repeat needs copies of one control run with one skill run merged into each")
     keys = sorted(first["new"])
+    if not keys:
+        raise bs.RunError("the merged skill run has no ideas")
     pairs = []
     for a, b in itertools.combinations(runs, 2):
         same = sum(a["new"][key] == b["new"][key] for key in keys)
@@ -309,8 +369,8 @@ def cmd_repeat(args):
                       "new_in_second_only": sum(b["new"][key] and not a["new"][key] for key in keys)})
     votes = [sum(run["new"][key] for run in runs) for key in keys]
     counts = [run["counts"]["skill_only"] for run in runs]
-    emit({"runs": [{"dir": run["dir"], **run["counts"], "ideas_outside_control": sum(run["new"].values())}
-                   for run in runs],
+    emit({"runs": [{"dir": run["dir"], **run["counts"], "ideas_outside_control": sum(run["new"].values()),
+                    "ungrouped_mechanisms": run["ungrouped"]} for run in runs],
           "skill_only_range": [min(counts), max(counts)], "pairs": pairs,
           "ideas": {"total": len(keys), "new_in_every_grouping": votes.count(len(runs)),
                     "new_in_none": votes.count(0), "split": sum(0 < vote < len(runs) for vote in votes)}})
@@ -344,7 +404,7 @@ def main(argv=None):
     check.add_argument("--min-new", type=int, default=10,
                        help="Floor for new mechanisms beyond the baseline at each level (observed so far: 13 to 28)")
     check.set_defaults(func=cmd_check)
-    audit = commands.add_parser("audit-init", help="Write a blind prompt for one judge agent of a different model")
+    audit = commands.add_parser("audit-init", help="Write a prompt for one judge agent of a different model")
     audit.add_argument("--dir", required=True, help="Control run with a merged skill run")
     audit.add_argument("--sample", type=int, default=25, help="Skill-only mechanisms to check for repeats")
     audit.add_argument("--seed", type=int, default=0)

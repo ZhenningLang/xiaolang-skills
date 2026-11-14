@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "brainstorm",
-      "description": "Divergent brainstorming with isolated parallel sub-agents (v1, evaluated on one question).",
+      "description": "Divergent brainstorming with isolated parallel sub-agents (v1; scored by a person on one question, counted against plain asking on two).",
       "source": "./",
       "strict": false,
       "skills": ["./skills/brainstorm"]

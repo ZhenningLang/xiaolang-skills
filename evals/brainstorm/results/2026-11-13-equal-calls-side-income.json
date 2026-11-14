@@ -93,7 +93,19 @@
    "beyond_its_own_baseline": 107,
    "idea_calls": 31,
    "idea_calls_dropped": 0,
-   "merge_finished": true
+   "merge_finished": true,
+   "calls_by_kind": {
+    "idea": 24,
+    "rewrite": 7,
+    "grouping": 12,
+    "rewrites_by_level": {
+     "round1": 3,
+     "pressure1": 1,
+     "pressure2": 2,
+     "pressure3": 1
+    },
+    "note": "read from the state file of the skill run; idea_calls above is idea plus rewrite"
+   }
   },
   "same_grouper": {
    "control_only": 3,

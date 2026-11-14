@@ -1,5 +1,7 @@
 # 头脑风暴技能：9 件事的裁决结果
 
+> **历史文档，不代表现状。** 这是 2026-11 发布 v1 之前的设计稿，保留只为留痕。发布的技能没有照这份稿子做完，以 [skills/brainstorm](../../skills/brainstorm/README.zh.md) 为准。差别见本目录的 [README](README.md)。
+
 Audience:   P1 审批 owner
 Scope:      头脑风暴技能的流程与评测方案 / Non-scope: 技能正文和跑分脚本的实现
 State:      approved

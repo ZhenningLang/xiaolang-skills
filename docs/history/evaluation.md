@@ -1,5 +1,7 @@
 # 头脑风暴流程：考题与打分
 
+> **历史文档，不代表现状。** 这是 2026-11 发布 v1 之前的设计稿，保留只为留痕。发布的技能没有照这份稿子做完，以 [skills/brainstorm](../../skills/brainstorm/README.zh.md) 为准。差别见本目录的 [README](README.md)。
+
 状态：草案，待作者 review。机制和假设见 [mechanisms.md](mechanisms.md)。
 
 ![评测循环](evaluation-loop.png)

@@ -47,10 +47,11 @@ class SkillBudgetTests(unittest.TestCase):
                 (self.fake.group if action["purpose"] == "group" else self.fake.generate)(task)
         self.fail("did not finish")
 
-    def skill_run(self):
-        host = skill_tests.FakeHost(self.skill)
+    def skill_run(self, *constraints, broken=None, grouping=None):
+        host = skill_tests.FakeHost(self.skill, broken=broken, grouping=grouping)
+        extra = [item for text in constraints for item in ("--constraint", text)]
         host.cli("init", "--dir", str(self.skill), "--question-file", str(QUESTION), "--seed", "7",
-                 "--profile", "economy", "--cards", str(SKILL_TESTS / "fixtures" / "cards.jsonl"))
+                 "--profile", "economy", "--cards", str(SKILL_TESTS / "fixtures" / "cards.jsonl"), *extra)
         return host.run()
 
     def test_control_run_is_plain_asking_at_the_requested_number_of_calls(self):
@@ -124,8 +125,8 @@ class SkillBudgetTests(unittest.TestCase):
         call("direct-init", "--dir", str(self.control), "--question-file", str(QUESTION), "--batches", "2",
              "--constraint", "no paid tools", "--constraint", "two hours a week")
         self.drive()
-        done = self.skill_run()
-        call("merge", "--dir", str(self.control), "--from", str(self.skill))
+        done = self.skill_run("no paid tools", "two hours a week")
+        self.assertEqual(call("merge", "--dir", str(self.control), "--from", str(self.skill))[0], 0)
         self.drive()
         return done
 
@@ -232,6 +233,131 @@ class SkillBudgetTests(unittest.TestCase):
             row["idea_ids"] = ["x-other" if item == key else item for item in row["idea_ids"]]
         (second / "state.json").write_text(json.dumps(state), encoding="utf-8")
         self.assertEqual(call("repeat", "--dir", str(self.control), "--dir", str(second))[0], 1)
+
+
+    # ----- inputs that used to give a wrong number or a traceback -----
+
+    def control_run(self, *constraints, batches="2"):
+        extra = [item for text in constraints for item in ("--constraint", text)]
+        call("direct-init", "--dir", str(self.control), "--question-file", str(QUESTION), "--batches", batches, *extra)
+        self.drive()
+
+    def test_merge_refuses_runs_that_were_not_given_the_same_constraints(self):
+        self.control_run()
+        self.skill_run("no paid tools")
+        code, _ = call("merge", "--dir", str(self.control), "--from", str(self.skill))
+        self.assertEqual(code, 1)
+        self.assertNotIn("merge", json.loads((self.control / "state.json").read_text(encoding="utf-8")))
+
+    def test_merge_refuses_runs_with_a_different_number_of_ideas_per_agent(self):
+        self.control_run()
+        self.skill_run()
+        state = json.loads((self.skill / "state.json").read_text(encoding="utf-8"))
+        state["ideas_per_agent"] = 3
+        (self.skill / "state.json").write_text(json.dumps(state), encoding="utf-8")
+        self.assertEqual(call("merge", "--dir", str(self.control), "--from", str(self.skill))[0], 1)
+
+    def test_a_new_audit_prompt_sets_the_old_answer_aside(self):
+        self.merged_run()
+        made = call("audit-init", "--dir", str(self.control), "--sample", "2", "--seed", "0")[1]
+        Path(made["answer"]).write_text('{"repeats": [], "constraints": []}', encoding="utf-8")
+        again = call("audit-init", "--dir", str(self.control), "--sample", "2", "--seed", "1")[1]
+        self.assertFalse(Path(made["answer"]).exists())
+        self.assertTrue(Path(again["set_aside"]).is_file())
+
+    def test_the_same_audit_prompt_keeps_the_answer(self):
+        self.merged_run()
+        made = call("audit-init", "--dir", str(self.control), "--sample", "2", "--seed", "0")[1]
+        Path(made["answer"]).write_text('{"repeats": [], "constraints": []}', encoding="utf-8")
+        again = call("audit-init", "--dir", str(self.control), "--sample", "2", "--seed", "0")[1]
+        self.assertTrue(Path(made["answer"]).exists())
+        self.assertNotIn("set_aside", again)
+
+    def test_a_malformed_audit_answer_is_reported_not_raised(self):
+        self.merged_run()
+        made = call("audit-init", "--dir", str(self.control), "--sample", "2", "--seed", "0")[1]
+        key = json.loads((self.control / "audit" / "key.json").read_text(encoding="utf-8"))
+        good = {"repeats": [{"b": label, "same_as": None} for label in key["B"]],
+                "constraints": [{"c": label, "violated": []} for label in key["C"]]}
+        first_c = next(iter(key["C"]))
+        cases = {"top level is a list": [],
+                 "repeats is a number": {**good, "repeats": 3},
+                 "same_as is a list": {**good, "repeats": [{"b": "B1", "same_as": ["A1"]}, *good["repeats"][1:]]},
+                 "b is a list": {**good, "repeats": [{"b": ["B1"], "same_as": None}, *good["repeats"][1:]]},
+                 "true is not constraint 1": {**good, "constraints": [{"c": first_c, "violated": [True]},
+                                                                      *good["constraints"][1:]]},
+                 "nested list": {**good, "constraints": [{"c": first_c, "violated": [[1]]}, *good["constraints"][1:]]}}
+        for name, answer in cases.items():
+            Path(made["answer"]).write_text(json.dumps(answer), encoding="utf-8")
+            code, result = call("audit-read", "--dir", str(self.control))
+            self.assertEqual(code, 1, name)
+            self.assertTrue(result is None or result["problems"], name)
+            if result is not None:
+                self.assertEqual(result["constraints"]["violations"], {"skill_only": 0, "control_only": 0, "both": 0}, name)
+        Path(made["answer"]).write_text(json.dumps(good), encoding="utf-8")
+        self.assertEqual(call("audit-read", "--dir", str(self.control))[0], 0)
+
+    def test_an_audit_of_nothing_gives_no_estimate(self):
+        self.merged_run()
+        made = call("audit-init", "--dir", str(self.control), "--sample", "0")[1]
+        key = json.loads((self.control / "audit" / "key.json").read_text(encoding="utf-8"))
+        Path(made["answer"]).write_text(json.dumps({"repeats": [], "constraints": [
+            {"c": label, "violated": []} for label in key["C"]]}), encoding="utf-8")
+        code, result = call("audit-read", "--dir", str(self.control))
+        self.assertEqual(code, 0)
+        self.assertIsNone(result["repeats"]["estimated_new"])
+
+    def test_repeat_refuses_groupings_of_ideas_with_other_text(self):
+        second, _ = self.two_groupings()
+        state = json.loads((second / "state.json").read_text(encoding="utf-8"))
+        key = next(key for key in state["ideas"] if not key.startswith("x-"))
+        state["ideas"][key]["text"] += " (another answer)"
+        (second / "state.json").write_text(json.dumps(state), encoding="utf-8")
+        self.assertEqual(call("repeat", "--dir", str(self.control), "--dir", str(second))[0], 1)
+
+    def test_ideas_no_grouper_placed_are_counted_apart(self):
+        self.control_run()
+        self.skill_run()
+        call("merge", "--dir", str(self.control), "--from", str(self.skill))
+        first = True
+        for _ in range(100):
+            code, action = call("next", "--dir", str(self.control), *([] if first else ["--give-up"]))
+            first = False
+            if action["action"] == "done":
+                break
+            if action["action"] == "dispatch":
+                for task in action["tasks"]:
+                    if action["purpose"] != "group":
+                        self.fake.generate(task)  # no grouping answer is ever written
+                first = True if action["purpose"] != "group" else False
+        result = call("compare", "--dir", str(self.control))[1]
+        ungrouped = result["same_grouper"]["ungrouped_mechanisms"]
+        self.assertGreater(ungrouped["skill_only"], 0)
+        self.assertEqual(ungrouped["control_only"], 0)  # the control ideas were grouped before the merge
+        self.assertLessEqual(ungrouped["skill_only"], result["same_grouper"]["skill_only"])
+        made = call("audit-init", "--dir", str(self.control))[1]
+        self.assertEqual(made["ungrouped_mechanisms"], result["same_grouper"]["ungrouped_mechanisms"])
+
+    def test_the_curve_counts_a_batch_whose_agents_were_all_dropped(self):
+        call("direct-init", "--dir", str(self.control), "--question-file", str(QUESTION), "--batches", "3")
+        self.fake.broken = {f"b002-a{agent}": "missing" for agent in (1, 2, 3)}
+        for _ in range(100):
+            code, action = call("next", "--dir", str(self.control))
+            if action["action"] == "wait":
+                code, action = call("next", "--dir", str(self.control), "--give-up")
+            if action["action"] == "done":
+                break
+            for task in action["tasks"]:
+                (self.fake.group if action["purpose"] == "group" else self.fake.generate)(task)
+        curve = call("compare", "--dir", str(self.control))[1]["control"]["curve"]
+        self.assertEqual([(row["batch"], row["calls_so_far"]) for row in curve], [(1, 3), (2, 6), (3, 9)])
+        self.assertEqual(curve[1]["new_mechanisms"], 0)
+
+    def test_smoke_check_names_a_grouping_step_that_left_ideas_ungrouped(self):
+        self.skill_run(grouping={"g001": "missing", "g002": "not_json.txt"})
+        code, result = call("check", "--dir", str(self.skill), "--min-new", "0")
+        self.assertEqual(code, 1)
+        self.assertIn("9 ideas were left ungrouped", result["problems"])
 
 
 if __name__ == "__main__":

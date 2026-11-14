@@ -8,11 +8,19 @@
 
 | 技能 | 做什么 | 状态 |
 |:---|:---|:---|
-| [brainstorm](skills/brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题；确实能想到直接问想不到的机制，多多少还不确定。见[证据与局限](skills/brainstorm/README.zh.md#证据与局限) |
+| [brainstorm](skills/brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题。和反复直接问比过两道题的计数：它能想到反复直接问想不到的机制，在认真量过的那道题上多 46 到 62 个。见[证据与局限](skills/brainstorm/README.zh.md#证据与局限) |
 
 每个技能在自己的目录里有一份 README：做什么、什么时候用、测到什么程度。
 
-这些技能的评测工具见 [evals/README.md](evals/README.md)。它们只做测量，不是技能。
+## 仓库里有什么
+
+| 路径 | 是什么 |
+|:---|:---|
+| `skills/<名字>/` | 一个技能：给 agent 读的 `SKILL.md`，给人读的 `README.md`，它的脚本和测试 |
+| `evals/` | 测量技能的工具和结果文件。它们不是技能。从 [evals/README.md](evals/README.md) 读起 |
+| `docs/history/` | v1 之前的设计稿，只为留痕。它们不代表发布的技能 |
+| `install.sh`、`.claude-plugin/` | 两种安装方式 |
+| `AGENTS.md` | 给修改本仓库的 agent 的规则 |
 
 ## 安装
 

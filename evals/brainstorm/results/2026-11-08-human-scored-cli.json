@@ -1,0 +1,181 @@
+{
+ "date": "2026-11-08",
+ "question_id": "cli_onboarding",
+ "what": "Human blind scoring of the full flow against asking the model directly, on the exams/v1 CLI onboarding question (how a personally maintained open-source CLI can lower the share of new users who fail on their first try). Two repetitions per config were scored on one comparison sheet. Every idea call was Sonnet run through the claude CLI with tools turned off. Numbers are recomputed from the sheet key, the answers, the recorded units and the budget ledger.",
+ "model": "claude-sonnet-5-5, called directly through the claude CLI with an empty tool list; the same model grouped ideas and rewrote the sheet items",
+ "configs": {
+  "direct": "3 agents x 3 batches of baseline asking, no cards, no methods, no rounds",
+  "full": "3 agents, 4 methods, cards, three-step prompt, rounds 1-2 and pressure 1-3, collisions sent back for a rewrite"
+ },
+ "units": {
+  "direct/rep-1": {
+   "idea_calls": 9,
+   "rewrite_calls": 0,
+   "ideas": 90,
+   "mechanisms": 21,
+   "usd": 0.1369
+  },
+  "direct/rep-2": {
+   "idea_calls": 9,
+   "rewrite_calls": 0,
+   "ideas": 90,
+   "mechanisms": 23,
+   "usd": 0.1128
+  },
+  "full/rep-1": {
+   "idea_calls": 24,
+   "rewrite_calls": 4,
+   "ideas": 233,
+   "mechanisms": 123,
+   "mechanisms_beyond_baseline": 116,
+   "usd": 3.0152
+  },
+  "full/rep-2": {
+   "idea_calls": 24,
+   "rewrite_calls": 7,
+   "ideas": 247,
+   "mechanisms": 133,
+   "mechanisms_beyond_baseline": 122,
+   "usd": 4.015
+  },
+  "note": "mechanisms = groups in the shared grouping of this question that hold at least one idea of the unit. The grouping had 185 mechanisms when the sheet was issued; a later third repetition added 28 more and did not change these counts."
+ },
+ "sheet": {
+  "items_shown": 45,
+  "target_mechanisms": 40,
+  "attention_checks": 3,
+  "repeats": 2,
+  "sampled_per_unit": 17,
+  "unit_slots": 68,
+  "how_sampled": "One seeded order over all mechanisms; each unit takes the first 17 mechanisms it produced (baseline included). 17 is the largest per-unit size whose union stays within 40 unique mechanisms. A mechanism produced by several units is shown and scored once and counts for each of them, so 4 x 17 = 68 unit slots are 40 distinct mechanisms.",
+  "overlap_between_units": {
+   "direct-1 & direct-2": 13,
+   "full-1 & full-2": 10,
+   "direct-1 & full-1": 5,
+   "direct-1 & full-2": 4,
+   "direct-2 & full-1": 2,
+   "direct-2 & full-2": 2,
+   "in_all_four": 2
+  },
+  "what_an_item_is": "one mechanism, shown as one idea rewritten into plain words by the model, with source names masked; the page shows no unit, config or model",
+  "blind": "the person answered all 45 items before the source of each was revealed"
+ },
+ "score": {
+  "definition": "per unit, the number of its 17 mechanisms answered 'I had not thought of this' = yes AND 'I care about this' = yes AND no fatal reason given. 'Want to try' is recorded but not part of the score.",
+  "units": {
+   "direct/rep-1": 4,
+   "direct/rep-2": 3,
+   "full/rep-1": 10,
+   "full/rep-2": 10
+  },
+  "per_config_total": {
+   "direct": 7,
+   "full": 20
+  }
+ },
+ "per_question": {
+  "direct/rep-1": {
+   "not_thought_of": 4,
+   "care": 16,
+   "fatal_reason": 0,
+   "want_to_try": 16
+  },
+  "direct/rep-2": {
+   "not_thought_of": 3,
+   "care": 16,
+   "fatal_reason": 0,
+   "want_to_try": 17
+  },
+  "full/rep-1": {
+   "not_thought_of": 10,
+   "care": 16,
+   "fatal_reason": 0,
+   "want_to_try": 16
+  },
+  "full/rep-2": {
+   "not_thought_of": 11,
+   "care": 15,
+   "fatal_reason": 0,
+   "want_to_try": 16
+  },
+  "reading": "Across both repetitions the full flow had 21 'not thought of' against 7 (+14), 31 'care' against 32 (-1), and no fatal reason on either side. The score gap of 13 comes entirely from 'not thought of'; the other two questions do not favour the full flow. One full/rep-2 mechanism was new but not cared about, so it did not score."
+ },
+ "attention_checks": {
+  "check_bad": {
+   "shown": 3,
+   "scored_by_mistake": 0
+  },
+  "repeats": {
+   "shown": 2,
+   "consistent": 2,
+   "note": "consistency is judged on 'care' and the fatal reason; both repeats also matched on the other two answers"
+  }
+ },
+ "cost": {
+  "source": "per-call cost reported by the CLI and settled in the budget ledger; the unit files and the ledger agree",
+  "scored_reps_usd": {
+   "direct": 0.2497,
+   "full": 7.0302
+  },
+  "ratio_full_to_direct": 28.1526,
+  "ratio_per_repetition": [
+   22.0257,
+   35.5867
+  ],
+  "with_third_repetition_usd": {
+   "direct": 0.375,
+   "full": 11.18,
+   "ratio": 29.8168
+  },
+  "not_included": {
+   "grouping_all_reps_usd": 9.4112,
+   "grouping_calls": 43,
+   "sheet_rewrite_usd": 0.3343,
+   "sheet_rewrite_calls": 11
+  },
+  "note": "One full/rep-1 call first ended with unknown billing, was recorded as not charged and was retried; only the retry is counted.",
+  "full_idea_generation_usd_by_level": {
+   "rep-1": {
+    "baseline": 0.233,
+    "round1": 0.288,
+    "round2": 0.322,
+    "pressure1": 0.468,
+    "pressure2": 0.647,
+    "pressure3": 1.058
+   },
+   "rep-2": {
+    "baseline": 0.222,
+    "round1": 0.267,
+    "round2": 0.44,
+    "pressure1": 0.69,
+    "pressure2": 0.911,
+    "pressure3": 1.485
+   },
+   "rep-3": {
+    "baseline": 0.227,
+    "round1": 0.265,
+    "round2": 0.469,
+    "pressure1": 0.567,
+    "pressure2": 0.789,
+    "pressure3": 1.832
+   },
+   "pressure_levels_against_all_earlier_levels": [
+    2.58,
+    3.32,
+    3.32
+   ],
+   "note": "Rewrites are counted in their level. This is the source of the '2 to 3.5 times' in the message the skill's script shows before pressure 1."
+  }
+ },
+ "limits": [
+  "one question, two repetitions per config, one scorer",
+  "17 mechanisms per unit; the two direct units share 13 of them, so their scores are far from independent",
+  "the sample for a direct unit covers 17 of its 21 or 23 mechanisms, for a full unit 17 of 123 or 133",
+  "an item is a mechanism shown in one rewritten wording, not a single raw idea",
+  "blinding was incomplete by the author's own account (length and wording could hint at the source); this is not measured in the files",
+  "no constraint check was run on these units",
+  "the direct config got no cards; the full flow cost about 28 times as much (22 and 36 per repetition), before shared grouping",
+  "only Sonnet called directly without tools; the shipped sub-agent version has no human score",
+  "a later sheet over three repetitions per config was started but not finished, so the third repetition is unscored"
+ ]
+}

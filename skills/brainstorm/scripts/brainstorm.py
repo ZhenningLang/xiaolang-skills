@@ -131,10 +131,14 @@ def read_cards(path):
         raise RunError("cards: expected a list")
     seen = set()
     for number, card in enumerate(cards, 1):
-        if (not isinstance(card, dict) or set(card) != {"id", "text"} or not isinstance(card["id"], str)
-                or not re.fullmatch(r"[A-Za-z0-9_.-]{1,40}", card["id"]) or card["id"] in seen
-                or not isinstance(card["text"], str) or not card["text"].strip()):
-            raise RunError(f"card {number}: expected unique id (letters, digits, _.-) and nonempty text")
+        if not isinstance(card, dict) or set(card) != {"id", "text"}:
+            raise RunError(f"card {number}: expected an object with only the keys id and text")
+        if not isinstance(card["id"], str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,40}", card["id"]):
+            raise RunError(f"card {number}: id must be 1 to 40 of the characters A-Z a-z 0-9 _ . -")
+        if card["id"] in seen:
+            raise RunError(f"card {number}: repeated id {card['id']}")
+        if not isinstance(card["text"], str) or not card["text"].strip():
+            raise RunError(f"card {number}: text must not be empty")
         seen.add(card["id"])
     return cards
 
@@ -169,9 +173,11 @@ def allocate(card_ids, seed, method_ids=None, used_methods=None):
     if used_methods is not None:
         # Stable sort: methods used least often so far come first, in the shuffled order.
         methods.sort(key=lambda name: used_methods.get(name, 0))
+    # A single card would round down to none; with two or more cards this equals the evaluated harness.
+    count = max(1, int(len(cards) * MATERIALS_PROPORTION)) if cards else 0
     rows = []
     for index in range(AGENTS):
-        selected = sorted(rng.sample(cards, int(len(cards) * MATERIALS_PROPORTION)))
+        selected = sorted(rng.sample(cards, count))
         rng.choice(["model"])  # the evaluated harness drew a model here; keeping the draw keeps assignments identical
         rows.append({"agent": index + 1, "method": methods[index % len(methods)], "cards": selected})
     return rows
@@ -367,7 +373,10 @@ def idea_order(state):
 
 
 def local_table(state):
-    """Mechanisms ordered by first appearance, each shown by its earliest member (as the evaluated loop did)."""
+    """Mechanisms ordered by first appearance, each shown by its earliest member (as the evaluated loop did).
+
+    "Earliest" is by batch, then agent, then idea id. An idea id is a hash, so among the ideas of one agent
+    the order is fixed but is not the order of that agent's answer. The evaluated loop sorted the same way."""
     order = idea_order(state)
     table = []
     for row in state["mechanisms"]:
@@ -641,15 +650,22 @@ def pressure_message(state):
             "together. Ask the user, then run next with --pressure go or --pressure stop.")
 
 
+def done_result(run_dir, state):
+    """What the host reports at the end. dropped_agents counts idea agents whose whole answer was lost;
+    failures also counts partial rewrites and grouping problems."""
+    return {"action": "done", "report": str(Path(run_dir).resolve() / "report.md"),
+            "mechanisms": len(state["mechanisms"]),
+            "beyond_baseline": sum(not row["in_baseline"] for row in state["mechanisms"]),
+            "ideas": len(state["ideas"]), "failures": len(state["failures"]),
+            "dropped_agents": sum(row["reason"] in ("missing_output", "invalid_output") for row in state["failures"])}
+
+
 def finish(run_dir, state):
     report = render_report(state)
     check_report(report, state)
-    path = Path(run_dir).resolve() / "report.md"
-    atomic_write(path, report)
+    atomic_write(Path(run_dir).resolve() / "report.md", report)
     state["complete"] = True
-    return {"action": "done", "report": str(path), "mechanisms": len(state["mechanisms"]),
-            "beyond_baseline": sum(not row["in_baseline"] for row in state["mechanisms"]),
-            "ideas": len(state["ideas"]), "failures": len(state["failures"])}
+    return done_result(run_dir, state)
 
 
 def advance(run_dir, state):
@@ -686,7 +702,7 @@ def advance(run_dir, state):
 def cmd_next(args):
     state = load_state(args.dir)
     if state["complete"]:
-        print(json.dumps({"action": "done", "report": str(Path(args.dir).resolve() / "report.md")}, ensure_ascii=False))
+        print(json.dumps(done_result(args.dir, state), ensure_ascii=False, indent=1))
         return
     if args.pressure is not None:
         if state["profile"] != "full":
@@ -778,7 +794,7 @@ def mechanism_heading(state, row):
         if level not in levels:
             levels.append(level)
     levels.sort(key=LEVEL_ORDER.index)
-    label = one_line(row["label"]) + (" (not grouped: the grouping answer was unusable)" if row.get("ungrouped") else "")
+    label = one_line(row["label"]) + (" (its first idea was not grouped: the grouping answer was unusable)" if row.get("ungrouped") else "")
     return label, " ".join(f"`{level}`" for level in levels) + f" · {len(row['idea_ids'])} phrasing(s)"
 
 
