@@ -59,7 +59,8 @@ class ContractTests(unittest.TestCase):
         self.assertNotIn("decimal", imports)
 
     def test_readme_documents_cost_boundaries(self):
-        text = (ROOT / "evals/README.md").read_text().lower()
+        # The short version is in the README; the full contract of the ledger and backend is in BILLING.md.
+        text = ((ROOT / "evals/README.md").read_text() + (ROOT / "evals/brainstorm/BILLING.md").read_text()).lower()
         for concept in ("estimated", "exit code 3", "single call", "output", "unverified",
                         "personal", "pricing", "fixed_tokens", "posix", "confirm-not-charged"):
             self.assertIn(concept, text)

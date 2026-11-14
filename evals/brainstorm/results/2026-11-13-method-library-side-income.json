@@ -127,5 +127,10 @@
   "Skill-only by the grouper fell from 91 to 38, but the grouper formed 59 mechanisms in this merge and 112 in the earlier one from a similar number of ideas. The grouper's granularity is not stable between merges, so grouper counts from different merges cannot be compared.",
   "Discounted estimate: 23 here, 36 with the four methods. Each estimate inherits its merge's granularity, so this does not show the library is worse. It shows no gain that this instrument can detect.",
   "One run on each side."
- ]
+ ],
+ "skill_calls_by_kind": {
+  "idea": 24,
+  "rewrite": 5,
+  "grouping": 11
+ }
 }

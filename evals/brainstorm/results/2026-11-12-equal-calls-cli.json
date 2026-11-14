@@ -110,7 +110,12 @@
    "judged_same_as_a_control_mechanism": 2,
    "control_ideas_sampled_from_4_largest_mechanisms": 32,
    "judged_misplaced": 1
-  }
+  },
+  "author_spot_check": {
+   "what": "The author read 10 skill-only mechanisms picked at random and said they would try about 7 or 8.",
+   "kind": "an overall impression given in conversation; not marked item by item, no file of answers exists"
+  },
+  "constraint_kind": "Every flagged violation in this file and in the later audits was about the weekly time limit. This was read from the judges' answers; only the counts were kept."
  },
  "audit_fixed_rule": {
   "rule": "Two mechanisms are the same when the thing that makes them work is the same: who acts, what they do, and why that produces the result. A different channel, audience, wording, scale or packaging alone is still the same mechanism. If you cannot decide, answer that they are different.",
