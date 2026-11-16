@@ -31,6 +31,10 @@ ROWS = {
     "lib_ideas": ("Skill ideas", "技能点子"),
     "lib_skill_only": ("Skill-only mechanisms by the grouper, two groupings", "分组者口径的技能独有机制，两次分组"),
     "lib_left": ("Left after the judge removed repeats, four passes", "评委去掉重复后剩下的，四遍"),
+    "blind_new": ("New, worth trying", "没想到，值得试"),
+    "blind_known": ("Thought of before, worth trying", "想到过，值得试"),
+    "blind_no": ("Not worth trying", "不值得试"),
+    "blind_unclear": ("Unclear", "看不懂"),
     "lang_calls": ("Idea calls of the run", "这次运行的出点子调用"),
     "lang_ideas": ("Ideas of the run", "这次运行的点子"),
     "lang_skill_only": ("By the grouper, two groupings", "分组者口径，两次分组"),
@@ -172,6 +176,12 @@ class SkillReadmeNumbersTests(unittest.TestCase):
             self.assertTrue(line_with(path, min(plain), max(plain), min(left), max(left)), f"{language}: six-question ranges")
         for language, path in ROOT_PAGES.items():
             self.assertTrue(line_with(path, min(left), max(left)), f"{language}: root README six-question range")
+
+    def test_quick_blind_score_table_matches_its_result_file(self):
+        total = result("2026-11-16-blind-six.json")["total"]
+        for row, field in (("blind_new", "new_and_worth_trying"), ("blind_known", "thought_of_and_worth_trying"),
+                           ("blind_no", "not_worth_trying"), ("blind_unclear", "unclear")):
+            self.both(row, [[total["skill_only"][field]], [total["plain_asking"][field]]])
 
     def test_grouper_repeat_numbers_match_their_result_file(self):
         data = result("2026-11-14-grouper-repeat-side-income.json")
