@@ -32,6 +32,12 @@ TEXT = {
         "gain_plain": "Plain asking: mechanisms found", "gain_grouper": "Skill: mechanisms plain asking did not reach, by the grouper",
         "gain_judge": "Skill: the same, after the judge removed repeats", "gain_x": "Different mechanisms",
         "cli_rough": "CLI tool onboarding (earlier method, a rough estimate after the judge)",
+        "six_title": "Six real-world questions: plain asking, and what the skill found beyond it",
+        "six_plain": "Plain asking: mechanisms found", "six_left": "Skill: beyond plain asking, after the judge (4 passes)",
+        "six_note": "Blue point: plain asking. Orange bar: skill-only mechanisms left after the judge, lowest to highest of 4 passes",
+        "q_restaurant": "Business: neighbourhood restaurant", "q_elevator": "Society: lift for an old building",
+        "q_friends": "Personal life: friends in a new city", "q_phone": "Family: a teenager's phone time",
+        "q_noshow": "Health care: clinic no-shows", "q_canteen": "Public: school canteen waste",
     },
     "zh": {
         "cli": "命令行工具上手", "income": "公众号第一笔收入",
@@ -50,6 +56,12 @@ TEXT = {
         "gain_plain": "反复直接问：找到的机制", "gain_grouper": "技能：反复直接问没想到的机制，分组者口径",
         "gain_judge": "技能：同上，评委去掉重复后", "gain_x": "不同机制的个数",
         "cli_rough": "命令行工具上手（早期量法，评委去重后是粗略估计）",
+        "six_title": "六道真实问题：反复直接问找到的，和技能另外多找到的",
+        "six_plain": "反复直接问：找到的机制", "six_left": "技能：反复直接问没想到的，评委去重后（四遍）",
+        "six_note": "蓝点：反复直接问。橙条：技能独有机制评委去重后，四遍的最低到最高",
+        "q_restaurant": "公司经营：社区餐馆", "q_elevator": "社会：老小区加装电梯",
+        "q_friends": "人生发展：新城市交朋友", "q_phone": "家庭教育：孩子刷手机",
+        "q_noshow": "医疗健康：诊所爽约", "q_canteen": "公共与环境：食堂剩饭",
     },
 }
 
@@ -177,7 +189,36 @@ def gain(language):
     return strip(language, t["gain_title"], rows, color_title=t["question"], domain=(0, 120), x_title=t["gain_x"])
 
 
-CHARTS = {"skill-gain": gain, "plain-curve": curve, "human-score": score, "grouper-steady": steady, "methods-compare": methods}
+def six(language):
+    """Per question: a point for plain asking, and a bar over the four judge passes of the skill."""
+    t = TEXT[language]
+    data = result("2026-11-16-six-questions.json")["questions"]
+    rows = []
+    for key, q in data.items():
+        left = [v for grouping in q["audit"].values() for v in (grouping["left_pass1"], grouping["left_pass2"])]
+        rows.append({"row": t["q_" + key], "plain": q["control"]["mechanisms"], "low": min(left), "high": max(left),
+                     "range": f"{min(left)}–{max(left)}"})
+    order = [row["row"] for row in rows]
+    y = {"field": "row", "type": "nominal", "title": None, "sort": order,
+         "axis": {"labelFontSize": 14, "labelLimit": 520}}
+    x_title = t["gain_x"]
+    return spec(language, {
+        "title": {"text": t["six_title"], "subtitle": t["six_note"], "subtitleFontSize": 14}, "width": 520, "height": 56 * len(rows) + 20, "data": {"values": rows},
+        "layer": [
+            {"mark": {"type": "rule", "strokeWidth": 10, "color": "#F58518", "opacity": 0.85},
+             "encoding": {"y": y, "x": {"field": "low", "type": "quantitative", "title": x_title,
+                                        "scale": {"domain": [0, 130]}}, "x2": {"field": "high"}}},
+            {"mark": {"type": "text", "dx": 8, "align": "left", "fontSize": 14, "color": "#C75F00"},
+             "encoding": {"y": y, "x": {"field": "high", "type": "quantitative"}, "text": {"field": "range"}}},
+            {"mark": {"type": "point", "filled": True, "size": 160, "color": "#4C78A8"},
+             "encoding": {"y": y, "x": {"field": "plain", "type": "quantitative"}}},
+            {"mark": {"type": "text", "dy": -16, "fontSize": 14, "color": "#2F5D8A"},
+             "encoding": {"y": y, "x": {"field": "plain", "type": "quantitative"}, "text": {"field": "plain"}}},
+        ],
+    })
+
+
+CHARTS = {"six-questions": six, "skill-gain": gain, "plain-curve": curve, "human-score": score, "grouper-steady": steady, "methods-compare": methods}
 
 
 def build():

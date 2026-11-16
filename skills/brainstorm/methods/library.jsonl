@@ -1,18 +1,18 @@
-{"id": "analogy", "text": "从一个不相关的领域找一个已经解决过类似问题的做法，把它搬过来用。"}
-{"id": "reverse", "text": "把题目里默认成立的一个前提反过来，看反过来之后能做什么。"}
-{"id": "person", "text": "完全站在受影响最大的那个人的位置，从那个人一天里实际遇到的时刻出发想办法。"}
-{"id": "resources", "text": "先列出手头已有但没被利用的资源，每个点子都必须用上其中至少一种。"}
-{"id": "substitute", "text": "先写出现在通常的做法由哪些部件、角色或材料组成，每个点子都把其中一个换成别的东西，并说明换了之后为什么能成立。"}
-{"id": "combine", "text": "找出两个现在分开进行的步骤、对象或角色，每个点子都把一对合成一个，让合并本身带来效果。"}
-{"id": "eliminate", "text": "先列出大家认为必不可少的环节，每个点子都彻底去掉其中一个，再想办法让事情在没有它的情况下照样成立。"}
-{"id": "repurpose", "text": "找出已经存在、但原本不是为这件事设计的东西，每个点子都把其中一样挪到这道题上来用。"}
-{"id": "reorder", "text": "先写出现在的先后顺序，每个点子都改变其中一处顺序，或者把谁先做谁后做对调。"}
-{"id": "extreme-limit", "text": "假设可用的时间、钱或人手只剩现在的十分之一，原来的做法必然做不成，从这个条件出发想办法。硬约束仍然要守。"}
-{"id": "lift-limit", "text": "先挑一个题目里没有写成硬约束、但大家默认存在的限制，假设它完全不存在，想出做法，再把做法改到现实里也能做。硬约束本身不能取消。"}
-{"id": "ten-times", "text": "目标不是改善一点，而是好十倍。先说明常规做法为什么到不了十倍，每个点子都必须是一条到得了的不同路径。"}
-{"id": "first-principles", "text": "先把问题拆成几条不能再拆的事实，不引用任何现成做法，只从这些事实出发重新搭出办法。"}
-{"id": "contradiction", "text": "先找出一对矛盾：想要一样东西更好，就会让另一样变差。每个点子都必须让两样同时成立，不许折中。"}
-{"id": "split", "text": "把对象按时间、空间、人群或场景切成几部分，每个点子都对其中一部分用一种和其余部分不同的做法。"}
-{"id": "make-it-worse", "text": "先列出能让这个问题变得更严重的做法，越具体越好，再把每一条反过来，得到点子。"}
-{"id": "random-object", "text": "随便选三样和题目无关的具体物件，比如渔网、路灯、收银条，每个点子都必须从其中一样的某个特性出发。"}
-{"id": "outsider", "text": "分别假设由急诊医生、游戏策划、物流调度员这类别的行业的人来解这道题，每个点子都用其中一个人平时工作里的惯用手法。"}
+{"id": "analogy", "text": "Find a practice from an unrelated field that has already solved a similar problem, and move it over to this one."}
+{"id": "reverse", "text": "Take one premise that the question assumes to be true, reverse it, and see what becomes possible."}
+{"id": "person", "text": "Stand fully in the place of the person most affected, and start from the moments that person actually meets in a day."}
+{"id": "resources", "text": "First list the resources that are already at hand but unused. Every idea must use at least one of them."}
+{"id": "substitute", "text": "First write down the parts, roles or materials that the usual way is made of. Every idea replaces one of them with something else and says why it still works after the change."}
+{"id": "combine", "text": "Find two steps, objects or roles that are now kept apart. Every idea joins one such pair into one, so that the joining itself produces the effect."}
+{"id": "eliminate", "text": "First list the steps everyone believes cannot be left out. Every idea removes one of them completely, then finds a way for things to work without it."}
+{"id": "repurpose", "text": "Find things that already exist but were not made for this problem. Every idea moves one of them over and uses it here."}
+{"id": "reorder", "text": "First write down the present order of events. Every idea changes the order in one place, or swaps who acts first and who acts second."}
+{"id": "extreme-limit", "text": "Assume only one tenth of the present time, money or people is left, so the usual way must fail. Start from that condition. The hard constraints still hold."}
+{"id": "lift-limit", "text": "First pick a limit that the question does not state as a hard constraint but that everyone assumes. Assume it is gone, find a way, then change that way until it also works in reality. The hard constraints themselves cannot be lifted."}
+{"id": "ten-times", "text": "The goal is not a small gain but ten times better. First say why the usual way cannot reach ten times. Every idea must be a different path that can."}
+{"id": "first-principles", "text": "First break the problem into a few facts that cannot be broken down further. Cite no existing practice; build a way up from those facts alone."}
+{"id": "contradiction", "text": "First find a contradiction: making one thing better makes another worse. Every idea must make both hold at once, with no compromise."}
+{"id": "split", "text": "Cut the subject into parts by time, place, group of people or situation. Every idea treats one part in a way that differs from the rest."}
+{"id": "make-it-worse", "text": "First list ways to make this problem worse, as concrete as you can. Then reverse each one to get an idea."}
+{"id": "random-object", "text": "Pick any three concrete objects that have nothing to do with the question, such as a fishing net, a street lamp, a till receipt. Every idea must start from one property of one of them."}
+{"id": "outsider", "text": "Assume the problem is given in turn to people of other trades, such as an emergency doctor, a game designer, a freight dispatcher. Every idea uses a habitual move from one such person's daily work."}

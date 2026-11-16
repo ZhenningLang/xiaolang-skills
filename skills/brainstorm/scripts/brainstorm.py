@@ -24,14 +24,14 @@ DEFAULT_IDEAS_PER_AGENT = 10
 MATERIALS_PROPORTION = 0.5
 GROUP_CHUNK = 40
 GROUP_ATTEMPTS = 2
-# Method text is copied verbatim from the evaluated configuration.
+# The four default methods. library.jsonl holds the same four, word for word, and fourteen more.
 METHODS = {
-    "analogy": "从一个不相关的领域找一个已经解决过类似问题的做法，把它搬过来用。",
-    "reverse": "把题目里默认成立的一个前提反过来，看反过来之后能做什么。",
-    "person": "完全站在受影响最大的那个人的位置，从那个人一天里实际遇到的时刻出发想办法。",
-    "resources": "先列出手头已有但没被利用的资源，每个点子都必须用上其中至少一种。",
+    "analogy": "Find a practice from an unrelated field that has already solved a similar problem, and move it over to this one.",
+    "reverse": "Take one premise that the question assumes to be true, reverse it, and see what becomes possible.",
+    "person": "Stand fully in the place of the person most affected, and start from the moments that person actually meets in a day.",
+    "resources": "First list the resources that are already at hand but unused. Every idea must use at least one of them.",
 }
-# A larger set that keeps the four above word for word. A run uses it only when asked: --methods library.
+# The larger set. A run uses it only when asked: --methods library.
 METHOD_LIBRARY = Path(__file__).resolve().parents[1] / "methods" / "library.jsonl"
 PROFILES = {"full": ["round1", "round2", "pressure1", "pressure2", "pressure3"],
             "economy": ["round1", "round2"]}
@@ -270,7 +270,7 @@ def grouping_prompt(chunk, mechanisms, ideas, output_path):
     return "\n".join([
         TOOL_RULE,
         "Group ideas by mechanism: the actual way an idea works, not its wording. Only merge equivalent mechanisms.",
-        'For example, "周六下午专场" and "周末青少年专属时段" describe the same mechanism.',
+        'For example, "a Saturday afternoon session" and "a weekend slot for teenagers only" describe the same mechanism.',
         "Assign every supplied new idea exactly once to an existing mechanism or a new group. Keep existing groups immutable.",
         "Write each new label in the same language as the ideas.",
         'Return only JSON: {"groups":[{"target":"m-001 or new:unique_tag","label":"mechanism description","idea_ids":["i-..."]}]}.',

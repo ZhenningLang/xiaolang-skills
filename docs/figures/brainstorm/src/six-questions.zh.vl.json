@@ -1,0 +1,209 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "计数取自结果文件",
+      "surface": "repo-doc"
+    }
+  },
+  "title": {
+    "text": "六道真实问题：反复直接问找到的，和技能另外多找到的",
+    "subtitle": "蓝点：反复直接问。橙条：技能独有机制评委去重后，四遍的最低到最高",
+    "subtitleFontSize": 14
+  },
+  "width": 520,
+  "height": 356,
+  "data": {
+    "values": [
+      {
+        "row": "公司经营：社区餐馆",
+        "plain": 24,
+        "low": 88,
+        "high": 89,
+        "range": "88–89"
+      },
+      {
+        "row": "社会：老小区加装电梯",
+        "plain": 42,
+        "low": 112,
+        "high": 118,
+        "range": "112–118"
+      },
+      {
+        "row": "人生发展：新城市交朋友",
+        "plain": 27,
+        "low": 85,
+        "high": 90,
+        "range": "85–90"
+      },
+      {
+        "row": "家庭教育：孩子刷手机",
+        "plain": 26,
+        "low": 67,
+        "high": 80,
+        "range": "67–80"
+      },
+      {
+        "row": "医疗健康：诊所爽约",
+        "plain": 23,
+        "low": 76,
+        "high": 80,
+        "range": "76–80"
+      },
+      {
+        "row": "公共与环境：食堂剩饭",
+        "plain": 35,
+        "low": 77,
+        "high": 82,
+        "range": "77–82"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "strokeWidth": 10,
+        "color": "#F58518",
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "公司经营：社区餐馆",
+            "社会：老小区加装电梯",
+            "人生发展：新城市交朋友",
+            "家庭教育：孩子刷手机",
+            "医疗健康：诊所爽约",
+            "公共与环境：食堂剩饭"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "low",
+          "type": "quantitative",
+          "title": "不同机制的个数",
+          "scale": {
+            "domain": [
+              0,
+              130
+            ]
+          }
+        },
+        "x2": {
+          "field": "high"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dx": 8,
+        "align": "left",
+        "fontSize": 14,
+        "color": "#C75F00"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "公司经营：社区餐馆",
+            "社会：老小区加装电梯",
+            "人生发展：新城市交朋友",
+            "家庭教育：孩子刷手机",
+            "医疗健康：诊所爽约",
+            "公共与环境：食堂剩饭"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "high",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "range"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "color": "#4C78A8"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "公司经营：社区餐馆",
+            "社会：老小区加装电梯",
+            "人生发展：新城市交朋友",
+            "家庭教育：孩子刷手机",
+            "医疗健康：诊所爽约",
+            "公共与环境：食堂剩饭"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "plain",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14,
+        "color": "#2F5D8A"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "公司经营：社区餐馆",
+            "社会：老小区加装电梯",
+            "人生发展：新城市交朋友",
+            "家庭教育：孩子刷手机",
+            "医疗健康：诊所爽约",
+            "公共与环境：食堂剩饭"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "plain",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "plain"
+        }
+      }
+    }
+  ]
+}

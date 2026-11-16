@@ -1,0 +1,209 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": {
+    "text": "Six real-world questions: plain asking, and what the skill found beyond it",
+    "subtitle": "Blue point: plain asking. Orange bar: skill-only mechanisms left after the judge, lowest to highest of 4 passes",
+    "subtitleFontSize": 14
+  },
+  "width": 520,
+  "height": 356,
+  "data": {
+    "values": [
+      {
+        "row": "Business: neighbourhood restaurant",
+        "plain": 24,
+        "low": 88,
+        "high": 89,
+        "range": "88–89"
+      },
+      {
+        "row": "Society: lift for an old building",
+        "plain": 42,
+        "low": 112,
+        "high": 118,
+        "range": "112–118"
+      },
+      {
+        "row": "Personal life: friends in a new city",
+        "plain": 27,
+        "low": 85,
+        "high": 90,
+        "range": "85–90"
+      },
+      {
+        "row": "Family: a teenager's phone time",
+        "plain": 26,
+        "low": 67,
+        "high": 80,
+        "range": "67–80"
+      },
+      {
+        "row": "Health care: clinic no-shows",
+        "plain": 23,
+        "low": 76,
+        "high": 80,
+        "range": "76–80"
+      },
+      {
+        "row": "Public: school canteen waste",
+        "plain": 35,
+        "low": 77,
+        "high": 82,
+        "range": "77–82"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "strokeWidth": 10,
+        "color": "#F58518",
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Business: neighbourhood restaurant",
+            "Society: lift for an old building",
+            "Personal life: friends in a new city",
+            "Family: a teenager's phone time",
+            "Health care: clinic no-shows",
+            "Public: school canteen waste"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "low",
+          "type": "quantitative",
+          "title": "Different mechanisms",
+          "scale": {
+            "domain": [
+              0,
+              130
+            ]
+          }
+        },
+        "x2": {
+          "field": "high"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dx": 8,
+        "align": "left",
+        "fontSize": 14,
+        "color": "#C75F00"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Business: neighbourhood restaurant",
+            "Society: lift for an old building",
+            "Personal life: friends in a new city",
+            "Family: a teenager's phone time",
+            "Health care: clinic no-shows",
+            "Public: school canteen waste"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "high",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "range"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "color": "#4C78A8"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Business: neighbourhood restaurant",
+            "Society: lift for an old building",
+            "Personal life: friends in a new city",
+            "Family: a teenager's phone time",
+            "Health care: clinic no-shows",
+            "Public: school canteen waste"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "plain",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14,
+        "color": "#2F5D8A"
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Business: neighbourhood restaurant",
+            "Society: lift for an old building",
+            "Personal life: friends in a new city",
+            "Family: a teenager's phone time",
+            "Health care: clinic no-shows",
+            "Public: school canteen waste"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "plain",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "plain"
+        }
+      }
+    }
+  ]
+}

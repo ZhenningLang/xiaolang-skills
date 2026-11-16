@@ -1,0 +1,145 @@
+{
+ "date": "2026-11-16",
+ "question_id": "side_income",
+ "what": "The skill with its method texts in English, on the second question, measured under the convention of 2026-11-14-methods-default-vs-library-side-income.json: the same plain-asking run (293 ideas, 21 mechanisms), the new skill run merged into two fresh copies of it and grouped twice by Opus, every skill-only mechanism judged twice by the same judge model as before.",
+ "setup": {
+  "question_and_constraints": "as in 2026-11-13-equal-calls-side-income.json",
+  "cards": "the same 10 cards",
+  "seed": "the same seed as the earlier default run",
+  "methods": "the four default methods, English texts with the same meaning as the earlier Chinese texts",
+  "grouping_example": "the one Chinese example in the grouping prompt replaced by an English one",
+  "idea_language": "every idea of the run was written in Chinese, as before"
+ },
+ "skill": {
+  "ideas": 274,
+  "idea_calls": 33,
+  "idea_calls_dropped": 0,
+  "mechanisms": 121,
+  "beyond_its_own_baseline": 98,
+  "calls_by_kind": {
+   "idea": 24,
+   "rewrite": 9,
+   "grouping": 13
+  }
+ },
+ "english_opus_groupings": {
+  "runs": [
+   {
+    "skill_only": 47,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 74,
+    "ungrouped_mechanisms": {
+     "skill_only": 0,
+     "control_only": 0,
+     "both": 0
+    },
+    "name": "english-opus-1"
+   },
+   {
+    "skill_only": 62,
+    "control_only": 3,
+    "both": 18,
+    "ideas_outside_control": 108,
+    "ungrouped_mechanisms": {
+     "skill_only": 1,
+     "control_only": 0,
+     "both": 0
+    },
+    "name": "english-opus-2"
+   }
+  ],
+  "skill_only_range": [
+   47,
+   62
+  ],
+  "pairs": [
+   {
+    "ideas": 274,
+    "same_verdict": 232,
+    "rate": 0.847,
+    "new_in_first_only": 4,
+    "new_in_second_only": 38
+   }
+  ],
+  "ideas": {
+   "total": 274,
+   "new_in_every_grouping": 70,
+   "new_in_none": 162,
+   "split": 42
+  }
+ },
+ "audit": {
+  "judge": "the same Claude model as the 2026-11-14 audits (other than Sonnet and Opus); two separate passes over each prompt",
+  "scope": "every skill-only mechanism",
+  "by_grouping": {
+   "english-opus-1": {
+    "skill_only": 47,
+    "checked": 47,
+    "repeats_pass1": 11,
+    "repeats_pass2": 8,
+    "left_pass1": 36,
+    "left_pass2": 39,
+    "same_verdict": 42,
+    "constraint_violations_pass1": 1,
+    "constraint_violations_pass2": 1,
+    "mechanisms_checked_for_constraints": 68
+   },
+   "english-opus-2": {
+    "skill_only": 62,
+    "checked": 62,
+    "repeats_pass1": 29,
+    "repeats_pass2": 27,
+    "left_pass1": 33,
+    "left_pass2": 35,
+    "same_verdict": 58,
+    "constraint_violations_pass1": 0,
+    "constraint_violations_pass2": 1,
+    "mechanisms_checked_for_constraints": 83
+   }
+  }
+ },
+ "against_the_chinese_texts": {
+  "skill_only_by_the_grouper": {
+   "chinese": [
+    76,
+    74
+   ],
+   "english": [
+    47,
+    62
+   ]
+  },
+  "left_after_the_judge": {
+   "chinese": [
+    53,
+    62,
+    51,
+    46
+   ],
+   "english": [
+    36,
+    39,
+    33,
+    35
+   ]
+  },
+  "same_verdict_of_two_groupings": {
+   "chinese": 0.957,
+   "english": 0.847
+  },
+  "chinese_from": "2026-11-14-methods-default-vs-library-side-income.json"
+ },
+ "reading": [
+  "Every count of this run is below the earlier run with Chinese texts: 47 and 62 skill-only mechanisms by the grouper against 76 and 74; 33 to 39 left after the judge against 46 to 62.",
+  "There is one run on each side. How much two runs with the same texts differ was never measured, so this does not show that the English texts are worse.",
+  "The two Opus groupings agreed on fewer ideas than before (85% against 96%); the judge was steadier than before (42 of 47 and 58 of 62 the same in two passes)."
+ ],
+ "limits": [
+  "one question",
+  "one skill run with English texts",
+  "two groupings and two judge passes per grouping",
+  "one idea of grouping english-opus-2 was left ungrouped and counts as its own mechanism",
+  "generation, grouping and judging all used models of one family"
+ ]
+}

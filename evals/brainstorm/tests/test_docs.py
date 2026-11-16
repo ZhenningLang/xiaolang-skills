@@ -31,6 +31,10 @@ ROWS = {
     "lib_ideas": ("Skill ideas", "技能点子"),
     "lib_skill_only": ("Skill-only mechanisms by the grouper, two groupings", "分组者口径的技能独有机制，两次分组"),
     "lib_left": ("Left after the judge removed repeats, four passes", "评委去掉重复后剩下的，四遍"),
+    "lang_calls": ("Idea calls of the run", "这次运行的出点子调用"),
+    "lang_ideas": ("Ideas of the run", "这次运行的点子"),
+    "lang_skill_only": ("By the grouper, two groupings", "分组者口径，两次分组"),
+    "lang_left": ("After the judge, four passes", "评委去重后，四遍"),
 }
 
 
@@ -127,6 +131,47 @@ class SkillReadmeNumbersTests(unittest.TestCase):
         for language, path in PAGES.items():
             self.assertTrue(line_with(path, one["repeats_pass1"], one["repeats_pass2"], one["skill_only"]),
                             f"{language}: the two judge passes over one library grouping")
+
+    def test_method_language_table_matches_its_result_files(self):
+        english = result("2026-11-16-english-methods-side-income.json")
+        chinese = result("2026-11-14-methods-default-vs-library-side-income.json")
+        old = result("2026-11-13-equal-calls-side-income.json")["compare"]["skill"]
+        audit, old_audit = english["audit"]["by_grouping"], chinese["audit"]["by_grouping"]
+        left = lambda by, names: [by[name][key] for name in names for key in ("left_pass1", "left_pass2")]
+        self.both("lang_calls", [[old["idea_calls"]], [english["skill"]["idea_calls"]]])
+        self.both("lang_ideas", [[old["ideas"]], [english["skill"]["ideas"]]])
+        self.both("lang_skill_only", [chinese["default_opus_groupings"]["skill_only"],
+                                      [row["skill_only"] for row in english["english_opus_groupings"]["runs"]]])
+        self.both("lang_left", [left(old_audit, ("default-opus-1", "default-opus-2")),
+                                left(audit, ("english-opus-1", "english-opus-2"))])
+        english_left = left(audit, ("english-opus-1", "english-opus-2"))
+        for language, path in PAGES.items():
+            self.assertTrue(line_with(path, min(english_left), max(english_left)), f"{language}: English range")
+
+    def test_six_question_table_matches_its_result_file(self):
+        names = {
+            "en": {"restaurant": "Neighbourhood restaurant (business)", "elevator": "Lift for an old building (society)",
+                   "friends": "Friends in a new city (personal life)", "phone": "A teenager's phone time (family)",
+                   "noshow": "Clinic no-shows (health care)", "canteen": "School canteen waste (public)"},
+            "zh": {"restaurant": "社区餐馆（公司经营）", "elevator": "老小区加装电梯（社会）", "friends": "新城市交朋友（人生发展）",
+                   "phone": "孩子刷手机（家庭教育）", "noshow": "诊所爽约（医疗健康）", "canteen": "食堂剩饭（公共与环境）"},
+        }
+        questions = result("2026-11-16-six-questions.json")["questions"]
+        plain, left = [], []
+        for language, path in PAGES.items():
+            rows = {row[0]: row[1:] for row in tables(path)}
+            for key, question in questions.items():
+                groupings = list(question["audit"].values())
+                passes = [g[k] for g in groupings for k in ("left_pass1", "left_pass2")]
+                expected = [[question["control"]["mechanisms"]], [g["skill_only"] for g in groupings], passes,
+                            [int(question["groupings"]["same_verdict_rate"] * 100 + 0.5)],
+                            [question["spot_check"]["judged_same"]]]
+                self.assertEqual([numbers(cell) for cell in rows[names[language][key]]], expected, f"{language}: {key}")
+                plain.append(question["control"]["mechanisms"])
+                left += passes
+            self.assertTrue(line_with(path, min(plain), max(plain), min(left), max(left)), f"{language}: six-question ranges")
+        for language, path in ROOT_PAGES.items():
+            self.assertTrue(line_with(path, min(left), max(left)), f"{language}: root README six-question range")
 
     def test_grouper_repeat_numbers_match_their_result_file(self):
         data = result("2026-11-14-grouper-repeat-side-income.json")

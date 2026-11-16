@@ -1,0 +1,717 @@
+{
+ "date": "2026-11-16",
+ "what": "Six real-world questions, one per direction, each measured under the convention of 2026-11-14-methods-default-vs-library-side-income.json: one plain-asking run of 30 idea calls (grouped by Sonnet), one skill run with the English method texts shipped now, the skill run merged into two copies of the plain-asking run and grouped twice by Opus, every skill-only mechanism judged twice by the same judge model as before. A different model then re-judged 15 mechanisms per question that the judge had kept in both passes.",
+ "cards": "Ten cards per question, drafted by an Opus sub-agent from general knowledge, with no statistics and no sources; they were not checked against sources or by the author before the runs.",
+ "questions": {
+  "restaurant": {
+   "direction": "公司经营",
+   "question": "一家 15 人的社区餐馆，外卖平台抽成上涨后，怎样在半年内把利润恢复到原来的水平？",
+   "constraints": [
+    "不涨堂食菜价",
+    "不退出外卖平台"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "外卖平台的扣费通常按订单金额比例计算，里面混着佣金、配送费、活动分摊等几部分，商家后台的结算单会分项列出，但不少店主只看最终到账金额。"
+    },
+    {
+     "id": "c02",
+     "text": "平台上的满减、折扣、配送费减免等活动，补贴大部分由商家承担；参加活动能换来排名和曝光，一旦退出，订单量往往随之下滑。"
+    },
+    {
+     "id": "c03",
+     "text": "外卖订单要额外用到餐盒、餐具、封口袋等包材，这笔钱由店家承担，按单计看起来不多，在核算外卖利润时却常被漏掉。"
+    },
+    {
+     "id": "c04",
+     "text": "社区餐馆的客流集中在午饭和晚饭两个时段，下午和深夜后厨与座位多半闲着，而人工和房租不管有没有客人都照常发生。"
+    },
+    {
+     "id": "c05",
+     "text": "社区餐馆的老顾客大多住在附近几条街，其中不少人既来店里吃，也在平台上点同一家店的外卖；平台订单里的顾客电话通常是隐私号，店家拿不到真实联系方式。"
+    },
+    {
+     "id": "c06",
+     "text": "外卖平台的商家规则一般禁止在订单、包装或小票里引导顾客绕开平台下单，被发现可能面临处罚或降权。"
+    },
+    {
+     "id": "c07",
+     "text": "后厨师傅和服务员最在意的是排班和收入是否稳定，菜单或出餐流程一改，他们的学习负担和出错压力就跟着上来，老员工对频繁调整常有抵触。"
+    },
+    {
+     "id": "c08",
+     "text": "同一张菜单上各道菜的毛利差别很大，卖得最多的招牌菜未必最赚钱，而多数小店并没有逐道菜核算过成本。"
+    },
+    {
+     "id": "c09",
+     "text": "食材供应商一般按采购量和付款周期给价，单家小店采购量小、议价能力弱，同一街区的几家小店之间很少联合采购。"
+    },
+    {
+     "id": "c10",
+     "text": "外卖平台允许商家给外卖单独设置价格、份量和套餐组合，与堂食菜单并不强制一致，平台上同一家店的外卖价略高于店内价的情况并不少见。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 295,
+    "mechanisms": 24
+   },
+   "skill": {
+    "idea_calls": 29,
+    "idea_calls_dropped": 0,
+    "ideas": 259,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.988
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 92,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 3,
+     "repeats_pass2": 3,
+     "left_pass1": 89,
+     "left_pass2": 89,
+     "same_verdict": 90,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 116
+    },
+    "opus-2": {
+     "skill_only": 92,
+     "ungrouped_skill_only": 1,
+     "repeats_pass1": 3,
+     "repeats_pass2": 4,
+     "left_pass1": 89,
+     "left_pass2": 88,
+     "same_verdict": 91,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 116
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 0
+   }
+  },
+  "elevator": {
+   "direction": "社会",
+   "question": "一个 6 层、没有电梯的老旧小区，怎样让同一个单元的楼上楼下住户就加装电梯达成一致？",
+   "constraints": [
+    "不靠强制或诉讼",
+    "政府补贴额度不变"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "一楼住户通常用不上电梯，却要承受采光被挡、噪音、楼前通道变窄和施工期间出入不便，不少人还担心加装后自家房子相对贬值。"
+    },
+    {
+     "id": "c02",
+     "text": "高层住户里往往有腿脚不便的老人，爬楼是每天的实际负担，他们对加装的意愿最强，也最愿意多出钱。"
+    },
+    {
+     "id": "c03",
+     "text": "加装电梯一般要求本单元相当比例的业主书面同意，且公示期间若有利害关系人提出异议，审批往往就会停下来，一户坚决反对就可能卡住整个单元。"
+    },
+    {
+     "id": "c04",
+     "text": "常见的费用分摊办法是按楼层递增出资，低层少出或不出，但具体每层出多少没有统一标准，往往是协商中争执最久的部分。"
+    },
+    {
+     "id": "c05",
+     "text": "政府补贴通常只覆盖建设成本的一部分，剩下的建设费和之后多年的电费、维保、年检费用都要住户自己承担，后期费用谁来出、怎么收经常没人事先说清。"
+    },
+    {
+     "id": "c06",
+     "text": "老小区的住户构成混杂，有自住的老住户、出租房的房东和常年不在的业主，房东和不在本地的业主对加装电梯的关心程度明显低于自住户。"
+    },
+    {
+     "id": "c07",
+     "text": "街道、社区居委会和一些电梯企业已经有过不少成功案例，有的地方还有专门帮居民跑审批、做协调的代建方或社区工作者，但很多住户并不知道这些渠道。"
+    },
+    {
+     "id": "c08",
+     "text": "邻里之间的旧矛盾，比如以前的漏水纠纷、占用公共空间，常常会在电梯协商中被翻出来，反对的理由表面上是电梯，实际是人和人之间的关系。"
+    },
+    {
+     "id": "c09",
+     "text": "老楼加装的电梯不少只能停在楼梯间的半层平台，住户出电梯后仍需走半层楼梯，这让部分高层住户觉得花了钱却没有完全解决问题。"
+    },
+    {
+     "id": "c10",
+     "text": "加装电梯需要占用楼前的公共绿地或通道，还可能涉及地下管线迁移，这些前期勘测和设计的结果会直接影响各户受到的具体影响有多大。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 292,
+    "mechanisms": 42
+   },
+   "skill": {
+    "idea_calls": 30,
+    "idea_calls_dropped": 0,
+    "ideas": 251,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.968
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 126,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 10,
+     "repeats_pass2": 8,
+     "left_pass1": 116,
+     "left_pass2": 118,
+     "same_verdict": 122,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 168
+    },
+    "opus-2": {
+     "skill_only": 125,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 12,
+     "repeats_pass2": 13,
+     "left_pass1": 113,
+     "left_pass2": 112,
+     "same_verdict": 120,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 167
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 0
+   }
+  },
+  "friends": {
+   "direction": "人生发展",
+   "question": "一个刚搬到新城市的 30 岁上班族，怎样在一年内交到 3 个能深夜打电话的朋友？",
+   "constraints": [
+    "不用交友或约会软件",
+    "每周用于社交的时间不超过 6 小时"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "成年人的友谊多半不是一次聊得投机就成形的，而是在同一个场合里反复、不经约定地碰面，慢慢从熟脸变成熟人。"
+    },
+    {
+     "id": "c02",
+     "text": "三十岁上下的本地同龄人很多已有伴侣、孩子或成形多年的朋友圈，下班后的时间被家庭占满，对结交新朋友的需求和余力都有限。"
+    },
+    {
+     "id": "c03",
+     "text": "同事是新城市里接触最频繁的一群人，但职场关系夹杂着上下级、绩效竞争和隐私顾虑，不少人刻意把同事和私人生活隔开。"
+    },
+    {
+     "id": "c04",
+     "text": "刚到一座城市的人手里往往有一批沉睡的弱关系，比如同城的大学校友、老乡、前同事或朋友的朋友，平时几乎不联系，也很少被当成社交资源。"
+    },
+    {
+     "id": "c05",
+     "text": "能深夜打电话的朋友，意味着对方愿意被打扰、愿意接住你的脆弱面；这种信任通常靠一次次小的自我暴露和互相帮忙累积，单靠一起玩得开心很难到达。"
+    },
+    {
+     "id": "c06",
+     "text": "兴趣班、跑团、桌游局这类线下活动人员流动大，许多参与者只来一两次，见面次数不够，认识的人常常停留在点头之交。"
+    },
+    {
+     "id": "c07",
+     "text": "小区邻居、常去的咖啡店、健身房和菜市场是每周都会重复出现的场所，熟面孔不少，但多数人很少越过寒暄这一步。"
+    },
+    {
+     "id": "c08",
+     "text": "城市里同样有大量刚落脚的外地上班族，他们也被通勤和加班挤占时间，也觉得孤单，却同样不好意思先开口。"
+    },
+    {
+     "id": "c09",
+     "text": "工作日晚上常被加班、通勤和恢复精力吃掉，社交时间大多只能挤到周末，而周末又要分给家务、补觉和回老家。"
+    },
+    {
+     "id": "c10",
+     "text": "主动邀约被婉拒或没有回音带来的尴尬，让很多成年人习惯等别人先发起，结果彼此都在等；与此同时，留在原城市的老朋友仍是主要的情感依靠，也会冲淡在新城市投入的动力。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 295,
+    "mechanisms": 27
+   },
+   "skill": {
+    "idea_calls": 32,
+    "idea_calls_dropped": 0,
+    "ideas": 259,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.965
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 92,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 7,
+     "repeats_pass2": 7,
+     "left_pass1": 85,
+     "left_pass2": 85,
+     "same_verdict": 92,
+     "constraint_violations": [
+      {
+       "skill_only": 1,
+       "control_only": 0,
+       "both": 1
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 1
+      }
+     ],
+     "mechanisms_checked_for_constraints": 119
+    },
+    "opus-2": {
+     "skill_only": 94,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 6,
+     "repeats_pass2": 4,
+     "left_pass1": 88,
+     "left_pass2": 90,
+     "same_verdict": 88,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 1
+      },
+      {
+       "skill_only": 1,
+       "control_only": 0,
+       "both": 1
+      }
+     ],
+     "mechanisms_checked_for_constraints": 121
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 1
+   }
+  },
+  "phone": {
+   "direction": "家庭教育",
+   "question": "一个初二学生每天刷手机约 5 小时，家长怎样在三个月内让这个时间减半？",
+   "constraints": [
+    "不没收手机，不装监控软件",
+    "不用钱或物质奖励交换"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "初二学生在手机上的时间通常分散在短视频、游戏、聊天软件和同学群里，其中聊天和群消息常被孩子视为维持同伴关系的必需，而不是单纯的娱乐。"
+    },
+    {
+     "id": "c02",
+     "text": "不少学校通过班级群或学习平台布置、提交作业，孩子用手机查资料写作业和刷手机常常交织在一起，家长从旁边很难分辨在做哪一件。"
+    },
+    {
+     "id": "c03",
+     "text": "短视频和手游的自动连播、无限下滑、每日任务和连续登录奖励等设计，本来就是为了延长停留时间，单靠意志力对抗这类设计连成年人也很吃力。"
+    },
+    {
+     "id": "c04",
+     "text": "十三四岁正处在青春期早期，孩子对自主权和隐私格外敏感，家长单方面定下的规则容易被看作控制，常引来顶嘴、偷偷用或冷战。"
+    },
+    {
+     "id": "c05",
+     "text": "家里大人自己刷手机的习惯孩子都看在眼里，父母和祖辈对手机的态度也常不一致；规则只约束孩子、或一方严一方松时，孩子很容易找到反驳的理由和执行的空子。"
+    },
+    {
+     "id": "c06",
+     "text": "主流手机系统自带屏幕使用时间统计、应用限额和停用时段功能，孩子自己也能查看和设置；同一个功能由孩子自己开还是由家长锁定，孩子的感受差别很大。"
+    },
+    {
+     "id": "c07",
+     "text": "刷手机的时间多集中在放学后、睡前和周末这些没有安排的空档；孩子以前喜欢过的运动、乐器、手工，以及住得近的同学，往往是家里现成却闲置的东西。"
+    },
+    {
+     "id": "c08",
+     "text": "睡前在床上用手机会推迟入睡、压缩睡眠，而初中生作业多、起得早，睡眠不足又会让人更疲惫，更想用手机放松。"
+    },
+    {
+     "id": "c09",
+     "text": "初二常被看作成绩分化的关键阶段，家长对手机的焦虑往往和对成绩的焦虑绑在一起，一谈手机很容易滑到谈成绩上，孩子也因此更抗拒这类谈话。"
+    },
+    {
+     "id": "c10",
+     "text": "口头约定时长、到点催促、发现超时就批评这类常见做法，往往在头几天有效，之后因执行不一致和反复争吵而松动，时间又慢慢回到原来的水平。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 263,
+    "mechanisms": 26
+   },
+   "skill": {
+    "idea_calls": 32,
+    "idea_calls_dropped": 0,
+    "ideas": 248,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.976
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 83,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 10,
+     "repeats_pass2": 7,
+     "left_pass1": 73,
+     "left_pass2": 76,
+     "same_verdict": 78,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 109
+    },
+    "opus-2": {
+     "skill_only": 85,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 18,
+     "repeats_pass2": 5,
+     "left_pass1": 67,
+     "left_pass2": 80,
+     "same_verdict": 72,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 111
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 2
+   }
+  },
+  "noshow": {
+   "direction": "医疗健康",
+   "question": "一家社区诊所约有两成预约患者既不来也不取消，怎样把这个比例降到一成以下？",
+   "constraints": [
+    "不收违约金",
+    "不新增前台人手"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "很多爽约并非故意不来，而是忘了预约时间；预约日期离就诊日越远，越容易被遗忘。"
+    },
+    {
+     "id": "c02",
+     "text": "患者想取消时，如果只能在工作时间打电话到前台，而电话又常占线，往往就干脆不来也不说。"
+    },
+    {
+     "id": "c03",
+     "text": "社区诊所的患者中老年人和慢病复诊者占比较高，他们常依赖子女接送或提醒，家里的接送安排一变就可能赴不了约。"
+    },
+    {
+     "id": "c04",
+     "text": "诊所的预约或信息系统里通常已存有患者手机号、历史就诊和爽约记录，但这些数据很少被用来分辨哪些人更容易爽约。"
+    },
+    {
+     "id": "c05",
+     "text": "短信提醒是常见做法，但短信容易被当成营销信息忽略，而且多是单向通知，患者没法直接回复确认或取消。"
+    },
+    {
+     "id": "c06",
+     "text": "一部分患者觉得社区诊所的号「不难挂、随时能再约」，爽约一次没有明显代价，也意识不到自己占着的号别人用不上。"
+    },
+    {
+     "id": "c07",
+     "text": "前台在高峰时段要同时接待现场患者、接电话和收费，逐个打电话确认第二天的预约很难排进日常工作。"
+    },
+    {
+     "id": "c08",
+     "text": "不少社区诊所已开通微信公众号、小程序或接入区域预约平台，这些渠道能给患者推送消息，但功能往往只用到挂号这一步。"
+    },
+    {
+     "id": "c09",
+     "text": "家庭医生签约团队与签约居民有固定联系，部分医生或护士会在微信上和居民直接沟通，这种熟人关系发来的消息比诊所的群发通知更容易得到回应。"
+    },
+    {
+     "id": "c10",
+     "text": "一个号被爽约后，当天通常没有及时补位的机制；与此同时又常有人想当天看病却约不上，空号和需求在同一天并存。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 292,
+    "mechanisms": 23
+   },
+   "skill": {
+    "idea_calls": 30,
+    "idea_calls_dropped": 0,
+    "ideas": 250,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.964
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 90,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 11,
+     "repeats_pass2": 14,
+     "left_pass1": 79,
+     "left_pass2": 76,
+     "same_verdict": 85,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 113
+    },
+    "opus-2": {
+     "skill_only": 90,
+     "ungrouped_skill_only": 13,
+     "repeats_pass1": 14,
+     "repeats_pass2": 10,
+     "left_pass1": 76,
+     "left_pass2": 80,
+     "same_verdict": 86,
+     "constraint_violations": [
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 0,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 113
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 0
+   }
+  },
+  "canteen": {
+   "direction": "公共与环境",
+   "question": "一所 1500 名学生的中学，食堂每天倒掉的剩饭约占三成，怎样在一个学期内减半？",
+   "constraints": [
+    "不减少学生的分量",
+    "伙食预算不增加"
+   ],
+   "cards": [
+    {
+     "id": "c01",
+     "text": "多数学校食堂按固定份量统一打饭，学生之间饭量差别很大，饭量小的学生常常吃不完，饭量大的又可能不够。"
+    },
+    {
+     "id": "c02",
+     "text": "剩饭里被倒掉的往往集中在某几道菜上，学生不爱吃的菜（如某些蔬菜或口味重复的菜）整盘剩下的情况比主食更常见。"
+    },
+    {
+     "id": "c03",
+     "text": "打菜窗口的阿姨或师傅手上有分量的自由度，但高峰期排队压力大，为了速度通常不会逐个询问学生要多要少。"
+    },
+    {
+     "id": "c04",
+     "text": "中学生午饭时间普遍很紧，部分学生赶着回教室、去补课或打球，吃得快、吃不完就倒掉是常见情形。"
+    },
+    {
+     "id": "c05",
+     "text": "家长关心孩子在学校吃不吃得饱、营养够不够，学校对\"给学生少打饭\"这类做法通常很敏感，担心引起投诉。"
+    },
+    {
+     "id": "c06",
+     "text": "食堂每天的备餐量多凭经验估计，遇到考试、活动、请假等人数波动时容易多做，剩下的成品菜一般只能报废。"
+    },
+    {
+     "id": "c07",
+     "text": "\"光盘行动\"等宣传口号在许多学校都搞过，初期有效果，但缺乏持续反馈时，学生的习惯往往很快回到原样。"
+    },
+    {
+     "id": "c08",
+     "text": "学校里本来就有班主任、学生会、值周班级等组织体系，日常已经在检查卫生、纪律，但很少把用餐浪费纳入同样的日常环节。"
+    },
+    {
+     "id": "c09",
+     "text": "泔水桶就放在餐具回收口，倒掉多少每天肉眼可见，但大多数食堂并不称重或记录，浪费量没有按班级、按菜品区分的数据。"
+    },
+    {
+     "id": "c10",
+     "text": "许多学校食堂由外包餐饮公司承包，其收益与供餐量和成本控制挂钩，学校改动菜单或打饭方式通常需要和承包方协商。"
+    }
+   ],
+   "control": {
+    "idea_calls": 30,
+    "ideas": 295,
+    "mechanisms": 35
+   },
+   "skill": {
+    "idea_calls": 35,
+    "idea_calls_dropped": 0,
+    "ideas": 250,
+    "check_ok": true
+   },
+   "groupings": {
+    "same_verdict_rate": 0.94
+   },
+   "audit": {
+    "opus-1": {
+     "skill_only": 86,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 7,
+     "repeats_pass2": 9,
+     "left_pass1": 79,
+     "left_pass2": 77,
+     "same_verdict": 82,
+     "constraint_violations": [
+      {
+       "skill_only": 1,
+       "control_only": 0,
+       "both": 0
+      },
+      {
+       "skill_only": 1,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 121
+    },
+    "opus-2": {
+     "skill_only": 88,
+     "ungrouped_skill_only": 0,
+     "repeats_pass1": 6,
+     "repeats_pass2": 7,
+     "left_pass1": 82,
+     "left_pass2": 81,
+     "same_verdict": 87,
+     "constraint_violations": [
+      {
+       "skill_only": 1,
+       "control_only": 1,
+       "both": 0
+      },
+      {
+       "skill_only": 1,
+       "control_only": 0,
+       "both": 0
+      }
+     ],
+     "mechanisms_checked_for_constraints": 123
+    }
+   },
+   "spot_check": {
+    "by": "one Opus sub-agent, once, same rule",
+    "sampled_from": "skill-only mechanisms of grouping opus-1 that the judge kept in both passes",
+    "sampled": 15,
+    "judged_same": 1
+   }
+  }
+ },
+ "reading": [
+  "On every question the skill reached far more mechanisms than plain asking at about the same number of idea calls: plain asking found 23 to 42, and 67 to 118 skill-only mechanisms were left after the judge.",
+  "A different model re-judged 15 kept mechanisms per question and called 4 of 90 repeats, so the judge was not lenient on these questions.",
+  "The skill-only counts here are much higher than on the newsletter-income question with the same English texts (33 to 39 left). That question's answers fall into a small set of ways to earn money; these questions have more room.",
+  "Counts of different mechanisms, not of useful ones. No person scored these runs."
+ ],
+ "limits": [
+  "one skill run and one plain-asking run per question",
+  "cards drafted by a model and not checked",
+  "the skill made 29 to 35 idea calls, plain asking 30",
+  "grouping opus-2 of noshow left 13 skill-only mechanisms ungrouped; they count as their own mechanisms",
+  "generation, grouping and judging all used models of one family",
+  "the six questions were picked by the assistant, from directions the owner named"
+ ]
+}

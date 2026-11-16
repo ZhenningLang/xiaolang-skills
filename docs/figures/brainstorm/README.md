@@ -7,6 +7,7 @@ The pictures in [skills/brainstorm/README.md](../../../skills/brainstorm/README.
 | `run-flow` | The stages of one run, the grouping, the rewrites and the report | `run-flow.<lang>.d2`, written by hand |
 | `three-comparisons` | The three comparisons the README speaks of | `three-comparisons.<lang>.d2`, written by hand |
 | `human-score` | The score of each repetition in the comparison scored by a person | `human-score.<lang>.vl.json` |
+| `six-questions` | Six real-world questions: plain asking, and the skill-only mechanisms left after the judge | `six-questions.<lang>.vl.json` |
 | `skill-gain` | At equal idea calls: what plain asking found, and what the skill reached beyond it | `skill-gain.<lang>.vl.json` |
 | `plain-curve` | How plain asking adds mechanisms call after call | `plain-curve.<lang>.vl.json` |
 | `grouper-steady` | Skill-only mechanisms when the same ideas are grouped again | `grouper-steady.<lang>.vl.json` |
