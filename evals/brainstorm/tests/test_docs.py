@@ -31,6 +31,10 @@ ROWS = {
     "lib_ideas": ("Skill ideas", "技能点子"),
     "lib_skill_only": ("Skill-only mechanisms by the grouper, two groupings", "分组者口径的技能独有机制，两次分组"),
     "lib_left": ("Left after the judge removed repeats, four passes", "评委去掉重复后剩下的，四遍"),
+    "lang_calls": ("Idea calls of the run", "这次运行的出点子调用"),
+    "lang_ideas": ("Ideas of the run", "这次运行的点子"),
+    "lang_skill_only": ("By the grouper, two groupings", "分组者口径，两次分组"),
+    "lang_left": ("After the judge, four passes", "评委去重后，四遍"),
 }
 
 
@@ -127,6 +131,22 @@ class SkillReadmeNumbersTests(unittest.TestCase):
         for language, path in PAGES.items():
             self.assertTrue(line_with(path, one["repeats_pass1"], one["repeats_pass2"], one["skill_only"]),
                             f"{language}: the two judge passes over one library grouping")
+
+    def test_method_language_table_matches_its_result_files(self):
+        english = result("2026-11-16-english-methods-side-income.json")
+        chinese = result("2026-11-14-methods-default-vs-library-side-income.json")
+        old = result("2026-11-13-equal-calls-side-income.json")["compare"]["skill"]
+        audit, old_audit = english["audit"]["by_grouping"], chinese["audit"]["by_grouping"]
+        left = lambda by, names: [by[name][key] for name in names for key in ("left_pass1", "left_pass2")]
+        self.both("lang_calls", [[old["idea_calls"]], [english["skill"]["idea_calls"]]])
+        self.both("lang_ideas", [[old["ideas"]], [english["skill"]["ideas"]]])
+        self.both("lang_skill_only", [chinese["default_opus_groupings"]["skill_only"],
+                                      [row["skill_only"] for row in english["english_opus_groupings"]["runs"]]])
+        self.both("lang_left", [left(old_audit, ("default-opus-1", "default-opus-2")),
+                                left(audit, ("english-opus-1", "english-opus-2"))])
+        english_left = left(audit, ("english-opus-1", "english-opus-2"))
+        for language, path in PAGES.items():
+            self.assertTrue(line_with(path, min(english_left), max(english_left)), f"{language}: English range")
 
     def test_grouper_repeat_numbers_match_their_result_file(self):
         data = result("2026-11-14-grouper-repeat-side-income.json")

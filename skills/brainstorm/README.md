@@ -48,7 +48,7 @@ It only diverges. It never scores, ranks or deletes ideas; choosing is your job.
 
 Thinking methods are data, not code. The four defaults: borrow a practice from an unrelated field, reverse a premise, stand in the place of the person most affected, use resources that sit idle. A larger set of 18 is in [methods/library.jsonl](methods/library.jsonl) (`--methods library`); you can add a line there or pass your own file. The larger set has shown no gain so far (see part 4).
 
-The method texts are in English. Every measurement before 2026-11-16 used Chinese texts with the same meaning; the English texts are being measured again on the second question, and part 4 will get the result. Sub-agents still answer in the language of the question.
+The method texts are in English. Every measurement before 2026-11-16 used Chinese texts with the same meaning. The English texts were measured once on the second question, and the counts came out lower than with the Chinese texts (see "Chinese method texts against English ones" in part 4); with one run on each side it is not known whether the language or plain run-to-run variation caused this. Sub-agents still answer in the language of the question.
 
 ### When and how to use it
 
@@ -65,13 +65,14 @@ Two profiles: **full** (default) runs every stage in the table above, and it is 
 ### In short
 
 - **Scored blind by the author, it gave more than twice as many ideas that were new and worth caring about.** One question only. Of 17 mechanisms sampled per repetition, the full flow had 10 and 10, asking the model directly 4 and 3.
-- **At the same number of calls, it reaches mechanisms that plain repeated asking does not.** On the one question measured with care, plain asking found 21 mechanisms in all; the skill reached another 46 to 62.
+- **At the same number of calls, it reaches mechanisms that plain repeated asking does not.** On the one question measured with care, plain asking found 21 mechanisms in all; the skill reached another 46 to 62 (Chinese method texts). The English texts shipped now were measured once and reached another 33 to 39.
 - **The price is money.** In the scored test the full flow cost about 28 times as much to generate ideas as asking directly.
 
 | | Without the skill | With the skill |
 |:---|:---|:---|
 | Scored blind: new and worth caring about, of 17 | 4, 3 | 10, 10 |
-| Different mechanisms at about 30 calls (second question) | 21 | another 46 to 62 |
+| Different mechanisms at about 30 calls (second question, Chinese method texts) | 21 | another 46 to 62 |
+| The same, English method texts shipped now | 21 | another 33 to 39 |
 | Cost of idea generation (scored test) | 1 times | about 28 times |
 
 <img src="../../docs/figures/brainstorm/skill-gain.en.png" width="820" alt="At about 30 idea calls on each side: mechanisms plain asking found, and mechanisms the skill reached beyond them">
@@ -149,6 +150,7 @@ R = [evals/brainstorm/results](../../evals/brainstorm/results/), where each file
 | 11-13 | First newsletter income | Skill with the library of 18 methods | Sonnet grouping once | Replaced by the last measurement row | `2026-11-13-method-library-side-income.json` |
 | 11-14 | First newsletter income | The same skill run, grouped again | Sonnet three times, Opus twice | A stronger grouper is steadier; since then the strongest model groups, twice | `2026-11-14-grouper-repeat-side-income.json` |
 | 11-14 | First newsletter income | 4 methods, library of 18 | Opus grouping twice; judge on every mechanism, twice | No evidence of a gain from the library; the default stays at 4 methods | `2026-11-14-methods-default-vs-library-side-income.json` |
+| 11-16 | First newsletter income | English method texts, Chinese method texts | Opus grouping twice; judge on every mechanism, twice | Every English count was lower; one run per side, so language and variation cannot be told apart | `2026-11-16-english-methods-side-income.json` |
 | 11-16 | Both questions | Cases | Picked from the runs above by fixed rules | A showcase, not a measurement | `2026-11-16-cases.json` |
 
 ### Words used here
@@ -253,10 +255,25 @@ One run with `--methods library` on the second question, compared with the defau
 - **So there is no evidence of a gain, and no proof of a loss.** The default stays at four methods.
 - **One run on each side.** How much a second skill run would differ was not measured.
 
+### Chinese method texts against English ones
+
+Since 2026-11-16 the method texts are in English. The skill ran again on the second question with the same cards, the same seed and the same plain-asking run, measured the 11-14 way: grouped twice by Opus, every skill-only mechanism judged twice. The sub-agents still wrote every idea in Chinese.
+
+| | Chinese method texts | English method texts |
+|:---|---:|---:|
+| Idea calls of the run | 31 | 33 |
+| Ideas of the run | 258 | 274 |
+| By the grouper, two groupings | 76, 74 | 47, 62 |
+| After the judge, four passes | 53, 62, 51, 46 | 36, 39, 33, 35 |
+
+- **Every English count is lower.** All four judge passes are below the lowest of the Chinese run.
+- **But there is one run on each side.** How much two runs with the same texts differ was never measured, so this does not prove the English texts worse.
+- **The two groupings agreed less this time**: 85% of ideas got the same verdict, against 96% for the Chinese run. The judge was steadier: its two passes agreed on 42 of 47 and on 58 of 62.
+
 ### Not known
 
 - Whether the result holds on other questions. Two were counted, one was scored.
-- How much two runs of the skill on one question differ.
+- How much two runs of the skill on one question differ. So it is also not known whether the lower English counts come from the language or from variation.
 - Which steps earn their cost. Nothing was removed and re-measured.
 - Whether the mechanisms beyond plain asking are useful. Only the one scored question and one informal read.
 - How the skill does with no cards, or with cards the agent gathers itself. Every measured run used 10 cards the author wrote in advance.

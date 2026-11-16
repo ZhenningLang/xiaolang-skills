@@ -13,7 +13,8 @@ What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../
 | `2026-11-13-equal-calls-side-income.json` | The same, second question | Its `compare.control` (the plain-asking run) is current. Its skill-only count of 91 and both audits are replaced by the two 11-14 files |
 | `2026-11-13-method-library-side-income.json` | Does the library of 18 methods reach more than the four default methods? | No. Its count of 38 is a low outlier of one Sonnet grouping. Replaced by the last file |
 | `2026-11-14-grouper-repeat-side-income.json` | How far does the grouping alone move the count? Three Sonnet groupings and two Opus groupings of one skill run | Yes |
-| `2026-11-14-methods-default-vs-library-side-income.json` | Four methods against the library, grouped twice by Opus, every skill-only mechanism judged twice | Yes. Also the current numbers for the default skill on the second question |
+| `2026-11-14-methods-default-vs-library-side-income.json` | Four methods against the library, grouped twice by Opus, every skill-only mechanism judged twice | Yes. The numbers for the default skill with Chinese method texts on the second question |
+| `2026-11-16-english-methods-side-income.json` | The same as the last 11-14 file, for the skill with its method texts in English | Yes. The only measurement of the English texts shipped now |
 | `2026-11-16-cases.json` | Which ideas does the skill README show as cases, from which run and stage, and by what rule were they picked? Twelve ideas over both questions | Yes. A showcase, not a measurement |
 
 ## Fields that look contradictory
