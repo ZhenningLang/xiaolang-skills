@@ -187,14 +187,4 @@ One run with `--methods library` on the second question, compared with the defau
 - How the skill does with no cards, or with cards the agent gathers itself. Every measured run used 10 cards the author wrote in advance.
 - How it does on other models. Idea agents, grouper and judge were all Claude models.
 
-### Earlier numbers you may meet
-
-Result files and older commits hold numbers that later measurements replaced.
-
-| Number | What it was | Replaced by |
-|:---|:---|:---|
-| 91 skill-only mechanisms on the second question | One Sonnet grouping, the high end of three | 76 and 74 (Opus, twice) |
-| 36, and "36 to 61" | Estimates from samples of 25 | 46 to 62 (every mechanism checked) |
-| 38 for the method library | One Sonnet grouping, a low outlier | 99 and 109 by the grouper; 31 to 82 after the judge |
-
 Data: [evals/brainstorm/results](../../evals/brainstorm/results/). Tools and how to repeat the comparison: [evals/README.md](../../evals/README.md).

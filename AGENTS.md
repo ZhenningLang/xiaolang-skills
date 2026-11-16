@@ -10,6 +10,6 @@ This is a public collection of agent skills. Anyone can read every file.
 - Each skill has `README.md` and `README.zh.md` in its own folder, written for people: what it does, when to use it, evidence and limits. The root READMEs hold only the skill table, the map of the repository and the install steps. Keep `README.md` and `README.zh.md` saying the same thing. `SKILL.md` is for the agent; keep the two apart.
 - Before every push run `scripts/check-leaks.sh` and `claude plugin validate .`; both must pass.
 - Install logic lives in `install.sh`. Test it with a temporary `HOME`, never the real one.
-- A number in a README must be in a file under `evals/<skill>/results/`. When a later measurement replaces a number, change the README to the new number and list the old one in that README's table of earlier numbers; do not stack the new number after the old one.
+- A number in a README must be in a file under `evals/<skill>/results/`. When a later measurement replaces a number, change the README to the new number. Do not keep the old number in the README: the result files and the git history hold it.
 - A README for people has figures, not only text and tables. Figures of a skill live in `docs/figures/<skill>/` with their definitions in `src/`; a chart takes its numbers from the result files through a script, never typed by hand. Each figure has an English and a Chinese file.
 - `docs/history/` is frozen. Do not update it and do not cite it as the current design.
