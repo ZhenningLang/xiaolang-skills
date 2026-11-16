@@ -1,0 +1,32 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "阶段多、标签密，克制的样式最易读", "surface": "repo-doc"}
+direction: down
+inp: "你的问题\n硬约束 + 资料卡片" { class: box }
+blind: "看不到已有点子" {
+  class: lane
+  grid-columns: 2
+  horizontal-gap: 60
+  base: "基线\n9 次调用 · 不给方法" { class: box }
+  r1: "第 1 轮\n3 次 · 每人一条思考方法" { class: box }
+  base -> r1
+}
+seen: "看得到已有点子（当作要避开的）" {
+  class: lane
+  grid-columns: 4
+  horizontal-gap: 50
+  r2: "第 2 轮\n3 次 · 去没人碰的部分" { class: box }
+  p1: "加压 1\n3 次 · 避开全部已有机制" { class: box }
+  p2: "加压 2\n3 次 · 优先用没用过的卡片" { class: box }
+  p3: "加压 3\n3 次 · 质疑问题的前提" { class: box }
+  r2 -> p1 -> p2 -> p3
+}
+group: "分组\n每批点子后，按机制归类" { class: store }
+rewrite: "重写\n撞上基线机制的点子\n退回一次，换新的子 agent" { class: changed }
+report: "report.md\n每个不同机制一行\n基线已想到的折叠在最后" { class: new }
+inp -> blind: "发给子 agent" { class: hero }
+blind -> seen { class: hero }
+blind -> group: "每批点子"
+seen -> group: "每批点子"
+group -> seen: "避开清单"
+group -> rewrite: "撞基线"
+rewrite -> group
+group -> report: "全部点子" { class: hero }

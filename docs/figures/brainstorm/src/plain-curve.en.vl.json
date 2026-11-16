@@ -1,0 +1,232 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "Plain asking: new mechanisms come slower and slower",
+  "width": 560,
+  "height": 300,
+  "data": {
+    "values": [
+      {
+        "calls": 3,
+        "mechanisms": 13,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 6,
+        "mechanisms": 17,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 9,
+        "mechanisms": 18,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 12,
+        "mechanisms": 19,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 15,
+        "mechanisms": 19,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 18,
+        "mechanisms": 20,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 21,
+        "mechanisms": 23,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 24,
+        "mechanisms": 24,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 27,
+        "mechanisms": 27,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 30,
+        "mechanisms": 27,
+        "question": "CLI tool onboarding"
+      },
+      {
+        "calls": 3,
+        "mechanisms": 11,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 6,
+        "mechanisms": 14,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 9,
+        "mechanisms": 15,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 12,
+        "mechanisms": 16,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 15,
+        "mechanisms": 16,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 18,
+        "mechanisms": 16,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 21,
+        "mechanisms": 18,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 24,
+        "mechanisms": 18,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 27,
+        "mechanisms": 21,
+        "question": "First income of a newsletter"
+      },
+      {
+        "calls": 30,
+        "mechanisms": 21,
+        "question": "First income of a newsletter"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "point": true
+      },
+      "encoding": {
+        "x": {
+          "field": "calls",
+          "type": "quantitative",
+          "title": "Idea calls so far",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          },
+          "axis": {
+            "values": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30
+            ]
+          }
+        },
+        "y": {
+          "field": "mechanisms",
+          "type": "quantitative",
+          "title": "Different mechanisms so far",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          }
+        },
+        "color": {
+          "field": "question",
+          "type": "nominal",
+          "title": "Question",
+          "legend": {
+            "orient": "bottom"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -12,
+        "fontSize": 14
+      },
+      "encoding": {
+        "x": {
+          "field": "calls",
+          "type": "quantitative",
+          "title": "Idea calls so far",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          },
+          "axis": {
+            "values": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30
+            ]
+          }
+        },
+        "y": {
+          "field": "mechanisms",
+          "type": "quantitative",
+          "title": "Different mechanisms so far",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          }
+        },
+        "color": {
+          "field": "question",
+          "type": "nominal",
+          "title": "Question",
+          "legend": {
+            "orient": "bottom"
+          }
+        },
+        "text": {
+          "field": "mechanisms"
+        }
+      }
+    }
+  ]
+}

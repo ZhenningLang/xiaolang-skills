@@ -1,0 +1,32 @@
+# fig: {"content": "arch", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "三组对比要分清，克制的样式不抢字", "surface": "repo-doc"}
+direction: right
+own: "你自己的一次运行" {
+  class: lane
+  base: "基线阶段\n的机制" { class: box }
+  rest: "后面各阶段\n的机制" { class: box }
+  res: "超出基线\n（报告里的数）" { class: new }
+  rest -> res
+  base -> res: "相减"
+}
+cnt: "计数对比（两道题）" {
+  class: lane
+  skill: "发布的技能\n约 31 次调用" { class: box }
+  plain: "反复直接问\n30 次调用，不给卡片和方法" { class: box }
+  g: "分组者\n归进同一套机制" { class: store }
+  only: "技能独有机制" { class: box }
+  j: "评委\n去掉重复的" { class: store }
+  kept: "剩下 46 到 62 个\n（第二道题）" { class: new }
+  skill -> g
+  plain -> g
+  g -> only -> j -> kept
+}
+hum: "人工评分（一道题，技能打包之前）" {
+  class: lane
+  full: "完整流程\n24 次调用 + 重写" { class: box }
+  direct: "直接调用模型\n只拿题目问 9 次" { class: box }
+  s: "各抽 17 个机制\n作者盲评" { class: store }
+  r: "10、10 对 4、3" { class: new }
+  full -> s
+  direct -> s
+  s -> r
+}

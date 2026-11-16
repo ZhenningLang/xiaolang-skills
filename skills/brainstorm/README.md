@@ -29,6 +29,8 @@ Two profiles:
 
 ## How one run works
 
+<img src="../../docs/figures/brainstorm/run-flow.en.png" width="760" alt="The stages of one run, what is grouped, and what goes into the report">
+
 | Stage | Idea calls | What a sub-agent is told | What it can see of earlier ideas |
 |:---|---:|:---|:---|
 | Baseline | 9 | The question, constraints and cards. No method. | Nothing |
@@ -49,6 +51,8 @@ Thinking methods are data, not code. Four methods are the default. A larger set 
 ## Evidence and limits
 
 ### Words used here
+
+<img src="../../docs/figures/brainstorm/three-comparisons.en.png" width="760" alt="Three comparisons: inside your own run, counted against plain asking, and scored by a person">
 
 - **Mechanism**: what makes an idea work. Two ideas with the same mechanism count once.
 - **Baseline**: the first stage of a skill run (see the table above). It has cards and no method. Your report folds what it produced.
@@ -96,6 +100,8 @@ The "full" flow against asking directly, before the skill was packaged. Both cal
 | "I care about this", of 17 | 16, 16 | 16, 15 |
 | Cost of idea generation, two repetitions together | USD 0.25 | USD 7.03 |
 
+<img src="../../docs/figures/brainstorm/human-score.en.png" width="560" alt="Score of each repetition, of 17 sampled mechanisms">
+
 - **The question.** How a personally maintained open-source CLI can lower the share of new users who fail on their first try.
 - **How it was scored.** For each repetition, 17 of its mechanisms were picked by one seeded order. Each was shown as one idea, rewritten in plain words, with nothing on the page about its source. The author answered every item before any source was shown. A mechanism scores when the author had not thought of it, cares about it and gives no fatal reason.
 - **Where the gap comes from.** All of it comes from "I had not thought of this". "I care about this" is equal on both sides.
@@ -122,6 +128,8 @@ The shipped skill ran next to plain asking, about 30 idea calls on each side. Al
 | Skill-only mechanisms left after the judge | about 93 (estimate) | 53 and 62 (first grouping), 51 and 46 (second) |
 | Mechanisms judged to break a hard constraint | 1 of 128 | 0 to 4 of 95 to 97, in five passes |
 
+<img src="../../docs/figures/brainstorm/plain-curve.en.png" width="620" alt="Plain asking: different mechanisms so far against idea calls so far, on both questions">
+
 - **The second question is the careful measurement.** Its range of 46 to 62 comes from two groupings and four judge passes.
 - **The first question was measured the early way and not redone.** One Sonnet grouping and a sample of 25 are both known to be unsteady (see the next section), so read 101 and 93 as rough.
 - **Plain asking slows down early but does not stop.** 18 of 27 and 15 of 21 mechanisms came in the first 9 calls. On both questions calls 25 to 27 still added 3.
@@ -144,6 +152,8 @@ Measured on the second question, with the ideas unchanged.
 | Judge on every mechanism of the default run, twice | Same verdict on 67 of 76, and on 65 of 74 |
 | Judge on every mechanism of the library run, twice | 17 and then 60 of 99 called repeats |
 
+<img src="../../docs/figures/brainstorm/grouper-steady.en.png" width="620" alt="Skill-only mechanisms when the same ideas are grouped again by Sonnet and by Opus">
+
 - **A stronger grouper is steadier.** The evaluation now groups with the strongest model available, twice.
 - **A sample of 25 is too small.** The evaluation now checks every skill-only mechanism, twice.
 - **The judge is the least steady part.** A difference between two runs counts only when it is larger than the difference between two judge passes over one run.
@@ -159,6 +169,8 @@ One run with `--methods library` on the second question, compared with the defau
 | Skill ideas | 258 | 246 |
 | Skill-only mechanisms by the grouper, two groupings | 76, 74 | 99, 109 |
 | Left after the judge removed repeats, four passes | 53, 62, 51, 46 | 82, 39, 31, 38 |
+
+<img src="../../docs/figures/brainstorm/methods-compare.en.png" width="760" alt="Counts of the four default methods and of the library of 18, by the grouper and after the judge">
 
 - **The grouper counts more for the library, the judge removes more.** Three of four judge passes leave the library below the default methods; one leaves it above.
 - **So there is no evidence of a gain, and no proof of a loss.** The default stays at four methods.

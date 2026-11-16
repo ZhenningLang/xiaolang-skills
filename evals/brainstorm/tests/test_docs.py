@@ -159,6 +159,46 @@ class SkillReadmeNumbersTests(unittest.TestCase):
                 self.assertIn(path.name, page.read_text(encoding="utf-8"), language)
 
 
+FIGURES = ROOT / "docs" / "figures" / "brainstorm"
+
+
+class FigureTests(unittest.TestCase):
+    def images(self, path):
+        return re.findall(r'<img src="([^"]+)"', path.read_text(encoding="utf-8"))
+
+    def test_chart_definitions_hold_the_numbers_of_the_result_files(self):
+        # The script reads the result files; a committed definition must equal what it writes now.
+        import importlib.util
+        module_spec = importlib.util.spec_from_file_location("build_specs", FIGURES / "build_specs.py")
+        module = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(module)
+        built = module.build()
+        self.assertEqual(sorted(built), sorted(path.name for path in (FIGURES / "src").glob("*.vl.json")))
+        for name, body in built.items():
+            self.assertEqual(json.loads((FIGURES / "src" / name).read_text(encoding="utf-8")), body, name)
+
+    def test_every_image_of_a_page_exists_and_has_its_definition(self):
+        for language, page in PAGES.items():
+            sources = self.images(page)
+            self.assertGreaterEqual(len(sources), 6, language)
+            for source in sources:
+                image = (page.parent / source).resolve()
+                self.assertTrue(image.is_file(), f"{language}: {source}")
+                self.assertEqual(image.read_bytes()[:8], b"\x89PNG\r\n\x1a\n", source)
+                self.assertTrue(image.name.endswith(f".{language}.png"), f"{language} page shows {image.name}")
+                stem = image.name[:-len(".png")]
+                self.assertTrue(any((FIGURES / "src" / f"{stem}{end}").is_file() for end in (".d2", ".vl.json")), stem)
+
+    def test_both_pages_show_the_same_figures_in_the_same_order(self):
+        names = {language: [Path(source).name.rsplit(".", 2)[0] for source in self.images(page)]
+                 for language, page in PAGES.items()}
+        self.assertEqual(names["en"], names["zh"])
+
+    def test_no_image_file_is_left_unused(self):
+        used = {Path(source).name for page in PAGES.values() for source in self.images(page)}
+        self.assertEqual(sorted(path.name for path in FIGURES.glob("*.png")), sorted(used))
+
+
 class LinkTests(unittest.TestCase):
     def test_relative_links_resolve(self):
         pages = [path for path in ROOT.rglob("*.md")

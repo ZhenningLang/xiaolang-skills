@@ -1,0 +1,122 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "Mechanisms the author had not thought of and cares about, of 17 sampled",
+  "width": 480,
+  "height": 300,
+  "data": {
+    "values": [
+      {
+        "side": "Asking the model directly",
+        "rep": "Repetition 1",
+        "score": 4
+      },
+      {
+        "side": "Asking the model directly",
+        "rep": "Repetition 2",
+        "score": 3
+      },
+      {
+        "side": "Full flow",
+        "rep": "Repetition 1",
+        "score": 10
+      },
+      {
+        "side": "Full flow",
+        "rep": "Repetition 2",
+        "score": 10
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "side",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Asking the model directly",
+            "Full flow"
+          ],
+          "axis": {
+            "labelAngle": 0,
+            "labelFontSize": 14
+          }
+        },
+        "xOffset": {
+          "field": "rep"
+        },
+        "y": {
+          "field": "score",
+          "type": "quantitative",
+          "title": "Score (of 17)",
+          "scale": {
+            "domain": [
+              0,
+              17
+            ]
+          }
+        },
+        "color": {
+          "field": "rep",
+          "type": "nominal",
+          "title": null,
+          "legend": {
+            "orient": "bottom"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -8,
+        "fontSize": 15,
+        "fontWeight": "bold"
+      },
+      "encoding": {
+        "x": {
+          "field": "side",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Asking the model directly",
+            "Full flow"
+          ],
+          "axis": {
+            "labelAngle": 0,
+            "labelFontSize": 14
+          }
+        },
+        "xOffset": {
+          "field": "rep"
+        },
+        "y": {
+          "field": "score",
+          "type": "quantitative",
+          "title": "Score (of 17)",
+          "scale": {
+            "domain": [
+              0,
+              17
+            ]
+          }
+        },
+        "text": {
+          "field": "score"
+        }
+      }
+    }
+  ]
+}

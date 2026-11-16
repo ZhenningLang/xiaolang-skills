@@ -1,0 +1,122 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "计数取自结果文件",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "抽样的 17 个机制里，作者「没想到且在乎」的个数",
+  "width": 480,
+  "height": 300,
+  "data": {
+    "values": [
+      {
+        "side": "直接调用模型",
+        "rep": "重复 1",
+        "score": 4
+      },
+      {
+        "side": "直接调用模型",
+        "rep": "重复 2",
+        "score": 3
+      },
+      {
+        "side": "完整流程",
+        "rep": "重复 1",
+        "score": 10
+      },
+      {
+        "side": "完整流程",
+        "rep": "重复 2",
+        "score": 10
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "side",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "直接调用模型",
+            "完整流程"
+          ],
+          "axis": {
+            "labelAngle": 0,
+            "labelFontSize": 14
+          }
+        },
+        "xOffset": {
+          "field": "rep"
+        },
+        "y": {
+          "field": "score",
+          "type": "quantitative",
+          "title": "分数（满分 17）",
+          "scale": {
+            "domain": [
+              0,
+              17
+            ]
+          }
+        },
+        "color": {
+          "field": "rep",
+          "type": "nominal",
+          "title": null,
+          "legend": {
+            "orient": "bottom"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -8,
+        "fontSize": 15,
+        "fontWeight": "bold"
+      },
+      "encoding": {
+        "x": {
+          "field": "side",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "直接调用模型",
+            "完整流程"
+          ],
+          "axis": {
+            "labelAngle": 0,
+            "labelFontSize": 14
+          }
+        },
+        "xOffset": {
+          "field": "rep"
+        },
+        "y": {
+          "field": "score",
+          "type": "quantitative",
+          "title": "分数（满分 17）",
+          "scale": {
+            "domain": [
+              0,
+              17
+            ]
+          }
+        },
+        "text": {
+          "field": "score"
+        }
+      }
+    }
+  ]
+}

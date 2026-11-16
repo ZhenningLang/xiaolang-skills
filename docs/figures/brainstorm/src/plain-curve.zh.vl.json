@@ -1,0 +1,232 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "计数取自结果文件",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "反复直接问：新机制越来越少",
+  "width": 560,
+  "height": 300,
+  "data": {
+    "values": [
+      {
+        "calls": 3,
+        "mechanisms": 13,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 6,
+        "mechanisms": 17,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 9,
+        "mechanisms": 18,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 12,
+        "mechanisms": 19,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 15,
+        "mechanisms": 19,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 18,
+        "mechanisms": 20,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 21,
+        "mechanisms": 23,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 24,
+        "mechanisms": 24,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 27,
+        "mechanisms": 27,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 30,
+        "mechanisms": 27,
+        "question": "命令行工具上手"
+      },
+      {
+        "calls": 3,
+        "mechanisms": 11,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 6,
+        "mechanisms": 14,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 9,
+        "mechanisms": 15,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 12,
+        "mechanisms": 16,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 15,
+        "mechanisms": 16,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 18,
+        "mechanisms": 16,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 21,
+        "mechanisms": 18,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 24,
+        "mechanisms": 18,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 27,
+        "mechanisms": 21,
+        "question": "公众号第一笔收入"
+      },
+      {
+        "calls": 30,
+        "mechanisms": 21,
+        "question": "公众号第一笔收入"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "point": true
+      },
+      "encoding": {
+        "x": {
+          "field": "calls",
+          "type": "quantitative",
+          "title": "累计出点子调用次数",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          },
+          "axis": {
+            "values": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30
+            ]
+          }
+        },
+        "y": {
+          "field": "mechanisms",
+          "type": "quantitative",
+          "title": "累计不同机制数",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          }
+        },
+        "color": {
+          "field": "question",
+          "type": "nominal",
+          "title": "题目",
+          "legend": {
+            "orient": "bottom"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -12,
+        "fontSize": 14
+      },
+      "encoding": {
+        "x": {
+          "field": "calls",
+          "type": "quantitative",
+          "title": "累计出点子调用次数",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          },
+          "axis": {
+            "values": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30
+            ]
+          }
+        },
+        "y": {
+          "field": "mechanisms",
+          "type": "quantitative",
+          "title": "累计不同机制数",
+          "scale": {
+            "domain": [
+              0,
+              30
+            ]
+          }
+        },
+        "color": {
+          "field": "question",
+          "type": "nominal",
+          "title": "题目",
+          "legend": {
+            "orient": "bottom"
+          }
+        },
+        "text": {
+          "field": "mechanisms"
+        }
+      }
+    }
+  ]
+}

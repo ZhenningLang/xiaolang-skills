@@ -1,0 +1,32 @@
+# fig: {"content": "arch", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "three comparisons to keep apart; a quiet style", "surface": "repo-doc"}
+direction: right
+own: "One run of your own" {
+  class: lane
+  base: "Mechanisms of\nthe baseline stage" { class: box }
+  rest: "Mechanisms of\nthe later stages" { class: box }
+  res: "Beyond the baseline\n(the number in your report)" { class: new }
+  rest -> res
+  base -> res: "subtract"
+}
+cnt: "Counted comparison (two questions)" {
+  class: lane
+  skill: "The shipped skill\nabout 31 calls" { class: box }
+  plain: "Plain asking\n30 calls, no cards, no methods" { class: box }
+  g: "Grouper\nputs both into one set of mechanisms" { class: store }
+  only: "Skill-only mechanisms" { class: box }
+  j: "Judge\nremoves repeats" { class: store }
+  kept: "46 to 62 left\n(second question)" { class: new }
+  skill -> g
+  plain -> g
+  g -> only -> j -> kept
+}
+hum: "Scored by a person (one question, before packaging)" {
+  class: lane
+  full: "Full flow\n24 calls + rewrites" { class: box }
+  direct: "Asking the model directly\nthe bare question, 9 times" { class: box }
+  s: "17 mechanisms sampled from each\nscored blind by the author" { class: store }
+  r: "10, 10 against 4, 3" { class: new }
+  full -> s
+  direct -> s
+  s -> r
+}
