@@ -128,6 +128,8 @@ R = [evals/brainstorm/results](../../evals/brainstorm/results/)，那里的 READ
 | 评委去重后剩下的技能独有机制 | 约 93（估计） | 53 和 62（第一次分组），51 和 46（第二次） |
 | 被判违反硬约束的机制 | 128 个里 1 个 | 五遍里，95 到 97 个中有 0 到 4 个 |
 
+<img src="../../docs/figures/brainstorm/skill-gain.zh.png" width="820" alt="两边各约 30 次出点子调用：反复直接问找到的机制，和技能另外多找到的机制">
+
 <img src="../../docs/figures/brainstorm/plain-curve.zh.png" width="620" alt="反复直接问：两道题上，累计不同机制数随调用次数的变化">
 
 - **第二道题是认真量过的**：46 到 62 这个范围来自两次分组和四遍评委。

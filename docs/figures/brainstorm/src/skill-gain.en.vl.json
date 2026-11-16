@@ -1,0 +1,211 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "About 30 idea calls on each side: what plain asking found, and what the skill found beyond it",
+  "width": 460,
+  "height": 208,
+  "data": {
+    "values": [
+      {
+        "row": "Plain asking: mechanisms found",
+        "group": "CLI tool onboarding (earlier method, a rough estimate after the judge)",
+        "count": 27,
+        "below": 1
+      },
+      {
+        "row": "Skill: mechanisms plain asking did not reach, by the grouper",
+        "group": "CLI tool onboarding (earlier method, a rough estimate after the judge)",
+        "count": 101,
+        "below": 0
+      },
+      {
+        "row": "Skill: the same, after the judge removed repeats",
+        "group": "CLI tool onboarding (earlier method, a rough estimate after the judge)",
+        "count": 93,
+        "below": 0
+      },
+      {
+        "row": "Plain asking: mechanisms found",
+        "group": "First income of a newsletter",
+        "count": 21,
+        "below": 0
+      },
+      {
+        "row": "Skill: mechanisms plain asking did not reach, by the grouper",
+        "group": "First income of a newsletter",
+        "count": 76,
+        "below": 1
+      },
+      {
+        "row": "Skill: mechanisms plain asking did not reach, by the grouper",
+        "group": "First income of a newsletter",
+        "count": 74,
+        "below": 0
+      },
+      {
+        "row": "Skill: the same, after the judge removed repeats",
+        "group": "First income of a newsletter",
+        "count": 53,
+        "below": 0
+      },
+      {
+        "row": "Skill: the same, after the judge removed repeats",
+        "group": "First income of a newsletter",
+        "count": 62,
+        "below": 1
+      },
+      {
+        "row": "Skill: the same, after the judge removed repeats",
+        "group": "First income of a newsletter",
+        "count": 51,
+        "below": 1
+      },
+      {
+        "row": "Skill: the same, after the judge removed repeats",
+        "group": "First income of a newsletter",
+        "count": 46,
+        "below": 0
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Plain asking: mechanisms found",
+            "Skill: mechanisms plain asking did not reach, by the grouper",
+            "Skill: the same, after the judge removed repeats"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Different mechanisms",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "title": "Question",
+          "legend": {
+            "orient": "bottom",
+            "direction": "vertical",
+            "labelLimit": 700
+          }
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 0"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Plain asking: mechanisms found",
+            "Skill: mechanisms plain asking did not reach, by the grouper",
+            "Skill: the same, after the judge removed repeats"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Different mechanisms",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 1"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": 18,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Plain asking: mechanisms found",
+            "Skill: mechanisms plain asking did not reach, by the grouper",
+            "Skill: the same, after the judge removed repeats"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Different mechanisms",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    }
+  ]
+}

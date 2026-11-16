@@ -128,6 +128,8 @@ The shipped skill ran next to plain asking, about 30 idea calls on each side. Al
 | Skill-only mechanisms left after the judge | about 93 (estimate) | 53 and 62 (first grouping), 51 and 46 (second) |
 | Mechanisms judged to break a hard constraint | 1 of 128 | 0 to 4 of 95 to 97, in five passes |
 
+<img src="../../docs/figures/brainstorm/skill-gain.en.png" width="820" alt="At about 30 idea calls on each side: mechanisms plain asking found, and mechanisms the skill reached beyond them">
+
 <img src="../../docs/figures/brainstorm/plain-curve.en.png" width="620" alt="Plain asking: different mechanisms so far against idea calls so far, on both questions">
 
 - **The second question is the careful measurement.** Its range of 46 to 62 comes from two groupings and four judge passes.

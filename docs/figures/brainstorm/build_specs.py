@@ -28,6 +28,10 @@ TEXT = {
         "default": "4 methods (default)", "library": "Library of 18",
         "by_grouper": "by the grouper, 2 groupings", "after_judge": "left after the judge, 4 passes",
         "methods": "Methods", "why": "counts read from the result files",
+        "gain_title": "About 30 idea calls on each side: what plain asking found, and what the skill found beyond it",
+        "gain_plain": "Plain asking: mechanisms found", "gain_grouper": "Skill: mechanisms plain asking did not reach, by the grouper",
+        "gain_judge": "Skill: the same, after the judge removed repeats", "gain_x": "Different mechanisms",
+        "cli_rough": "CLI tool onboarding (earlier method, a rough estimate after the judge)",
     },
     "zh": {
         "cli": "命令行工具上手", "income": "公众号第一笔收入",
@@ -42,6 +46,10 @@ TEXT = {
         "default": "4 条方法（默认）", "library": "18 条方法库",
         "by_grouper": "分组者口径，2 次分组", "after_judge": "评委去重后剩下，4 遍",
         "methods": "方法", "why": "计数取自结果文件",
+        "gain_title": "两边各约 30 次出点子调用：反复直接问找到的，和技能另外多找到的",
+        "gain_plain": "反复直接问：找到的机制", "gain_grouper": "技能：反复直接问没想到的机制，分组者口径",
+        "gain_judge": "技能：同上，评委去掉重复后", "gain_x": "不同机制的个数",
+        "cli_rough": "命令行工具上手（早期量法，评委去重后是粗略估计）",
     },
 }
 
@@ -99,7 +107,7 @@ def score(language):
     })
 
 
-def strip(language, title, rows, color_title=None):
+def strip(language, title, rows, color_title=None, domain=(20, 120), x_title=None):
     """One row of points per label; every point carries its number."""
     t = TEXT[language]
     order = list(dict.fromkeys(row["row"] for row in rows))
@@ -108,12 +116,13 @@ def strip(language, title, rows, color_title=None):
             row["below"] = rank % 2
     encoding = {
         "y": {"field": "row", "type": "nominal", "title": None, "sort": order,
-              "axis": {"labelFontSize": 14, "labelLimit": 420}},
-        "x": {"field": "count", "type": "quantitative", "title": t["count"], "scale": {"domain": [20, 120]}},
+              "axis": {"labelFontSize": 14, "labelLimit": 520}},
+        "x": {"field": "count", "type": "quantitative", "title": x_title or t["count"], "scale": {"domain": list(domain)}},
     }
     point = dict(encoding)
     if color_title:
-        point["color"] = {"field": "group", "type": "nominal", "title": color_title, "legend": {"orient": "bottom"}}
+        point["color"] = {"field": "group", "type": "nominal", "title": color_title,
+                          "legend": {"orient": "bottom", "direction": "vertical", "labelLimit": 700}}
     return spec(language, {
         "title": title, "width": 460, "height": 56 * len(order) + 40, "data": {"values": rows},
         "layer": [
@@ -149,7 +158,26 @@ def methods(language):
     return strip(language, t["methods_title"], rows, color_title=t["methods"])
 
 
-CHARTS = {"plain-curve": curve, "human-score": score, "grouper-steady": steady, "methods-compare": methods}
+def gain(language):
+    """Both sides at equal idea calls: plain asking, and what the skill reached beyond it."""
+    t = TEXT[language]
+    first = result("2026-11-12-equal-calls-cli.json")
+    second = result("2026-11-13-equal-calls-side-income.json")["compare"]
+    current = result("2026-11-14-methods-default-vs-library-side-income.json")
+    audit = current["audit"]["by_grouping"]
+    left = [audit[f"default-opus-{number}"][f"left_pass{turn}"] for number in (1, 2) for turn in (1, 2)]
+    counts = {
+        t["cli_rough"]: ([first["control"]["mechanisms"]], [first["same_grouper"]["skill_only"]],
+                         [first["audit_fixed_rule"]["repeats"]["estimated_new"]]),
+        t["income"]: ([second["control"]["mechanisms"]], current["default_opus_groupings"]["skill_only"], left),
+    }
+    rows = [{"row": t[label], "group": question, "count": count}
+            for question, kinds in counts.items()
+            for label, values in zip(("gain_plain", "gain_grouper", "gain_judge"), kinds) for count in values]
+    return strip(language, t["gain_title"], rows, color_title=t["question"], domain=(0, 120), x_title=t["gain_x"])
+
+
+CHARTS = {"skill-gain": gain, "plain-curve": curve, "human-score": score, "grouper-steady": steady, "methods-compare": methods}
 
 
 def build():

@@ -61,7 +61,7 @@
           ],
           "axis": {
             "labelFontSize": 14,
-            "labelLimit": 420
+            "labelLimit": 520
           }
         },
         "x": {
@@ -99,7 +99,7 @@
           ],
           "axis": {
             "labelFontSize": 14,
-            "labelLimit": 420
+            "labelLimit": 520
           }
         },
         "x": {
@@ -140,7 +140,7 @@
           ],
           "axis": {
             "labelFontSize": 14,
-            "labelLimit": 420
+            "labelLimit": 520
           }
         },
         "x": {
