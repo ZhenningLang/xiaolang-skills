@@ -1,0 +1,137 @@
+{
+ "date": "2026-11-16",
+ "what": "A quick blind score by the author on the six questions of 2026-11-16-six-questions.json. Per question, 7 skill-only mechanisms the judge kept in both passes (grouping opus-1) and 7 plain-asking mechanisms were drawn at random (seed 20261116) and shuffled; 84 items in all.",
+ "how": {
+  "shown": "each mechanism as its representative idea, rewritten by an Opus sub-agent per question into a title of at most 20 characters and one or two sentences of at most 70, with method wording removed; the rewriter did not know the source",
+  "answer": "one key per item: 1 had not thought of it and worth trying, 2 had thought of it and worth trying, 3 not worth trying, 4 unclear",
+  "blinding_check": {
+   "mean_text_characters": {
+    "skill_only": 62.1,
+    "plain_asking": 61.8
+   },
+   "mean_title_characters": {
+    "skill_only": 14.1,
+    "plain_asking": 13.2
+   },
+   "source_labels_in_page": 0
+  }
+ },
+ "items_per_side": 42,
+ "by_question": {
+  "restaurant": {
+   "skill_only": {
+    "new_and_worth_trying": 5,
+    "thought_of_and_worth_trying": 1,
+    "not_worth_trying": 1,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 3,
+    "thought_of_and_worth_trying": 4,
+    "not_worth_trying": 0,
+    "unclear": 0
+   }
+  },
+  "elevator": {
+   "skill_only": {
+    "new_and_worth_trying": 4,
+    "thought_of_and_worth_trying": 1,
+    "not_worth_trying": 2,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 7,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 0,
+    "unclear": 0
+   }
+  },
+  "friends": {
+   "skill_only": {
+    "new_and_worth_trying": 5,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 2,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 5,
+    "thought_of_and_worth_trying": 1,
+    "not_worth_trying": 1,
+    "unclear": 0
+   }
+  },
+  "phone": {
+   "skill_only": {
+    "new_and_worth_trying": 7,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 0,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 6,
+    "thought_of_and_worth_trying": 1,
+    "not_worth_trying": 0,
+    "unclear": 0
+   }
+  },
+  "noshow": {
+   "skill_only": {
+    "new_and_worth_trying": 5,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 2,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 6,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 1,
+    "unclear": 0
+   }
+  },
+  "canteen": {
+   "skill_only": {
+    "new_and_worth_trying": 7,
+    "thought_of_and_worth_trying": 0,
+    "not_worth_trying": 0,
+    "unclear": 0
+   },
+   "plain_asking": {
+    "new_and_worth_trying": 4,
+    "thought_of_and_worth_trying": 2,
+    "not_worth_trying": 1,
+    "unclear": 0
+   }
+  }
+ },
+ "total": {
+  "skill_only": {
+   "new_and_worth_trying": 33,
+   "thought_of_and_worth_trying": 2,
+   "not_worth_trying": 7,
+   "unclear": 0
+  },
+  "plain_asking": {
+   "new_and_worth_trying": 31,
+   "thought_of_and_worth_trying": 8,
+   "not_worth_trying": 3,
+   "unclear": 0
+  }
+ },
+ "fisher_two_sided_p": {
+  "new_and_worth_trying": 0.798,
+  "thought_of_and_worth_trying": 0.088,
+  "not_worth_trying": 0.313
+ },
+ "reading": [
+  "New and worth trying: 33 of 42 skill-only mechanisms and 31 of 42 plain-asking ones. No real difference.",
+  "Already thought of: 2 of 42 skill-only against 8 of 42 plain-asking. Not worth trying: 7 against 3. Neither difference is clear with 42 items a side (p 0.09 and 0.31).",
+  "On these questions most plain-asking ideas were also new to the author, unlike the CLI question where the author knew the field. The rate per mechanism is about equal; the skill reaches about three times as many mechanisms."
+ ],
+ "limits": [
+  "one person, one pass",
+  "42 items a side",
+  "the author is not an expert in most of these fields",
+  "the rewrite cut minor steps (pilots, checks) to fit 70 characters",
+  "rates are per sampled mechanism, not per run"
+ ]
+}

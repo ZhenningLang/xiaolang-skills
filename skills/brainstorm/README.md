@@ -56,7 +56,7 @@ The method texts are in English. Every measurement before 2026-11-16 used Chines
 - **Do not use it** to choose between known options, to fix a bug, or for a quick list of a few ideas.
 - **It is expensive.** The second counted run used 31 idea calls and 12 grouping calls, about 43 sub-agent calls. The script stops and asks before the most expensive part.
 
-Ask your agent to brainstorm a question and give it your hard constraints (things no idea may break). If you have notes or source material, hand them over: the agent cuts them into cards and each sub-agent gets a random half. You get `report.md`: a contents list with one line per mechanism, then every mechanism with all the ideas grouped under it and where each idea came from.
+Ask your agent to brainstorm a question and give it your hard constraints (things no idea may break). If you give none, the agent asks once and suggests a few; "none" is a fine answer. If you have notes or source material, hand them over: the agent cuts them into cards and each sub-agent gets a random half. You get `report.md`: a contents list with one line per mechanism, then every mechanism with all the ideas grouped under it and where each idea came from.
 
 Two profiles: **full** (default) runs every stage in the table above, and it is what the measurements below measured; **economy** stops after round 2, is cheaper, and was not measured on its own.
 
@@ -65,6 +65,7 @@ Two profiles: **full** (default) runs every stage in the table above, and it is 
 ### In short
 
 - **On real-world problems in six directions, it reached mechanisms plain repeated asking did not**: one question each in society, business, personal life, family, health care, and public life. At the same number of calls, plain asking found 23 to 42 mechanisms; the skill reached another 67 to 118 (after the judge).
+- **On the six new questions the author quickly scored 84 mechanisms blind**: one idea is about as good on either side. 33 of 42 skill-only mechanisms and 31 of 42 plain-asking ones were "new and worth trying". What the skill adds is mostly quantity.
 - **Scored blind by the author, it gave more than twice as many ideas that were new and worth caring about.** One question only. Of 17 mechanisms sampled per repetition, the full flow had 10 and 10, asking the model directly 4 and 3.
 - **At the same number of calls, it reaches mechanisms that plain repeated asking does not.** On the one question measured with care, plain asking found 21 mechanisms in all; the skill reached another 46 to 62 (Chinese method texts). The English texts shipped now were measured once and reached another 33 to 39.
 - **The price is money.** In the scored test the full flow cost about 28 times as much to generate ideas as asking directly.
@@ -97,7 +98,7 @@ In the scored test, the author marked 18 different mechanisms of the full flow, 
 ### Discounts to apply
 
 - **Different is not useful.** The counts count different mechanisms. Usefulness was scored on one question only.
-- **Eight counted, one scored.** Nobody judged whether the ideas on the six new questions are good.
+- **Eight counted; one fully scored, six quickly scored.** The quick score drew only 14 mechanisms per question, and the author is not an expert in these fields.
 - **One run per side on each question.** How much two runs on one question differ was not measured.
 - **The cards of the six new questions were drafted by a model**, not checked against sources and not seen by the author.
 
@@ -177,6 +178,7 @@ R = [evals/brainstorm/results](../../evals/brainstorm/results/), where each file
 | 11-14 | First newsletter income | 4 methods, library of 18 | Opus grouping twice; judge on every mechanism, twice | No evidence of a gain from the library; the default stays at 4 methods | `2026-11-14-methods-default-vs-library-side-income.json` |
 | 11-16 | First newsletter income | English method texts, Chinese method texts | Opus grouping twice; judge on every mechanism, twice | Every English count was lower; one run per side, so language and variation cannot be told apart | `2026-11-16-english-methods-side-income.json` |
 | 11-16 | Six new questions, one per direction | Shipped skill (English method texts), plain asking | Opus grouping twice per question; judge on every mechanism, twice; re-check by another model | The skill reached many more mechanisms on all six; the re-check found no lenient judge | `2026-11-16-six-questions.json` |
+| 11-16 | Six new questions | Skill-only and plain-asking mechanisms | The author's quick blind score, 14 per question, 84 in all | "New and worth trying" about equal; the skill's strength is quantity | `2026-11-16-blind-six.json` |
 | 11-16 | Eight questions | Cases | Picked from the runs above by fixed rules | A showcase, not a measurement | `2026-11-16-cases.json` |
 
 ### Words used here
@@ -300,6 +302,24 @@ One run with `--methods library` on the second question, compared with the defau
 - **The cards were drafted by a model**, not checked against sources, and not seen by the author.
 - **One family of models.** Idea agents, groupers, judge and re-checker were all Claude models.
 
+### A quick blind score of the six new questions
+
+Per question, 7 skill-only mechanisms (kept by the judge in both passes) and 7 plain-asking mechanisms were drawn at random and shuffled, with no source shown: 84 in all. Each was rewritten as a title and one or two plain sentences with no method wording. The author pressed one key per item.
+
+| The author's answer | Skill-only | Plain asking |
+|:---|---:|---:|
+| New, worth trying | 33 | 31 |
+| Thought of before, worth trying | 2 | 8 |
+| Not worth trying | 7 | 3 |
+| Unclear | 0 | 0 |
+
+- **"New and worth trying" is about equal**: 33 of 42 against 31 of 42.
+- **Fewer skill ideas were already known, but more were not worth trying**: 2 against 8, and 7 against 3. With 42 a side, both could be chance (two-sided Fisher test, p about 0.09 and 0.31).
+- **Unlike the CLI question**: there the author knew the field and had thought of most plain-asking ideas; here the author mostly does not, so most ideas on both sides were new.
+- **How to read it**: one skill idea is not better than one plain-asking idea; the skill's strength is quantity, about three times as many mechanisms for the same number of calls.
+- **Blinding**: after the rewrite the texts averaged 62.1 and 61.8 characters, and the page had no source labels. The rewrite cut some minor steps to stay within 70 characters.
+- Data: [`2026-11-16-blind-six.json`](../../evals/brainstorm/results/2026-11-16-blind-six.json).
+
 ### Chinese method texts against English ones
 
 Since 2026-11-16 the method texts are in English. The skill ran again on the second question with the same cards, the same seed and the same plain-asking run, measured the 11-14 way: grouped twice by Opus, every skill-only mechanism judged twice. The sub-agents still wrote every idea in Chinese.
@@ -320,7 +340,7 @@ Since 2026-11-16 the method texts are in English. The skill ran again on the sec
 - Whether the result holds on other questions: eight were counted and the skill reached many more mechanisms on all of them; only one was scored, and nobody judged the new questions' ideas.
 - How much two runs of the skill on one question differ. So it is also not known whether the lower English counts come from the language or from variation.
 - Which steps earn their cost. Nothing was removed and re-measured.
-- Whether the mechanisms beyond plain asking are useful. Only the one scored question and one informal read.
+- Whether the mechanisms beyond plain asking are useful: one question fully scored, six quickly scored. In the quick score skill-only ideas were judged worth trying as often as plain-asking ones, but the sample is small and the author is not an expert.
 - How the skill does with no cards, or with cards the agent gathers itself. Every measured run used 10 cards the author wrote in advance.
 - How it does on other models. Idea agents, grouper and judge were all Claude models.
 
