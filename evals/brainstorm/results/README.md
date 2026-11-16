@@ -15,7 +15,8 @@ What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../
 | `2026-11-14-grouper-repeat-side-income.json` | How far does the grouping alone move the count? Three Sonnet groupings and two Opus groupings of one skill run | Yes |
 | `2026-11-14-methods-default-vs-library-side-income.json` | Four methods against the library, grouped twice by Opus, every skill-only mechanism judged twice | Yes. The numbers for the default skill with Chinese method texts on the second question |
 | `2026-11-16-english-methods-side-income.json` | The same as the last 11-14 file, for the skill with its method texts in English | Yes. The only measurement of the English texts shipped now |
-| `2026-11-16-cases.json` | Which ideas does the skill README show as cases, from which run and stage, and by what rule were they picked? Twelve ideas over both questions | Yes. A showcase, not a measurement |
+| `2026-11-16-six-questions.json` | With equal idea calls, does the shipped skill reach mechanisms plain asking does not, on six real-world questions in different directions? Includes each question's cards and a re-check of the judge | Yes |
+| `2026-11-16-cases.json` | Which ideas does the skill README show as cases, from which run and stage, and by what rule were they picked? Twenty-four ideas over eight questions | Yes. A showcase, not a measurement |
 
 ## Fields that look contradictory
 

@@ -8,7 +8,7 @@ The page has four parts:
 
 1. [Method](#1-method): how it keeps ideas from piling up on the same answers.
 2. [What the skill adds](#2-what-the-skill-adds): what you get beyond not using it, and what it costs.
-3. [Cases](#3-cases): ideas on two open questions that only the skill reached.
+3. [Cases](#3-cases): ideas on eight open questions that only the skill reached.
 4. [Experiments and findings](#4-experiments-and-findings): what each measurement measured, what it found, and where it is weak.
 
 ## 1. Method
@@ -64,6 +64,7 @@ Two profiles: **full** (default) runs every stage in the table above, and it is 
 
 ### In short
 
+- **On real-world problems in six directions, it reached mechanisms plain repeated asking did not**: one question each in society, business, personal life, family, health care, and public life. At the same number of calls, plain asking found 23 to 42 mechanisms; the skill reached another 67 to 118 (after the judge).
 - **Scored blind by the author, it gave more than twice as many ideas that were new and worth caring about.** One question only. Of 17 mechanisms sampled per repetition, the full flow had 10 and 10, asking the model directly 4 and 3.
 - **At the same number of calls, it reaches mechanisms that plain repeated asking does not.** On the one question measured with care, plain asking found 21 mechanisms in all; the skill reached another 46 to 62 (Chinese method texts). The English texts shipped now were measured once and reached another 33 to 39.
 - **The price is money.** In the scored test the full flow cost about 28 times as much to generate ideas as asking directly.
@@ -73,6 +74,9 @@ Two profiles: **full** (default) runs every stage in the table above, and it is 
 | Scored blind: new and worth caring about, of 17 | 4, 3 | 10, 10 |
 | Different mechanisms at about 30 calls (second question, Chinese method texts) | 21 | another 46 to 62 |
 | The same, English method texts shipped now | 21 | another 33 to 39 |
+| Six new questions, about 30 calls each (English method texts) | 23 to 42 | another 67 to 118 |
+
+<img src="../../docs/figures/brainstorm/six-questions.en.png" width="760" alt="Six real-world questions: mechanisms plain asking found, and mechanisms the skill reached beyond them">
 | Cost of idea generation (scored test) | 1 times | about 28 times |
 
 <img src="../../docs/figures/brainstorm/skill-gain.en.png" width="820" alt="At about 30 idea calls on each side: mechanisms plain asking found, and mechanisms the skill reached beyond them">
@@ -93,8 +97,9 @@ In the scored test, the author marked 18 different mechanisms of the full flow, 
 ### Discounts to apply
 
 - **Different is not useful.** The counts count different mechanisms. Usefulness was scored on one question only.
-- **Two questions only.** Two were counted, one was scored.
-- **One skill run per side.** How much two runs on one question differ was not measured.
+- **Eight counted, one scored.** Nobody judged whether the ideas on the six new questions are good.
+- **One run per side on each question.** How much two runs on one question differ was not measured.
+- **The cards of the six new questions were drafted by a model**, not checked against sources and not seen by the author.
 
 ## 3. Cases
 
@@ -130,11 +135,31 @@ Every idea below is taken from a real run. Its meaning is unchanged; it is only 
 | Copy a journal's guest editor | Put together one special issue for a vendor's developer blog or community: invite authors, unify the style, edit once, and take an editing fee per issue without writing any article yourself | Pressure 2, borrow from another field |
 | Auction an exclusive window for a script | Keep a much-asked-for script closed; the company that bids highest uses it alone for six months, then the source goes public | Pressure 3, use idle resources |
 
+### Six new questions, one per direction: checked by the judge, not scored by the author
+
+**How picked.** Skill-only mechanisms that the judge called a repeat of plain asking in neither pass, two per question. The author has not scored these questions.
+
+| Direction | Idea | How it works | From |
+|:---|:---|:---|:---|
+| Business | Ask at the till: "One to take home?" | Delivery apps take a cut, so sell a second portion to guests already in the room. Charged at the restaurant's price, no app, no commission | Pressure 1, reverse a premise |
+| Business | Design the menu like a car platform | Let a dozen best sellers share five or six bases and toppings, so each ingredient is bought in larger amounts and the merged volume is used to bargain with suppliers | Pressure 2, borrow from another field |
+| Society | No payment until the ground floor signs | Put the residents' own money in escrow and pay it out by building stage; each payment waits until the ground-floor household confirms the promises of the last stage were kept, so they hold the gate instead of being told | Pressure 2, use idle resources |
+| Society | Copy a theatre's restricted-view discount | Grade each flat's loss (blocked window, narrower path, steps still to climb), publish a discount table in advance, and let the table set each household's share, with no flat-by-flat bargaining | Pressure 2, borrow from another field |
+| Personal life | Mind the homes of peers with families | Feed their pets and water their plants for free when they travel. Handing over a key is deep trust; it takes none of their evenings and nobody has to make the first invitation | Pressure 1, use idle resources |
+| Personal life | Check in on nights of extreme weather | On a typhoon, blackout or snowstorm night the whole city is awake, which gives a first late-night call a reason everyone understands; keep a small group that talks only on such nights | Pressure 2, use idle resources |
+| Family | Parents drop one old rule first | Each month, publicly cancel one rule the child resents most, saying it is not a trade; then invite the child to suggest one small change on the phone, and leave the choice to the child | Pressure 2, use idle resources |
+| Family | Swap screen-time passcodes with a friend | The child and a trusted friend each set a limit with the phone's own tool and give the unlock code to the other; the enforcer becomes a peer instead of a parent | Pressure 3, stand in the child's place |
+| Health care | Move elderly patients before a weather warning | When a storm or cold-wave warning is issued, hold a slot two days later for the next day's elderly patients: one tap moves it, no tap keeps it, and a freed slot goes to the waiting list at once | Pressure 1, stand in the patient's place |
+| Health care | Spot a same-day hospital booking | If the regional booking platform shows the same phone number booked at another hospital that day, offer to move the clinic slot; the patient will most likely go to the hospital and the clinic slot would quietly go to waste | Pressure 1, stand in the patient's place |
+| Public | Plan portions with the newsvendor model | A missing dish is covered by a same-price substitute, a leftover dish is thrown out whole; the two losses differ, so cook less of what spoils and more of what keeps, instead of always too much | Pressure 3, borrow from another field |
+| Public | Blind-test the rice and soy sauce | Within the same price, let students pick brands by taste in a blind test; nearly every dish uses them, the menu and portions stay the same, and the contractor has little to object to | Pressure 3, reverse a premise |
+
 ### Read the cases knowing this
 
 - **The cases were picked**, by the AI assistant that wrote this page, not sampled at random. For a random sample, see the human score in part 4.
 - **The first question's cases come from the full flow before the skill was packaged.** Its prompts are the skill's, but it ran another way (see part 4).
-- **All 12 cases came from pressure stages.** That agrees with the counts in part 2, but the picking itself is biased, so it is not evidence.
+- **All 24 cases came from pressure stages.** That agrees with the counts in part 2, but the picking itself is biased, so it is not evidence.
+- **The cases of the six new questions show only that plain asking did not reach them**, not that they are good.
 
 ## 4. Experiments and findings
 
@@ -151,7 +176,8 @@ R = [evals/brainstorm/results](../../evals/brainstorm/results/), where each file
 | 11-14 | First newsletter income | The same skill run, grouped again | Sonnet three times, Opus twice | A stronger grouper is steadier; since then the strongest model groups, twice | `2026-11-14-grouper-repeat-side-income.json` |
 | 11-14 | First newsletter income | 4 methods, library of 18 | Opus grouping twice; judge on every mechanism, twice | No evidence of a gain from the library; the default stays at 4 methods | `2026-11-14-methods-default-vs-library-side-income.json` |
 | 11-16 | First newsletter income | English method texts, Chinese method texts | Opus grouping twice; judge on every mechanism, twice | Every English count was lower; one run per side, so language and variation cannot be told apart | `2026-11-16-english-methods-side-income.json` |
-| 11-16 | Both questions | Cases | Picked from the runs above by fixed rules | A showcase, not a measurement | `2026-11-16-cases.json` |
+| 11-16 | Six new questions, one per direction | Shipped skill (English method texts), plain asking | Opus grouping twice per question; judge on every mechanism, twice; re-check by another model | The skill reached many more mechanisms on all six; the re-check found no lenient judge | `2026-11-16-six-questions.json` |
+| 11-16 | Eight questions | Cases | Picked from the runs above by fixed rules | A showcase, not a measurement | `2026-11-16-cases.json` |
 
 ### Words used here
 
@@ -255,6 +281,25 @@ One run with `--methods library` on the second question, compared with the defau
 - **So there is no evidence of a gain, and no proof of a loss.** The default stays at four methods.
 - **One run on each side.** How much a second skill run would differ was not measured.
 
+### Six new questions, one run each
+
+| Question | Plain-asking mechanisms | Skill-only by the grouper, two groupings | Left after the judge, four passes | Groupings agree | Repeats in a re-check of 15 |
+|:---|---:|---:|---:|---:|---:|
+| Neighbourhood restaurant (business) | 24 | 92, 92 | 89, 89, 89, 88 | 99% | 0 |
+| Lift for an old building (society) | 42 | 126, 125 | 116, 118, 113, 112 | 97% | 0 |
+| Friends in a new city (personal life) | 27 | 92, 94 | 85, 85, 88, 90 | 97% | 1 |
+| A teenager's phone time (family) | 26 | 83, 85 | 73, 76, 67, 80 | 98% | 2 |
+| Clinic no-shows (health care) | 23 | 90, 90 | 79, 76, 76, 80 | 96% | 0 |
+| School canteen waste (public) | 35 | 86, 88 | 79, 77, 82, 81 | 94% | 1 |
+
+- **Questions and hard constraints**: in [`2026-11-16-six-questions.json`](../../evals/brainstorm/results/2026-11-16-six-questions.json), with the 10 cards of each question.
+- **How measured**: the same way as the second question. The skill used the English method texts shipped now; plain asking made 30 idea calls, the skill 29 to 35.
+- **Re-check**: on each question 15 mechanisms the judge kept in both passes were picked at random and judged again by another model under the same rule. It called 4 of 90 repeats, so the judge was not noticeably lenient here.
+- **Why these counts are much higher than on the newsletter question**: [inferred from where the ideas fall; no separate test] newsletter income has a few ways to earn money, which plain asking covers quickly; these questions leave far more room.
+- **The second grouping of the clinic question left 13 skill-only mechanisms ungrouped.** Each counts as its own mechanism and may inflate that count. The other grouping had none, and the two came out close.
+- **The cards were drafted by a model**, not checked against sources, and not seen by the author.
+- **One family of models.** Idea agents, groupers, judge and re-checker were all Claude models.
+
 ### Chinese method texts against English ones
 
 Since 2026-11-16 the method texts are in English. The skill ran again on the second question with the same cards, the same seed and the same plain-asking run, measured the 11-14 way: grouped twice by Opus, every skill-only mechanism judged twice. The sub-agents still wrote every idea in Chinese.
@@ -272,7 +317,7 @@ Since 2026-11-16 the method texts are in English. The skill ran again on the sec
 
 ### Not known
 
-- Whether the result holds on other questions. Two were counted, one was scored.
+- Whether the result holds on other questions: eight were counted and the skill reached many more mechanisms on all of them; only one was scored, and nobody judged the new questions' ideas.
 - How much two runs of the skill on one question differ. So it is also not known whether the lower English counts come from the language or from variation.
 - Which steps earn their cost. Nothing was removed and re-measured.
 - Whether the mechanisms beyond plain asking are useful. Only the one scored question and one informal read.
