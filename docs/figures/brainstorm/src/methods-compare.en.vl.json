@@ -1,0 +1,226 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "4 methods and the library of 18: the ranges overlap",
+  "width": 460,
+  "height": 264,
+  "data": {
+    "values": [
+      {
+        "row": "4 methods (default) · by the grouper, 2 groupings",
+        "group": "4 methods (default)",
+        "count": 76,
+        "below": 1
+      },
+      {
+        "row": "4 methods (default) · by the grouper, 2 groupings",
+        "group": "4 methods (default)",
+        "count": 74,
+        "below": 0
+      },
+      {
+        "row": "4 methods (default) · left after the judge, 4 passes",
+        "group": "4 methods (default)",
+        "count": 53,
+        "below": 0
+      },
+      {
+        "row": "4 methods (default) · left after the judge, 4 passes",
+        "group": "4 methods (default)",
+        "count": 62,
+        "below": 1
+      },
+      {
+        "row": "4 methods (default) · left after the judge, 4 passes",
+        "group": "4 methods (default)",
+        "count": 51,
+        "below": 1
+      },
+      {
+        "row": "4 methods (default) · left after the judge, 4 passes",
+        "group": "4 methods (default)",
+        "count": 46,
+        "below": 0
+      },
+      {
+        "row": "Library of 18 · by the grouper, 2 groupings",
+        "group": "Library of 18",
+        "count": 99,
+        "below": 0
+      },
+      {
+        "row": "Library of 18 · by the grouper, 2 groupings",
+        "group": "Library of 18",
+        "count": 109,
+        "below": 1
+      },
+      {
+        "row": "Library of 18 · left after the judge, 4 passes",
+        "group": "Library of 18",
+        "count": 82,
+        "below": 1
+      },
+      {
+        "row": "Library of 18 · left after the judge, 4 passes",
+        "group": "Library of 18",
+        "count": 39,
+        "below": 0
+      },
+      {
+        "row": "Library of 18 · left after the judge, 4 passes",
+        "group": "Library of 18",
+        "count": 31,
+        "below": 0
+      },
+      {
+        "row": "Library of 18 · left after the judge, 4 passes",
+        "group": "Library of 18",
+        "count": 38,
+        "below": 1
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "4 methods (default) · by the grouper, 2 groupings",
+            "4 methods (default) · left after the judge, 4 passes",
+            "Library of 18 · by the grouper, 2 groupings",
+            "Library of 18 · left after the judge, 4 passes"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "title": "Methods",
+          "legend": {
+            "orient": "bottom",
+            "direction": "vertical",
+            "labelLimit": 700
+          }
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 0"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "4 methods (default) · by the grouper, 2 groupings",
+            "4 methods (default) · left after the judge, 4 passes",
+            "Library of 18 · by the grouper, 2 groupings",
+            "Library of 18 · left after the judge, 4 passes"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 1"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": 18,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "4 methods (default) · by the grouper, 2 groupings",
+            "4 methods (default) · left after the judge, 4 passes",
+            "Library of 18 · by the grouper, 2 groupings",
+            "Library of 18 · left after the judge, 4 passes"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "counts read from the result files",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "Skill-only mechanisms: the same ideas, grouped again",
+  "width": 460,
+  "height": 152,
+  "data": {
+    "values": [
+      {
+        "row": "Sonnet grouper, 3 times",
+        "count": 91,
+        "below": 0
+      },
+      {
+        "row": "Sonnet grouper, 3 times",
+        "count": 76,
+        "below": 1
+      },
+      {
+        "row": "Sonnet grouper, 3 times",
+        "count": 58,
+        "below": 0
+      },
+      {
+        "row": "Opus grouper, 2 times",
+        "count": 76,
+        "below": 1
+      },
+      {
+        "row": "Opus grouper, 2 times",
+        "count": 74,
+        "below": 0
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Sonnet grouper, 3 times",
+            "Opus grouper, 2 times"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 0"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Sonnet grouper, 3 times",
+            "Opus grouper, 2 times"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 1"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": 18,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Sonnet grouper, 3 times",
+            "Opus grouper, 2 times"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "Skill-only mechanisms",
+          "scale": {
+            "domain": [
+              20,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    }
+  ]
+}

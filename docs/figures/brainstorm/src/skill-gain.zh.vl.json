@@ -1,0 +1,211 @@
+{
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "计数取自结果文件",
+      "surface": "repo-doc"
+    }
+  },
+  "title": "两边各约 30 次出点子调用：反复直接问找到的，和技能另外多找到的",
+  "width": 460,
+  "height": 208,
+  "data": {
+    "values": [
+      {
+        "row": "反复直接问：找到的机制",
+        "group": "命令行工具上手（早期量法，评委去重后是粗略估计）",
+        "count": 27,
+        "below": 1
+      },
+      {
+        "row": "技能：反复直接问没想到的机制，分组者口径",
+        "group": "命令行工具上手（早期量法，评委去重后是粗略估计）",
+        "count": 101,
+        "below": 0
+      },
+      {
+        "row": "技能：同上，评委去掉重复后",
+        "group": "命令行工具上手（早期量法，评委去重后是粗略估计）",
+        "count": 93,
+        "below": 0
+      },
+      {
+        "row": "反复直接问：找到的机制",
+        "group": "公众号第一笔收入",
+        "count": 21,
+        "below": 0
+      },
+      {
+        "row": "技能：反复直接问没想到的机制，分组者口径",
+        "group": "公众号第一笔收入",
+        "count": 76,
+        "below": 1
+      },
+      {
+        "row": "技能：反复直接问没想到的机制，分组者口径",
+        "group": "公众号第一笔收入",
+        "count": 74,
+        "below": 0
+      },
+      {
+        "row": "技能：同上，评委去掉重复后",
+        "group": "公众号第一笔收入",
+        "count": 53,
+        "below": 0
+      },
+      {
+        "row": "技能：同上，评委去掉重复后",
+        "group": "公众号第一笔收入",
+        "count": 62,
+        "below": 1
+      },
+      {
+        "row": "技能：同上，评委去掉重复后",
+        "group": "公众号第一笔收入",
+        "count": 51,
+        "below": 1
+      },
+      {
+        "row": "技能：同上，评委去掉重复后",
+        "group": "公众号第一笔收入",
+        "count": 46,
+        "below": 0
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 160,
+        "opacity": 0.85
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "反复直接问：找到的机制",
+            "技能：反复直接问没想到的机制，分组者口径",
+            "技能：同上，评委去掉重复后"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "不同机制的个数",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "title": "题目",
+          "legend": {
+            "orient": "bottom",
+            "direction": "vertical",
+            "labelLimit": 700
+          }
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 0"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "反复直接问：找到的机制",
+            "技能：反复直接问没想到的机制，分组者口径",
+            "技能：同上，评委去掉重复后"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "不同机制的个数",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.below == 1"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": 18,
+        "fontSize": 14
+      },
+      "encoding": {
+        "y": {
+          "field": "row",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "反复直接问：找到的机制",
+            "技能：反复直接问没想到的机制，分组者口径",
+            "技能：同上，评委去掉重复后"
+          ],
+          "axis": {
+            "labelFontSize": 14,
+            "labelLimit": 520
+          }
+        },
+        "x": {
+          "field": "count",
+          "type": "quantitative",
+          "title": "不同机制的个数",
+          "scale": {
+            "domain": [
+              0,
+              120
+            ]
+          }
+        },
+        "text": {
+          "field": "count"
+        }
+      }
+    }
+  ]
+}

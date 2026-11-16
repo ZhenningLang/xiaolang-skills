@@ -18,6 +18,7 @@ Each skill has its own README in its folder: what it does, when to use it, and h
 |:---|:---|
 | `skills/<name>/` | One skill: `SKILL.md` for the agent, `README.md` for people, its scripts and tests |
 | `evals/` | Tools that measure the skills, and the result files. They are not a skill. Start at [evals/README.md](evals/README.md) |
+| `docs/figures/` | Figures of the skill READMEs, with the definitions they are rendered from |
 | `docs/history/` | Design notes from before v1, kept as a record. They do not describe the skills as shipped |
 | `install.sh`, `.claude-plugin/` | The two ways to install |
 | `AGENTS.md` | Rules for agents that change this repository |

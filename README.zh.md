@@ -18,6 +18,7 @@
 |:---|:---|
 | `skills/<名字>/` | 一个技能：给 agent 读的 `SKILL.md`，给人读的 `README.md`，它的脚本和测试 |
 | `evals/` | 测量技能的工具和结果文件。它们不是技能。从 [evals/README.md](evals/README.md) 读起 |
+| `docs/figures/` | 技能说明页的配图，以及渲染它们用的图定义 |
 | `docs/history/` | v1 之前的设计稿，只为留痕。它们不代表发布的技能 |
 | `install.sh`、`.claude-plugin/` | 两种安装方式 |
 | `AGENTS.md` | 给修改本仓库的 agent 的规则 |

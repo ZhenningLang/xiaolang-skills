@@ -1,0 +1,32 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "many stages and dense labels; a quiet style reads best", "surface": "repo-doc"}
+direction: down
+inp: "Your question\nhard constraints + cards" { class: box }
+blind: "Cannot see earlier ideas" {
+  class: lane
+  grid-columns: 2
+  horizontal-gap: 60
+  base: "Baseline\n9 calls · no method" { class: box }
+  r1: "Round 1\n3 calls · one method each" { class: box }
+  base -> r1
+}
+seen: "Can see earlier ideas (as things to avoid)" {
+  class: lane
+  grid-columns: 4
+  horizontal-gap: 50
+  r2: "Round 2\n3 calls · go where no one went" { class: box }
+  p1: "Pressure 1\n3 calls · avoid every mechanism so far" { class: box }
+  p2: "Pressure 2\n3 calls · prefer unused cards" { class: box }
+  p3: "Pressure 3\n3 calls · question the premise" { class: box }
+  r2 -> p1 -> p2 -> p3
+}
+group: "Grouping\nafter each batch, by mechanism" { class: store }
+rewrite: "Rewrite\nan idea that hits a baseline mechanism\ngoes back once, to a fresh sub-agent" { class: changed }
+report: "report.md\none line per different mechanism\nbaseline mechanisms folded at the end" { class: new }
+inp -> blind: "sent to sub-agents" { class: hero }
+blind -> seen { class: hero }
+blind -> group: "each batch"
+seen -> group: "each batch"
+group -> seen: "avoid list"
+group -> rewrite: "hits baseline"
+rewrite -> group
+group -> report: "all ideas" { class: hero }
