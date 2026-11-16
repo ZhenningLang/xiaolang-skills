@@ -8,7 +8,7 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 
 | Skill | What it does | Status |
 |:---|:---|:---|
-| [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on two questions: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care. See [evidence and limits](skills/brainstorm/README.md#evidence-and-limits) |
+| [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on two questions: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care. See [what the skill adds](skills/brainstorm/README.md#2-what-the-skill-adds) |
 
 Each skill has its own README in its folder: what it does, when to use it, and how far it has been tested.
 

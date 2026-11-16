@@ -1,8 +1,8 @@
 # Results
 
-Summaries of every measurement of the brainstorm skill. Each file holds counts and descriptions only: no idea text, no model output. The raw runs are not in the repository.
+Summaries of every measurement of the brainstorm skill. Each file holds counts and descriptions only, with one exception: `2026-11-16-cases.json` holds the full text of the ideas shown as cases. The raw runs are not in the repository.
 
-What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../../../skills/brainstorm/README.md#evidence-and-limits). How to repeat a comparison is in [evals/README.md](../../README.md).
+What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../../../skills/brainstorm/README.md#4-experiments-and-findings). How to repeat a comparison is in [evals/README.md](../../README.md).
 
 ## Files, oldest first
 
@@ -14,6 +14,7 @@ What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../
 | `2026-11-13-method-library-side-income.json` | Does the library of 18 methods reach more than the four default methods? | No. Its count of 38 is a low outlier of one Sonnet grouping. Replaced by the last file |
 | `2026-11-14-grouper-repeat-side-income.json` | How far does the grouping alone move the count? Three Sonnet groupings and two Opus groupings of one skill run | Yes |
 | `2026-11-14-methods-default-vs-library-side-income.json` | Four methods against the library, grouped twice by Opus, every skill-only mechanism judged twice | Yes. Also the current numbers for the default skill on the second question |
+| `2026-11-16-cases.json` | Which ideas does the skill README show as cases, from which run and stage, and by what rule were they picked? Twelve ideas over both questions | Yes. A showcase, not a measurement |
 
 ## Fields that look contradictory
 

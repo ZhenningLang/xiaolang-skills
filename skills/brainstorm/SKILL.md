@@ -7,7 +7,7 @@ description: Use when the user wants many genuinely different ideas for an open 
 
 A script holds the run state, the random assignments and every sub-agent prompt. Your job is to feed it, dispatch the sub-agents it asks for, and relay the result. Do not write, edit or judge ideas yourself.
 
-The flow and its prompts are ported from the "full" configuration that a person scored. Differences from that configuration are listed under "Differences from the scored flow" below. Read "Evidence and limits" in `README.md` next to this file before you promise the user anything.
+The flow and its prompts are ported from the "full" configuration that a person scored. Differences from that configuration are listed under "Differences from the scored flow" below. Read part 4, "Experiments and findings", of `README.md` next to this file before you promise the user anything.
 
 ## What happens
 
@@ -67,8 +67,8 @@ The configuration a person scored called one model directly, without tools. This
 
 - `--ideas-per-agent` (default 10, the measured value): lowering it keeps sub-agent output short enough for hosts that cut long replies, but the run then differs from what was measured.
 - Running some agents on other models, or letting agents search the web, is off by default and has not been measured; do it only if the user explicitly asks.
-- The four method instructions (analogy, reverse a premise, stand in the affected person's place, use idle resources) are kept word for word from the scored run, which was in Chinese. Agents still answer in the language of the question.
-- `--methods library` uses the larger set in `methods/library.jsonl` (the four above plus more, such as substitute, eliminate, contradiction, first principles). `--methods <file>` uses the user's own set. In both cases every agent of a batch gets a different method, and a method is reused only after every other method was used. One trial run showed no gain that the repository's comparison could detect (see `README.md` next to this file, Evidence and limits): use it only when the user asks for more thinking methods, and say so in your summary.
+- The four method instructions (analogy, reverse a premise, stand in the affected person's place, use idle resources) are English translations of the Chinese texts of the scored run. Agents still answer in the language of the question.
+- `--methods library` uses the larger set in `methods/library.jsonl` (the four above plus more, such as substitute, eliminate, contradiction, first principles). `--methods <file>` uses the user's own set. In both cases every agent of a batch gets a different method, and a method is reused only after every other method was used. One trial run showed no gain that the repository's comparison could detect (see part 4 of `README.md` next to this file): use it only when the user asks for more thinking methods, and say so in your summary.
 
 ## Adding thinking methods
 

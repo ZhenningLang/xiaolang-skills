@@ -1,0 +1,227 @@
+{
+ "what": "Ideas shown as cases in the skill README. Every text is copied from a run; nothing was rewritten.",
+ "cli_onboarding": {
+  "question": "一个个人维护的开源命令行工具，怎样降低新用户第一次上手就失败的比例？",
+  "constraints": [
+   "不加遥测",
+   "维护者每周只有 2 小时"
+  ],
+  "run": "the full flow of 2026-11-08-human-scored-cli.json, before the skill was packaged",
+  "how_picked": "From the mechanisms the author scored 'had not thought of', 'care' and no fatal reason, the ones with no idea at all from asking the model directly. 14 mechanisms met this; the six here were picked by the assistant that wrote the README.",
+  "met_the_rule": 14,
+  "cases": [
+   {
+    "mechanism_id": "m-088",
+    "title": "借 AED 语音引导：提供 tool next，根据本机状态只说下一步",
+    "text": "自动体外除颤器不指望使用者读说明书，它一步一步地说：先做这个，做完再做下一个，并且通过检测判断是否真的做完。给工具加一个 `tool next` 命令：它读取本机的真实状态，例如配置文件是否存在、依赖是否能找到、是否已成功运行过一次最小流程，只输出此刻唯一该做的一件事和对应的一条命令，重复运行就能一路走到“已就绪”。不同系统和 shell 的写法差异（c04）也可以由它按当前环境选好，用户不用自己在文档里挑。所有报错末尾统一加一句“不知道下一步？运行 tool next”，补上只有调用栈的报错所缺的指引（c03）。状态判断复用 doctor 的检查函数（c06），全程本地，无网络、无遥测。状态机只有五六个节点，写一次，之后只在流程变化时改。",
+    "levels": [
+     "pressure2",
+     "pressure3"
+    ],
+    "methods": [
+     "analogy",
+     "person"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   },
+   {
+    "mechanism_id": "m-160",
+    "title": "借编译器的做法：报错不指向工具的代码，而是指向用户输入里出错的那一处",
+    "text": "原方案是把所有报错压成「一句原因加三选一的动作」。这里换一个机制：不管动作，改变报错所指的对象。调用栈描述的是工具内部的执行路径，新用户看不懂；他们真正需要知道的是，自己给的哪一部分有问题。所以出错时，工具把用户这次的输入原样回显，并用标记指出出错的位置。输入是命令行时，指到具体的参数或取值。输入是文件时，指到第几行、第几列，把那一行摘出来，在下面用 ^^^ 标记，再加一句“这里应该是 X 的形式”，并给出该处合法写法的一个小例子。例如：`第 3 行：2024/13/01  ^^ 月份应为 1–12，例如 2024-12-01`。调用栈只在 `--debug` 下显示。实现上，在解析输入的那一层给错误附带“输入片段与位置”，渲染则统一用现成的诊断库（如 Rust 的 miette、Python 的 rich、Go 的各类 diagnostic 包）。解析层只做一次接入，之后新增检查只需多传一个位置。用户一眼就能分清是自己的输入有问题还是工具坏了，并且知道改哪里。这样跟新用户第一次换成自己真实文件时的失败正好对上。所有渲染都在本地完成，不记录、不上传任何数据，不涉及遥测。一次性接入后几乎不需要维护，适合每周只有 2 小时的维护者。",
+    "levels": [
+     "pressure1"
+    ],
+    "methods": [
+     "reverse"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   },
+   {
+    "mechanism_id": "m-185",
+    "title": "issue 表单字段触发的自动复现：在对应系统和 shell 的 runner 上重跑一遍",
+    "text": "原方案靠志愿者在发版前人工试装。这里换成机制：不找人，在有人提 issue 时由机器去复现。多数失败用户会直接放弃，只有少数人愿意提 issue（c05），所以让这少数人的一份报告发挥最大作用。issue 表单（c08）固定四个下拉字段：系统、shell、安装渠道、版本，并附一条 `tool --version` 的输出。维护者给 issue 打上 `repro` 标签后，一个 GitHub Action 读取表单字段，映射到最接近的免费 runner（macOS、Windows、Ubuntu）和对应的 shell（bash、zsh、PowerShell、cmd），按该渠道的官方安装命令装一遍，再运行 README 首屏的验证和示例。结果以评论形式贴回 issue：“在 macOS + zsh + brew 上复现成功/失败，日志如下”。同一个工作流还能给出分流：复现成功说明是用户本机环境问题，评论里直接附上排查条目链接；复现失败则自动加上 `confirmed-install-bug` 标签，维护者的每周 2 小时只处理这类。不同系统和 shell 的差异（c04）以及各包管理器的用户群（c10）都不需要维护者自己准备机器。全程只读取用户主动填写的表单，不收集任何自动数据，没有遥测。工作流写一次，之后无人值守。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "resources"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   },
+   {
+    "mechanism_id": "m-149",
+    "title": "防止同名程序抢占：起不易重名的命令名，`--version` 自报家门，安装后检查 PATH 上是否有别的同名程序",
+    "text": "有些用户装完后运行 `tool`，实际跑到的是系统里另一个同名程序（比如 Debian 把 fd 装成 `fdfind`，或旧版本残留），他们看到的是完全不相关的报错，无从判断。发布前先在 brew、apt、npm 里查一遍命令名是否冲突。`tool --version` 固定输出“名称 版本（项目地址）”这一行，让用户一眼分辨装对没有。安装脚本结束时用 `command -v` 与 `which -a` 检查 PATH 上是否有别的同名文件，有就提示“当前 `tool` 指向的不是刚装的这个：路径 …”。全部本地检查，无遥测，写一次即可。",
+    "levels": [
+     "pressure1",
+     "pressure3"
+    ],
+    "methods": [
+     "person",
+     "resources"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   },
+   {
+    "mechanism_id": "m-150",
+    "title": "把仓库的 About 简介和搜索结果摘要当作真正的第一屏",
+    "text": "很多用户从搜索引擎或 GitHub 搜索结果进来，在打开 README 之前，就只看到仓库的 About 一行简介和 topics。把这一行写成“一句话用途 + 支持的系统 + 安装命令”，例如“把 X 转成 Y 的命令行工具｜macOS/Linux/Windows｜brew install tool”，把 topics 设成用户会搜的词，再上传一张社交预览图，图上直接写这条安装命令。这样即使只看了最先出现的一行，复制到的也是对的命令和正确的前提。设置一次，之后只在换安装方式时改一下，几乎不占每周时间。",
+    "levels": [
+     "pressure1"
+    ],
+    "methods": [
+     "person"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   },
+   {
+    "mechanism_id": "m-100",
+    "title": "借同类工具的公开 issue：不等自己的用户失败，先读别人的失败",
+    "text": "可用资源：同类开源工具公开的 issue 和讨论区，这些是现成的、无需任何遥测的失败数据。质疑前提：以为失败信号只能来自自己的用户。多数失败用户会沉默（c05），自己的 issue 区样本太少。做法：每月花 30 分钟，打开两三个同类工具的 issue 区，搜 install、PATH、permission、not found 之类的词，挑出被反复提到的上手失败。逐条回答一个问题：我的工具在同样的环境下会不会也这样？会的话，就把它加成 doctor 的一项检查（c06）或一句报错提示。这等于用别人的失败样本，提前给自己的新用户打补丁。读的全是公开页面，不涉及任何用户数据，只占每周 2 小时里很小的一块。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "resources"
+    ],
+    "ideas_from_asking_directly": 0,
+    "author": {
+     "not_thought_of": true,
+     "care": true,
+     "want_to_try": true,
+     "fatal_reason": null
+    }
+   }
+  ],
+  "first_stage_of_scored_full_flow_mechanisms": {
+   "what": "The 18 different mechanisms of the full flow that the author scored 'had not thought of', 'care' and no fatal reason, over both repetitions, by the stage that first produced an idea of each",
+   "baseline": 3,
+   "round1": 3,
+   "round2": 2,
+   "pressure1": 4,
+   "pressure2": 3,
+   "pressure3": 3,
+   "total": 18
+  }
+ },
+ "side_income": {
+  "question": "一个人运营的中文技术公众号，怎样在三个月内拿到第一笔收入？",
+  "constraints": [
+   "每周投入不超过 5 小时",
+   "不卖课，不建付费群"
+  ],
+  "run": "the default skill run of 2026-11-13-equal-calls-side-income.json, grouping default-opus-1 of 2026-11-14-methods-default-vs-library-side-income.json",
+  "how_picked": "From the 70 skill-only mechanisms that the judge did not call a repeat in either pass; picked by the assistant that wrote the README. The author has not scored these.",
+  "met_the_rule": 70,
+  "cases": [
+   {
+    "mechanism_id": "m-061",
+    "title": "借合同能源管理：帮小团队压缩云账单，只从实际省下的钱里分成",
+    "text": "搬用的做法来自节能服务公司的合同能源管理：先出改造方案，节省下来的电费双方按比例分，没省下就不收，客户不用先冒险。搬到技术号：评论区里问「这个怎么配」的人里，有小团队负责人，手里有一张每月固定的云服务账单。做法：在文末写明，可发脱敏后的账单摘要和一句话架构，我先花 15 分钟判断能否每月省出几百元以上，判断不出就不接；能接的给 2 到 3 项具体改动（规格、闲置资源、存储分层、缓存），由对方自己执行；双方书面约定以改动前三个月平均账单为基线，改动后连续一个自然月的节省额，按固定比例（如两成）分成并设上限。不要对方的账号权限，只看脱敏账单。每周最多一单，约 1.5 小时，其余时间写文章。注意收入滞后：第一个月成交，第二个月对方执行，第三个月才能结算，所以第一个月就要开始接。风险是对方不执行或基线有争议，所以基线口径必须先写明。不卖课，不建付费群，每周不超过 5 小时。",
+    "levels": [
+     "pressure2"
+    ],
+    "methods": [
+     "analogy"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   },
+   {
+    "mechanism_id": "m-079",
+    "title": "反过来想「读者是人」：把评论区高频问题当题库，替工具方测 AI 助手答错在哪，交错答清单和该补的文档页",
+    "text": "越来越多开发者先问 AI 助手再翻文档，工具方的文档团队未必知道助手把自己的产品答成什么样。买家是工具方的文档或开发者关系。作者手里有现成题库：评论区里读者真实问过的「这个怎么配」（c05）。做法：先拿一个自己真用的工具，从评论区挑 20 个问题，分别问三个主流 AI 助手，对照官方文档逐条标「对、错、过时」，错的按原因归类（文档没写、版本旧、写法有歧义），整理成一页样例，写出建议补的三个文档页，发给对方负责人并报按份价格。每份约 2 小时，每周最多一份，样例同时是一篇号里的文章。与人工走查文档的区别：测的是 AI 答得对不对，不是人能不能跑通。不碰任何未公开信息。[未验证：没有数据表明工具方会为此付费，也没有价格区间]，所以三个月内目标只是收到一次报价，成交更好。每周总投入不超过 5 小时。不卖课，不建付费群。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "reverse"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   },
+   {
+    "mechanism_id": "m-089",
+    "title": "国内网络可达性实测：用自己的检查脚本给出海工具出一份实测报告",
+    "text": "手头资源是自用的下载、安装和接口检查脚本（c06）。很多海外开发工具在国内网络下载慢、依赖装不上，工具团队却没有国内节点，看不到真实体验。作者天天在国内网络装依赖，这本身就是稀缺视角。做法：把脚本整理成固定流程，在自己的家用宽带和手机热点两个网络下各跑一遍，出一页报告：各步骤耗时、失败点、公开可用的镜像和合规的替代做法，只测公开地址，不使用任何绕过手段。写明测试条件，只有两个网络点，不代表全国。向 5 家出海工具方的增长或开发者关系负责人报价。区别于文档走查（查文档内容）和对比测试（比两个方案）。每份约 3 小时分摊到两周，其余写作，总投入不超过 5 小时。三个月内目标是成交一份。不卖课，不建付费群。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "resources"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   },
+   {
+    "mechanism_id": "m-087",
+    "title": "替非技术的科技自媒体和企业号，发布前把技术说错的地方挑出来",
+    "text": "站在看到一篇科技稿里把技术概念讲错的作者位置：写稿的运营不懂技术，审稿的编辑也不懂，错误只会在评论区被内行指出来，那时已经发出去了。买家不是读者，也不是出版社，而是赶着发稿的科技自媒体和企业市场部。我质疑的前提是「写技术的人只能卖文章」。服务：稿件发布前 24 小时内，返回一页「技术错误清单加建议改法」，不改文风，不署名，按稿固定价。起步：第一个月在自己号发一篇「科技报道里常见的十个技术说错的地方」，只用通用例子，不点名任何具体稿件；再私信或发邮件给 8 个自己常看的科技自媒体和企业号运营，附这篇文章和价格，并免费核一篇小稿做示范。每份约 40 分钟，每周最多接两份，合计不超过 1.5 小时，写作约 3.5 小时。三个月内目标是成交一单。与出版社审校的区别：对方要的是速度，和一份能直接照着改的清单。风险：对方未必承认自己不懂，所以示范稿要先给；对方的未发布稿件保密，不转述。不卖课，不建付费群。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "person"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   },
+   {
+    "mechanism_id": "m-060",
+    "title": "借学术期刊的客座主编：替厂商开发者博客或社区组一期专刊，按期收组稿编辑费",
+    "text": "搬用的做法来自学术期刊的特刊客座编辑：出版方没人手约稿，请懂行的人组一期专题，约稿、审稿、编排，按期付编辑费，自己不必写其中任何一篇。搬到技术号：厂商的开发者博客、技术社区和周刊常缺稿源，而作者平时看评论区、关注同领域小号，认识一批写得好的读者和作者。做法：选一个对方读者关心的主题（比如「某工具迁移踩坑」），向对方运营提出：我替你们约 4 到 5 篇稿，统一体例、校一轮，一期一口价，稿费由对方另付作者；先拿自己号里的两篇文章当体例样本。每期约 3 小时（约稿 1 小时、编辑 2 小时），一周其余时间写作。与代写、编辑润色的区别是买家买的是组织和筛选，不是我的文字。三个月内目标是做成一期。风险是被约的作者不回复，所以先约好人再报价。要问清署名和稿费由谁支付。不卖课，不建付费群，每周不超过 5 小时。",
+    "levels": [
+     "pressure2"
+    ],
+    "methods": [
+     "analogy"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   },
+   {
+    "mechanism_id": "m-092",
+    "title": "脚本独占窗口：出价最高的一家公司独占六个月，到期后公开源码",
+    "text": "手头资源是自用脚本（c06）。卖给读者是一次性买断，卖给企业是商用授权费；这里换一个买点：买的是「独占期」。选评论区里最常被问到的一个日志解析或配置检查脚本，文章里只公布功能和演示，不放源码；向评论区里看起来是公司在问问题的读者和 3 家工具或服务公司发一页说明：设保底价，截止日出价最高的一家获得 6 个月独占使用权，独占期内不提供给其他人，到期后我把源码公开到代码仓库。买家付的是「先用且独占」，不是所有权。前提：先确认脚本里没有雇主代码和不能再分发的第三方内容。整理说明和演示约两个周末，之后每周只处理邮件，不超过 1 小时，其余时间写作。三个月内目标是收到至少一份出价；没人出价就直接公开，并把过程写成一篇文章。不卖课，不建付费群，每周总投入不超过 5 小时。",
+    "levels": [
+     "pressure3"
+    ],
+    "methods": [
+     "resources"
+    ],
+    "judge": "not a repeat of any plain-asking mechanism, in both passes over grouping default-opus-1",
+    "author": null
+   }
+  ]
+ }
+}
