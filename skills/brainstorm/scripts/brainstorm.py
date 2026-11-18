@@ -24,6 +24,8 @@ DEFAULT_IDEAS_PER_AGENT = 10
 MATERIALS_PROPORTION = 0.5
 GROUP_CHUNK = 40
 GROUP_ATTEMPTS = 2
+ORGANIZE_ATTEMPTS = 2
+LANGS = ("en", "zh")
 # The four default methods. library.jsonl holds the same four, word for word, and fourteen more.
 METHODS = {
     "analogy": "Find a practice from an unrelated field that has already solved a similar problem, and move it over to this one.",
@@ -589,6 +591,78 @@ def ingest_grouping(state, task_id):
                                   "detail": f"{len(ungrouped)} ideas kept as their own mechanisms: " + "; ".join(errors[:5])})
 
 
+# ---------- organising the results for the reader ----------
+
+def organize_prompt(state, output_path):
+    rows = [{"id": row["mechanism_id"], "label": row["label"],
+             "example_title": state["ideas"][row["representative"]]["title"]} for row in local_table(state)]
+    return "\n".join([
+        TOOL_RULE,
+        "You organise the results of a brainstorm so a person can scan them. You do not judge them.",
+        "Do two things:",
+        "1. Sort every mechanism into one theme. Use 6 to 12 themes, fewer if there are few mechanisms. A theme names "
+        "the lever the ideas pull (what they change, where the signal comes from, who acts), not how good they are. "
+        "Each mechanism goes into exactly one theme. Do not drop, merge or rank mechanisms. Order themes by the first "
+        "mechanism they contain, in the order given; keep mechanisms inside a theme in the order given.",
+        "2. Give every mechanism a short title: at most 16 Chinese, Japanese or Korean characters, or 8 words in other "
+        "languages, in the language of the question, saying what the idea does. No numbering, no quality words.",
+        'Return only JSON: {"themes":[{"name":"...","mechanisms":["m-001"]}],"titles":{"m-001":"..."}}.',
+        "Question:", wrap_data(state["question"]), "Mechanisms:", wrap_data(rows), delivery(output_path)]) + "\n"
+
+
+def issue_organize(run_dir, state):
+    attempt = state.get("organize_attempt", 1)
+    task_id = f"o{attempt:03d}"
+    prompt_path, output_path = task_paths(run_dir, task_id)
+    atomic_write(prompt_path, organize_prompt(state, output_path))
+    state["tasks"][task_id] = {"kind": "organize", "attempt": attempt, "cards": [], "prompt": str(prompt_path),
+                               "output": str(output_path), "status": "pending"}
+    return [task_id]
+
+
+def parse_organize(text, known):
+    """Themes and short titles. Unknown or repeated ids are dropped; anything missing is left to the report."""
+    payload = json.loads(strip_fence(text))
+    if not isinstance(payload, dict) or not isinstance(payload.get("themes"), list):
+        raise ValueError("Expected a themes array")
+    titles = payload.get("titles", {})
+    if not isinstance(titles, dict):
+        raise ValueError("Expected titles to be an object")
+    seen, themes = set(), []
+    for row in payload["themes"]:
+        if not isinstance(row, dict) or not isinstance(row.get("name"), str) or not row["name"].strip():
+            continue
+        ids = [key for key in row.get("mechanisms") or [] if isinstance(key, str) and key in known and key not in seen]
+        seen.update(ids)
+        if ids:
+            themes.append({"name": one_line(row["name"])[:60], "mechanisms": ids})
+    clean = {key: one_line(value)[:80] for key, value in titles.items()
+             if key in known and isinstance(value, str) and value.strip()}
+    return {"themes": themes, "titles": clean}
+
+
+def ingest_organize(state, task_id):
+    task = state["tasks"][task_id]
+    output = Path(task["output"])
+    known = {row["mechanism_id"] for row in state["mechanisms"]}
+    try:
+        if not output.is_file():
+            raise ValueError("missing answer file")
+        result = parse_organize(output.read_text(encoding="utf-8"), known)
+    except (ValueError, UnicodeDecodeError, RecursionError) as exc:
+        attempt = task["attempt"]
+        again = attempt < ORGANIZE_ATTEMPTS
+        fail(state, task_id, "organize_unreadable", f"{exc}; " + ("issued once more" if again else
+                                                                   "the report lists the mechanisms without themes"))
+        if again:
+            state["organize_attempt"] = attempt + 1
+        else:
+            state["organized"] = {"themes": [], "titles": {}, "failed": True}
+        return
+    task["status"] = "ok"
+    state["organized"] = result
+
+
 def enqueue(state, ids):
     for start in range(0, len(ids), GROUP_CHUNK):
         state["queue"].append({"idea_ids": ids[start:start + GROUP_CHUNK], "attempt": 1})
@@ -601,6 +675,9 @@ def ingest_pending(state):
     if state["tasks"][pending[0]]["kind"] == "group":
         for task_id in pending:
             ingest_grouping(state, task_id)
+        return
+    if state["tasks"][pending[0]]["kind"] == "organize":
+        ingest_organize(state, pending[0])
         return
     by_batch = {}
     for task_id in pending:
@@ -621,15 +698,26 @@ def steps_of(state):
     return ["baseline"] + PROFILES[state["profile"]]
 
 
+MODEL_ROLE = {"generate": "generate", "rewrite": "generate", "group": "group", "organize": "group"}
+
+
 def dispatch(run_dir, state, task_ids, purpose):
     state["pending"] = task_ids
-    tasks = [{"id": key, "prompt": state["tasks"][key]["prompt"], "output": state["tasks"][key]["output"]}
-             for key in task_ids]
+    models = state.get("models")
+    tasks = []
+    for key in task_ids:
+        task = state["tasks"][key]
+        row = {"id": key, "prompt": task["prompt"], "output": task["output"]}
+        if models:
+            row["model"] = models[MODEL_ROLE[task["kind"]]]
+        tasks.append(row)
+    instructions = ("Start one fresh isolated sub-agent per task, all in one reply. Send each exactly: "
+                    "'Read the file <prompt> and do exactly what it says.' Wait for every task, then run next once. "
+                    "Running next while an answer file is missing changes nothing and lists the missing tasks.")
+    if models:
+        instructions += " Run each sub-agent on the model named in its task's model field; the user chose it."
     return {"action": "dispatch", "purpose": purpose, "level": steps_of(state)[state["step"]["index"]]
-            if state["step"]["index"] < len(steps_of(state)) else None, "tasks": tasks,
-            "instructions": "Start one fresh isolated sub-agent per task, all in one reply. Send each exactly: "
-                            "'Read the file <prompt> and do exactly what it says.' Wait for every task, then run next once. "
-                            "Running next while an answer file is missing changes nothing and lists the missing tasks."}
+            if state["step"]["index"] < len(steps_of(state)) else None, "tasks": tasks, "instructions": instructions}
 
 
 def level_summary(state, level):
@@ -654,6 +742,7 @@ def done_result(run_dir, state):
     """What the host reports at the end. dropped_agents counts idea agents whose whole answer was lost;
     failures also counts partial rewrites and grouping problems."""
     return {"action": "done", "report": str(Path(run_dir).resolve() / "report.md"),
+            "report_html": str(Path(run_dir).resolve() / "report.html"),
             "mechanisms": len(state["mechanisms"]),
             "beyond_baseline": sum(not row["in_baseline"] for row in state["mechanisms"]),
             "ideas": len(state["ideas"]), "failures": len(state["failures"]),
@@ -664,6 +753,7 @@ def finish(run_dir, state):
     report = render_report(state)
     check_report(report, state)
     atomic_write(Path(run_dir).resolve() / "report.md", report)
+    atomic_write(Path(run_dir).resolve() / "report.html", render_report_html(run_dir, state))
     state["complete"] = True
     return done_result(run_dir, state)
 
@@ -675,6 +765,8 @@ def advance(run_dir, state):
         steps = steps_of(state)
         step = state["step"]
         if step["index"] >= len(steps):
+            if state.get("organize") and state.get("organized") is None:
+                return dispatch(run_dir, state, issue_organize(run_dir, state), "organize")
             return finish(run_dir, state)
         level = steps[step["index"]]
         if step["phase"] == "start":
@@ -724,7 +816,38 @@ def cmd_next(args):
     print(json.dumps(result, ensure_ascii=False, indent=1))
 
 
-def cmd_init(args):
+def review_module():
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import review
+    return review
+
+
+def new_state(question, constraints, cards, methods, seed, profile, ideas_per_agent, **extra):
+    return {"version": STATE_VERSION, "question": question, "constraints": constraints, "cards": cards,
+            "methods": methods, "seed": seed, "profile": profile, "ideas_per_agent": ideas_per_agent,
+            "pressure": None, "next_batch": 1, "group_counter": 0, "step": {"index": 0, "phase": "start"},
+            "tasks": {}, "pending": [], "queue": [], "ideas": {}, "mechanisms": [], "failures": [],
+            "summary": [], "complete": False, **extra}
+
+
+def state_from_review(args):
+    """The run exactly as the user confirmed it on the review page."""
+    run_dir = Path(args.dir)
+    others = [path.name for path in run_dir.iterdir() if path.name != "review"] if run_dir.exists() else []
+    if others:
+        raise RunError(f"{run_dir} already holds a run; use a new directory for each run")
+    if args.question is not None or args.question_file or args.constraint or args.constraints_file or args.cards:
+        raise RunError("--from-review takes the question, constraints and cards from the confirmed review")
+    draft, answer = review_module().load_confirmed(run_dir)
+    texts = {row["id"]: row["text"] for row in draft["methods"]["items"]}
+    seed = args.seed if args.seed is not None else secrets.randbelow(2 ** 31)
+    return new_state(answer["question"].strip(), [row["text"].strip() for row in answer["constraints"]],
+                     answer["cards"], {key: texts[key] for key in answer["methods"]}, seed, answer["profile"],
+                     answer["ideas_per_agent"], cards_source=answer["cards_source"] if answer["cards"] else None,
+                     models=answer["models"], lang=answer["lang"], organize=True, setup="review/confirmed.html")
+
+
+def state_from_args(args):
     run_dir = Path(args.dir)
     if run_dir.exists() and any(run_dir.iterdir()):
         raise RunError(f"{run_dir} is not empty; use a new directory for each run")
@@ -736,6 +859,8 @@ def cmd_init(args):
     constraints = list(args.constraint or [])
     if args.constraints_file:
         constraints += [line for line in Path(args.constraints_file).read_text(encoding="utf-8").splitlines() if line.strip()]
+    if args.cards and args.cards_source is None:
+        raise RunError("--cards needs --cards-source user (the user supplied them) or agent (you wrote them)")
     cards = read_cards(args.cards) if args.cards else []
     if args.methods == "evaluated":
         methods = dict(METHODS)
@@ -744,18 +869,39 @@ def cmd_init(args):
         methods = {row["id"]: row["text"] for row in rows}
     if args.ideas_per_agent < 1:
         raise RunError("--ideas-per-agent must be positive")
+    if (args.model_generate is None) != (args.model_group is None):
+        raise RunError("give both --model-generate and --model-group, or neither")
+    extra = {"lang": args.lang if args.lang in LANGS else "en", "organize": args.organize}
+    if cards:
+        extra["cards_source"] = args.cards_source
+    if args.model_generate:
+        extra["models"] = {"generate": args.model_generate, "group": args.model_group}
     seed = args.seed if args.seed is not None else secrets.randbelow(2 ** 31)
-    state = {"version": STATE_VERSION, "question": question, "constraints": constraints, "cards": cards,
-             "methods": methods, "seed": seed, "profile": args.profile, "ideas_per_agent": args.ideas_per_agent,
-             "pressure": None, "next_batch": 1, "group_counter": 0, "step": {"index": 0, "phase": "start"},
-             "tasks": {}, "pending": [], "queue": [], "ideas": {}, "mechanisms": [], "failures": [],
-             "summary": [], "complete": False}
+    return new_state(question, constraints, cards, methods, seed, args.profile, args.ideas_per_agent, **extra)
+
+
+def cmd_init(args):
+    state = state_from_review(args) if args.from_review else state_from_args(args)
+    run_dir = Path(args.dir)
     run_dir.mkdir(parents=True, exist_ok=True)
     save_state(run_dir, state)
-    print(json.dumps({"dir": str(run_dir.resolve()), "seed": seed, "profile": args.profile, "cards": len(cards),
-                      "methods": len(methods), "constraints": len(constraints),
-                      "ideas_per_agent": args.ideas_per_agent,
-                      "evaluated_settings": args.ideas_per_agent == DEFAULT_IDEAS_PER_AGENT and methods == METHODS}, ensure_ascii=False))
+    print(json.dumps({"dir": str(run_dir.resolve()), "seed": state["seed"], "profile": state["profile"],
+                      "cards": len(state["cards"]), "methods": len(state["methods"]),
+                      "constraints": len(state["constraints"]), "ideas_per_agent": state["ideas_per_agent"],
+                      "models": state.get("models"), "evaluated_settings": state["ideas_per_agent"] ==
+                      DEFAULT_IDEAS_PER_AGENT and state["methods"] == METHODS}, ensure_ascii=False))
+
+
+def cmd_review(args):
+    print(json.dumps(review_module().write_draft(args), ensure_ascii=False, indent=1))
+
+
+def cmd_serve_review(args):
+    return review_module().serve(args)
+
+
+def cmd_confirm_review(args):
+    print(json.dumps(review_module().confirm_from_file(args), ensure_ascii=False, indent=1))
 
 
 def cmd_status(args):
@@ -770,77 +916,161 @@ def cmd_status(args):
 
 # ---------- report ----------
 
+REPORT_TEXT = {
+    "en": {"title": "Brainstorm results", "question": "Question", "constraints": "Hard constraints", "colon": ":",
+           "setup": "Run setup (question, hard constraints, cards, methods, models)",
+           "counts": "**{beyond}** beyond the baseline · {total} mechanisms · {ideas} ideas. Nothing was scored or removed.",
+           "html": "A page that is easier to read: `report.html` next to this file.",
+           "contents": "Contents", "common": "The baseline already had these", "other": "Other",
+           "show": "Show {n} mechanisms", "details": "Run details", "level": "Level", "ideas": "Ideas",
+           "new": "New beyond baseline", "failed": "Failed agents", "seed": "Seed", "profile": "Profile",
+           "failures": "Dropped or partial sub-agent outputs", "agent": "agent {n}", "cards": "cards", "rewrite": "rewrite",
+           "returned": "collided with the baseline; sent back for a rewrite",
+           "ungrouped": "its first idea was not grouped: the grouping answer was unusable", "cards_by_agent": "Cards written by the agent.",
+           "levels": {"baseline": "Baseline", "round1": "Round 1", "round2": "Round 2", "pressure1": "Pressure 1",
+                      "pressure2": "Pressure 2", "pressure3": "Pressure 3"}},
+    "zh": {"title": "头脑风暴结果", "question": "问题", "constraints": "硬约束", "colon": "：",
+           "setup": "开跑设置（问题、硬约束、卡片、方法、模型）",
+           "counts": "基线之外 **{beyond}** 种 · 全部 {total} 种机制 · {ideas} 个点子。没有打分，也没有删除。",
+           "html": "更好读的网页版：同一目录下的 `report.html`。",
+           "contents": "目录", "common": "基线已有的机制", "other": "其他",
+           "show": "展开 {n} 种机制", "details": "运行详情", "level": "阶段", "ideas": "点子",
+           "new": "基线之外新增", "failed": "失败", "seed": "随机种子", "profile": "流程",
+           "failures": "丢弃或不完整的子任务输出", "agent": "子任务 {n}", "cards": "卡片", "rewrite": "重写",
+           "returned": "和基线撞车，已退回重写", "ungrouped": "第一个点子未分组：分组答案无法使用",
+           "cards_by_agent": "卡片由 agent 整理。",
+           "levels": {"baseline": "基线", "round1": "第一轮", "round2": "第二轮", "pressure1": "加压 1",
+                      "pressure2": "加压 2", "pressure3": "加压 3"}},
+}
+REPORT_PAGE = Path(__file__).resolve().parent / "report_page.html"
+METHOD_I18N = Path(__file__).resolve().parents[1] / "methods" / "i18n"
+
+
 def one_line(text):
     return " ".join(text.split())
 
 
-def idea_entry(state, idea, returned_ids):
-    tags = [idea["level"] + (" rewrite" if idea["returned"] else "")]
-    lineage = [f"agent {idea['agent']}"]
-    if idea["method"]:
-        lineage.append(f"method {idea['method']}")
-    if idea["cards_used"]:
-        lineage.append("cards used " + ", ".join(idea["cards_used"]))
-    note = " (collided with the baseline; sent back for a rewrite)" if idea["idea_id"] in returned_ids else ""
-    lines = [f"- `{tags[0]}` **{one_line(idea['title'])}** · {' · '.join(lineage)}{note}"]
-    lines += ["  " + line if line.strip() else "" for line in idea["text"].strip().splitlines()]
-    return lines
+def text_of(state):
+    return REPORT_TEXT.get(state.get("lang"), REPORT_TEXT["en"])
 
 
-def mechanism_heading(state, row):
+def method_names():
+    out = {}
+    for path in sorted(METHOD_I18N.glob("*.json")):
+        for key, value in json.loads(path.read_text(encoding="utf-8")).items():
+            out.setdefault(key, {})[path.stem] = value
+    return out
+
+
+def reading_order(state):
+    """Beyond-baseline mechanisms grouped by theme, then the baseline ones; numbers follow this order.
+
+    Themes come from the organise step. A mechanism it left out goes to a trailing group, so none is hidden."""
+    table = local_table(state)
+    beyond = [row for row in table if not row["in_baseline"]]
+    common = [row for row in table if row["in_baseline"]]
+    by_id = {row["mechanism_id"]: row for row in beyond}
+    organized = state.get("organized") or {}
+    groups, seen = [], set()
+    for theme in organized.get("themes", []):
+        rows = [by_id[key] for key in theme["mechanisms"] if key in by_id and key not in seen]
+        seen.update(row["mechanism_id"] for row in rows)
+        if rows:
+            groups.append({"name": theme["name"], "rows": rows})
+    rest = [row for row in beyond if row["mechanism_id"] not in seen]
+    if rest:
+        groups.append({"name": text_of(state)["other"] if groups else None, "rows": rest})
+    numbers, n = {}, 0
+    for row in [row for group in groups for row in group["rows"]] + common:
+        n += 1
+        numbers[row["mechanism_id"]] = n
+    return groups, common, numbers
+
+
+def levels_of(state, row):
     levels = []
     for key in row["idea_ids"]:
         level = state["ideas"][key]["level"]
         if level not in levels:
             levels.append(level)
-    levels.sort(key=LEVEL_ORDER.index)
-    label = one_line(row["label"]) + (" (its first idea was not grouped: the grouping answer was unusable)" if row.get("ungrouped") else "")
-    return label, " ".join(f"`{level}`" for level in levels) + f" · {len(row['idea_ids'])} phrasing(s)"
+    return sorted(levels, key=LEVEL_ORDER.index)
 
 
-def contents_line(state, row, number):
-    label, sources = mechanism_heading(state, row)
-    return f"- {number}. {label} · {sources}"
+def heading(state, row):
+    title = (state.get("organized") or {}).get("titles", {}).get(row["mechanism_id"])
+    return one_line(title or row["label"]), (one_line(row["label"]) if title else None)
+
+
+def source_line(state, idea, returned_ids):
+    t = text_of(state)
+    names = method_names()
+    parts = [t["levels"].get(idea["level"], idea["level"]) + (" · " + t["rewrite"] if idea["returned"] else "")]
+    if idea["method"]:
+        name = names.get(idea["method"], {}).get(state.get("lang", "en"), {}).get("name")
+        parts.append(name or idea["method"])
+    parts.append(t["agent"].format(n=idea["agent"]))
+    if idea["cards_used"]:
+        parts.append(t["cards"] + " " + ", ".join(idea["cards_used"]))
+    if idea["idea_id"] in returned_ids:
+        parts.append(t["returned"])
+    return " · ".join(parts)
 
 
 def mechanism_block(state, row, number, returned_ids):
-    label, sources = mechanism_heading(state, row)
-    lines = [f"### {number}. {label}", "", "Sources: " + sources, ""]
+    t = text_of(state)
+    title, label = heading(state, row)
+    levels = " · ".join(t["levels"].get(level, level) for level in levels_of(state, row))
+    lines = [f"### {number}. {title}", ""]
+    if label:
+        lines += [label, ""]
+    lines += [f"<sub>{levels}" + (" · " + t["ungrouped"] if row.get("ungrouped") else "") + "</sub>", ""]
     for key in row["idea_ids"]:
-        lines += idea_entry(state, state["ideas"][key], returned_ids)
-    return lines + [""]
+        idea = state["ideas"][key]
+        lines.append(f"- **{one_line(idea['title'])}**")
+        lines += ["  " + line if line.strip() else "" for line in idea["text"].strip().splitlines()]
+        lines += ["", f"  <sub>{source_line(state, idea, returned_ids)}</sub>", ""]
+    return lines
 
 
 def render_report(state):
-    table = local_table(state)
-    beyond = [row for row in table if not row["in_baseline"]]
-    common = [row for row in table if row["in_baseline"]]
+    t = text_of(state)
+    groups, common, numbers = reading_order(state)
+    beyond = [row for group in groups for row in group["rows"]]
     returned_ids = {key for task in state["tasks"].values() if task["kind"] == "rewrite" for key in task["originals"]}
-    lines = ["# Brainstorm results", "", "Question (verbatim):", ""]
-    lines += ["> " + line for line in state["question"].rstrip("\n").splitlines()] + [""]
-    if state["constraints"]:
-        lines += ["Hard constraints:", ""] + [f"- {one_line(item)}" for item in state["constraints"]] + [""]
-    lines += [f"{len(table)} mechanisms from {len(state['ideas'])} ideas: {len(beyond)} beyond the baseline, "
-              f"{len(common)} that the plain baseline already produced. Nothing was scored or removed; "
-              "order is first appearance, not quality. Seed " + str(state["seed"]) + ", profile " + state["profile"] + ".", ""]
-    lines += ["| Level | Ideas | New mechanisms beyond baseline | Failed agents |", "|:---|---:|---:|---:|"]
-    lines += [f"| {row['level']} | {row['ideas']} | {row['new_mechanisms_beyond_baseline']} | {row['failed_agents']} |"
-              for row in state["summary"] if "ideas" in row]
-    lines += ["", "## Contents", "", "One line per mechanism, same numbers as the sections below. Beyond the baseline:", ""]
-    lines += [contents_line(state, row, number) for number, row in enumerate(beyond, 1)]
-    lines += ["", "<details>", f"<summary>{len(common)} mechanisms the plain baseline already produced</summary>", ""]
-    lines += [contents_line(state, row, number) for number, row in enumerate(common, len(beyond) + 1)]
-    lines += ["", "</details>"]
-    lines += ["", f"## Beyond the baseline ({len(beyond)})", ""]
-    for number, row in enumerate(beyond, 1):
-        lines += mechanism_block(state, row, number, returned_ids)
-    lines += [f"## Same mechanism as the baseline ({len(common)})", "", "<details>",
-              f"<summary>Show {len(common)} mechanisms the plain baseline already produced</summary>", ""]
-    for number, row in enumerate(common, len(beyond) + 1):
-        lines += mechanism_block(state, row, number, returned_ids)
-    lines += ["</details>", ""]
+    lines = [f"# {t['title']}", ""]
+    if state.get("setup"):
+        lines += [f"[{t['setup']}]({state['setup']})", ""]
+    else:
+        lines += ["> " + line if line.strip() else ">" for line in state["question"].strip().splitlines()] + [""]
+        if state["constraints"]:
+            lines += [t["constraints"] + t["colon"], ""] + [f"- {one_line(item)}" for item in state["constraints"]] + [""]
+    lines += [t["counts"].format(beyond=len(beyond), total=len(numbers), ideas=len(state["ideas"])), ""]
+    if state.get("cards_source") == "agent":
+        lines += [t["cards_by_agent"], ""]
+    lines += [t["html"], "", f"## {t['contents']}", ""]
+    for group in groups:
+        if group["name"]:
+            lines += [f"**{group['name']}** · {len(group['rows'])}", ""]
+        lines += [f"- {numbers[row['mechanism_id']]}. {heading(state, row)[0]}" for row in group["rows"]] + [""]
+    lines += ["<details>", f"<summary>{t['common']} · {len(common)}</summary>", ""]
+    lines += [f"- {numbers[row['mechanism_id']]}. {heading(state, row)[0]}" for row in common]
+    lines += ["", "</details>", ""]
+    for group in groups:
+        if group["name"]:
+            lines += [f"## {group['name']}", ""]
+        for row in group["rows"]:
+            lines += mechanism_block(state, row, numbers[row["mechanism_id"]], returned_ids)
+    lines += [f"## {t['common']} · {len(common)}", "", "<details>",
+              f"<summary>{t['show'].format(n=len(common))}</summary>", ""]
+    for row in common:
+        lines += mechanism_block(state, row, numbers[row["mechanism_id"]], returned_ids)
+    lines += ["</details>", "", f"## {t['details']}", ""]
+    lines += [f"| {t['level']} | {t['ideas']} | {t['new']} | {t['failed']} |", "|:---|---:|---:|---:|"]
+    lines += [f"| {t['levels'].get(row['level'], row['level'])} | {row['ideas']} | {row['new_mechanisms_beyond_baseline']} "
+              f"| {row['failed_agents']} |" for row in state["summary"] if "ideas" in row]
+    lines += ["", f"{t['profile']}: {state['profile']} · {t['seed']}: {state['seed']}", ""]
     if state["failures"]:
-        lines += ["## Dropped or partial sub-agent outputs", ""]
+        lines += [f"### {t['failures']}", ""]
         lines += [f"- `{row['task']}` {row['reason']}: {one_line(row['detail'])}" for row in state["failures"]]
         lines.append("")
     return "\n".join(lines)
@@ -849,10 +1079,37 @@ def render_report(state):
 def check_report(text, state):
     """The report must show every mechanism once and every idea once."""
     headings = sum(1 for line in text.splitlines() if re.match(r"### \d+\. ", line))
-    entries = sum(1 for line in text.splitlines() if line.startswith("- `") and "** · agent " in line)
+    entries = sum(1 for line in text.splitlines() if re.fullmatch(r"- \*\*.*\*\*", line))
     if headings != len(state["mechanisms"]) or entries != len(state["ideas"]):
         raise RunError(f"Report self-check failed: {headings} mechanisms shown for {len(state['mechanisms'])}, "
                        f"{entries} ideas shown for {len(state['ideas'])}")
+
+
+def report_data(run_dir, state):
+    groups, common, numbers = reading_order(state)
+    rows = [row for group in groups for row in group["rows"]] + common
+    keys = ("title", "text", "level", "returned", "method", "agent", "cards_used")
+    mechanisms = []
+    for row in rows:
+        title, label = heading(state, row)
+        mechanisms.append({"id": row["mechanism_id"], "n": numbers[row["mechanism_id"]],
+                           "title": title if label else "", "label": label or title,
+                           "in_baseline": row["in_baseline"], "levels": levels_of(state, row),
+                           "ideas": [{key: state["ideas"][idea][key] for key in keys} for idea in row["idea_ids"]]})
+    name = Path(run_dir).resolve().name
+    return {"lang": state.get("lang", "en"), "run": name, "run_id": f"{name}-{state['seed']}",
+            "question": state["question"].strip(), "constraints": state["constraints"], "setup": state.get("setup"),
+            "counts": {"mechanisms": len(rows), "beyond": len(rows) - len(common), "ideas": len(state["ideas"])},
+            "themes": [{"name": group["name"], "mechanisms": [row["mechanism_id"] for row in group["rows"]]}
+                       for group in groups],
+            "mechanisms": mechanisms, "methods": method_names(),
+            "summary": [row for row in state["summary"] if "ideas" in row], "failures": state["failures"],
+            "seed": state["seed"], "profile": state["profile"]}
+
+
+def render_report_html(run_dir, state):
+    blob = json.dumps(report_data(run_dir, state), ensure_ascii=False).replace("<", "\\u003c")
+    return REPORT_PAGE.read_text(encoding="utf-8").replace("__REPORT__", blob)
 
 
 # ---------- CLI ----------
@@ -873,7 +1130,39 @@ def main(argv=None):
     init.add_argument("--seed", type=int)
     init.add_argument("--profile", choices=sorted(PROFILES), default="full")
     init.add_argument("--ideas-per-agent", type=int, default=DEFAULT_IDEAS_PER_AGENT)
+    init.add_argument("--from-review", action="store_true",
+                      help="Start from the setup the user confirmed on the review page (the normal way to start)")
+    init.add_argument("--cards-source", choices=["user", "agent"], help="Who wrote the cards; required with --cards")
+    init.add_argument("--lang", default="en", help="Language of the report: en or zh")
+    init.add_argument("--model-generate", help="Model for idea and rewrite agents, as the host names it")
+    init.add_argument("--model-group", help="Model for grouping and organising agents, as the host names it")
+    init.add_argument("--organize", action="store_true", help="Add the organise step (themes and short titles)")
     init.set_defaults(func=cmd_init)
+    rev = commands.add_parser("review", help="Write the review draft and its page before a run")
+    rev.add_argument("--dir", required=True, help="The new run directory")
+    rev.add_argument("--message-file", help="The user's message, verbatim; shown folded on the page")
+    rev.add_argument("--question-file", required=True, help="Your draft of the question the sub-agents work on")
+    rev.add_argument("--constraint", action="append", help="A hard constraint the user stated; repeat")
+    rev.add_argument("--suggest-constraint", action="append", help="A hard constraint you suggest; the user keeps or drops it")
+    rev.add_argument("--cards", help="Cards as .jsonl or .json ({id, text}), or plain text split by blank lines")
+    rev.add_argument("--cards-source", choices=["user", "agent"], help="Who wrote the cards; required with --cards")
+    rev.add_argument("--model-choice", action="append", help="A model this host can run, as id=Label; repeat")
+    rev.add_argument("--model-default", help="The model id preselected for every role")
+    rev.add_argument("--measured-model", help="The choice that matches the measured setup, if any")
+    rev.add_argument("--profile", choices=["full", "economy"], default="full")
+    rev.add_argument("--ideas-per-agent", type=int, default=DEFAULT_IDEAS_PER_AGENT)
+    rev.add_argument("--lang", default="en", help="Page and report language: en or zh")
+    rev.set_defaults(func=cmd_review)
+    serve = commands.add_parser("serve-review", help="Serve the review page on 127.0.0.1 until the user confirms")
+    serve.add_argument("--dir", required=True)
+    serve.add_argument("--port", type=int, default=0)
+    serve.add_argument("--open", action="store_true", help="Also open the page in the default browser")
+    serve.add_argument("--timeout", type=float, default=4 * 3600)
+    serve.set_defaults(func=cmd_serve_review)
+    conf = commands.add_parser("confirm-review", help="Save an answer the user pasted back when the page could not send it")
+    conf.add_argument("--dir", required=True)
+    conf.add_argument("--answer-file", required=True)
+    conf.set_defaults(func=cmd_confirm_review)
     step = commands.add_parser("next", help="Read finished task outputs, then print the next action")
     step.add_argument("--dir", required=True)
     step.add_argument("--pressure", choices=["go", "stop"])
@@ -885,11 +1174,11 @@ def main(argv=None):
     status.set_defaults(func=cmd_status)
     args = parser.parse_args(argv)
     try:
-        args.func(args)
+        code = args.func(args)
     except (RunError, ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
-    return 0
+    return code or 0
 
 
 if __name__ == "__main__":

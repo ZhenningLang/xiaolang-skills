@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brainstorm review</title>
+<style>
+:root {
+  --bg: oklch(97.5% 0.006 85);
+  --surface: oklch(99.5% 0.003 85);
+  --fg: oklch(24% 0.012 260);
+  --muted: oklch(52% 0.012 260);
+  --border: oklch(89% 0.008 85);
+  --accent: oklch(47% 0.13 255);
+  --accent-soft: oklch(95% 0.03 255);
+  --warn: oklch(55% 0.13 65);
+  --warn-soft: oklch(96% 0.045 80);
+  --ok: oklch(50% 0.11 150);
+  --ok-soft: oklch(95.5% 0.04 150);
+  --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(19% 0.008 260); --surface: oklch(23% 0.009 260); --fg: oklch(93% 0.006 85);
+    --muted: oklch(70% 0.01 260); --border: oklch(33% 0.01 260); --accent: oklch(72% 0.12 255);
+    --accent-soft: oklch(30% 0.05 255); --warn: oklch(78% 0.12 75); --warn-soft: oklch(30% 0.05 75);
+    --ok: oklch(74% 0.12 150); --ok-soft: oklch(29% 0.05 150);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 88px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.bar { position: sticky; top: 0; z-index: 5; background: color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.bar-in { max-width: 1120px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+.bar h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: .01em; }
+.bar .run { color: var(--muted); font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
+.bar .grow { flex: 1; }
+.lang { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.lang button { border: 0; background: none; padding: 2px 9px; font-size: 12px; color: var(--muted); }
+.lang button.on { background: var(--surface); color: var(--fg); font-weight: 600; }
+.pending { font-size: 13px; color: var(--warn); white-space: nowrap; background: none; border: 0; padding: 4px 2px;
+  text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 4px; }
+.pending:hover { color: var(--fg); }
+.pending.done { color: var(--ok); text-decoration: none; cursor: default; }
+.go { background: var(--accent); color: var(--surface); border: 0; border-radius: 8px; padding: 9px 18px; font-weight: 600; white-space: nowrap; }
+.go:hover:not(:disabled) { filter: brightness(1.08); }
+.go:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 80px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; }
+main { min-width: 0; }
+section { padding: 4px 0 36px; }
+section + section { border-top: 1px solid var(--border); padding-top: 28px; }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sec-head .n { font: 600 13px var(--mono); color: var(--muted); }
+.sec-head h2 { font-size: 20px; margin: 0; font-weight: 650; }
+.sec-head .meta { font-size: 13px; color: var(--muted); }
+
+.editor { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; min-height: 120px;
+  font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.editor:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.editor:empty::before { content: attr(data-ph); color: var(--muted); }
+details.orig { margin-top: 12px; font-size: 14px; }
+details.orig summary { color: var(--muted); cursor: pointer; width: fit-content; }
+details.orig pre { margin: 8px 0 0; padding: 12px 14px; background: var(--bg); border: 1px dashed var(--border); border-radius: 8px;
+  white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 var(--font); color: var(--muted); }
+
+.row { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; }
+.row.pend { border-color: var(--warn); background: var(--warn-soft); }
+.row.off { opacity: .5; }
+.row textarea { flex: 1; min-width: 0; border: 0; background: none; resize: none; overflow: hidden; padding: 2px 0; line-height: 1.6; }
+.row textarea:focus { outline: none; }
+.row:focus-within { border-color: var(--accent); }
+.tag { flex: none; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); margin-top: 3px; white-space: nowrap; }
+.tag.agent { color: var(--warn); border-color: color-mix(in oklch, var(--warn) 40%, var(--border)); }
+.sec-head .tag { margin-top: 0; }
+.id { flex: none; font: 12px var(--mono); color: var(--muted); margin-top: 5px; min-width: 28px; }
+.acts { flex: none; display: flex; gap: 6px; }
+.btn { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 3px 10px; font-size: 13px; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.keep.on { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.btn.drop.on { background: var(--bg); border-color: var(--muted); }
+.ghost { background: none; border: 1px dashed var(--border); border-radius: var(--radius); width: 100%; padding: 9px; color: var(--muted); }
+.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.empty-note { color: var(--muted); font-size: 14px; padding: 4px 0 12px; }
+.check { display: inline-flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; padding: 6px 10px; border-radius: 8px; border: 1px solid transparent; }
+.check.pend { border-color: var(--warn); background: var(--warn-soft); }
+.check input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; cursor: pointer; font-size: 14px; }
+.opt:hover { border-color: color-mix(in oklch, var(--accent) 50%, var(--border)); }
+.opt.on { border-color: var(--accent); background: var(--accent-soft); }
+.opt input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); }
+.opt .ot { min-width: 0; }
+.opt .oid { display: flex; gap: 8px; align-items: center; font-weight: 600; margin-bottom: 2px; overflow-wrap: anywhere; }
+.opt .def { font-size: 11px; font-weight: 500; color: var(--ok); border: 1px solid color-mix(in oklch, var(--ok) 40%, var(--border)); border-radius: 999px; padding: 0 6px; }
+.opt .otx { color: var(--muted); overflow-wrap: anywhere; }
+.opt.on .otx { color: var(--fg); }
+.mini { margin-top: 10px; display: flex; gap: 6px; }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.field select, .field input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.seg2 { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg2 button { border: 0; background: none; padding: 7px 16px; font-size: 14px; }
+.seg2 button + button { border-left: 1px solid var(--border); }
+.seg2 button.on { background: var(--accent); color: var(--surface); }
+.block { margin-bottom: 20px; }
+
+aside { position: sticky; top: 76px; align-self: start; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.card h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 0 0 12px; letter-spacing: .02em; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kv a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--muted); }
+.dev { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.dev h4 { margin: 0 0 8px; font-size: 13px; color: var(--warn); font-weight: 600; }
+.dev h4.clean { color: var(--ok); }
+.dev ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+.dev li { margin-bottom: 4px; }
+.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { 0% { box-shadow: 0 0 0 4px var(--warn); } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+.result { margin-top: 14px; font-size: 14px; }
+.result.ok { color: var(--ok); }
+.result.err { color: var(--warn); }
+.result textarea { width: 100%; min-height: 120px; margin-top: 8px; font: 12px var(--mono); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 20px 16px 64px; }
+  aside { position: static; order: -1; }
+  .bar-in { padding: 10px 16px; flex-wrap: wrap; gap: 8px 12px; }
+  .bar .run, .bar .grow { display: none; }
+  .pending { margin-left: auto; }
+  .go { width: 100%; order: 9; }
+  .grid2, .opts { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+body.ro .acts, body.ro #c-add, body.ro .mini, body.ro #go, body.ro .check { display: none; }
+body.ro .opt:not(.on) { display: none; }
+body.ro .opt { cursor: default; }
+body.ro .seg2 button:not(.on) { display: none; }
+body.ro .editor { background: var(--bg); }
+.done-tag { font-size: 13px; color: var(--ok); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <h1 id="title"></h1><span class="run" id="run"></span><span class="grow"></span>
+  <span class="lang" id="lang"></span>
+  <button class="pending" id="pending" type="button"></button>
+  <button class="go" id="go" type="button"></button>
+</div></div>
+<div class="wrap">
+  <main>
+    <section id="s-q"></section>
+    <section id="s-c"></section>
+    <section id="s-k"></section>
+    <section id="s-m"></section>
+    <section id="s-r"></section>
+  </main>
+  <aside><div class="card" id="summary"></div><div class="result" id="result" role="status" aria-live="polite"></div></aside>
+</div>
+<script id="draft" type="application/json">__DRAFT__</script>
+<script>
+const D = JSON.parse(document.getElementById("draft").textContent);
+// Every visible string lives here. To add a language, copy one block and translate the values.
+const I18N = {
+  en: {
+    name: "EN", title: "Brainstorm · review", go: "Start the run", sending: "Sending…",
+    pend: n => n + (n === 1 ? " item left" : " items left"), ready: "Ready",
+    q: "Question", qPh: "Write the question the sub-agents should work on", orig: "Your original message",
+    c: "Hard constraints", cNone: "None", you: "Yours", agent: "Suggested", keep: "Keep", drop: "Drop",
+    add: "Add a constraint", del: "Remove", k: "Material cards", kNone: "None", kAgent: "Written by the agent",
+    kSeen: "I have read these cards", kHalf: n => n + " per agent",
+    m: "Thinking methods", mPicked: n => n + " picked", def: "default", mAll: "All", mDef: "Defaults",
+    r: "Scale and models", profile: "Profile", full: "Full", economy: "Economy", ipa: "Ideas per agent",
+    mGen: "Idea and rewrite agents", mGrp: "Grouping agents",
+    sum: "This run", sQ: "Question", sC: "Hard constraints", sK: "Cards", sM: "Methods", sModel: "Models",
+    sCalls: "Idea agents", sRw: "Rewrites, at most", sGr: "Grouping, about",
+    chars: n => n + " chars", undecided: n => n + " undecided", by: s => s === "agent" ? "agent" : "yours",
+    dev: "Differs from the measured setup", clean: "Matches the measured setup",
+    dQ: "Question rewritten by the agent", dNoC: "No hard constraints", dCards: "Cards written by the agent", dNoK: "No cards",
+    dEco: "Economy profile", dM: "Methods other than the four defaults", dIpa: n => n + " ideas per agent, not 10",
+    dModel: (r, m) => r + ": " + m, rGen: "Idea agents", rGrp: "Grouping",
+    needQ: "Question", needC: "Suggested constraint", needK: "Cards not marked as read", needM: n => "Pick at least " + n + " methods",
+    okMsg: "Confirmed. The agent starts the run now; you can close this page.",
+    errMsg: "Could not reach the agent. Copy this and paste it into the chat:",
+    roTitle: "Brainstorm · run setup", roTag: "Confirmed"
+  },
+  zh: {
+    name: "中", title: "头脑风暴 · 开跑前确认", go: "确认开跑", sending: "正在发送",
+    pend: n => "还有 " + n + " 处待确认", ready: "可以开跑",
+    q: "问题", qPh: "写下要子任务发散的问题", orig: "你的原话",
+    c: "硬约束", cNone: "无", you: "你写的", agent: "建议", keep: "保留", drop: "去掉",
+    add: "添加一条约束", del: "删除", k: "材料卡片", kNone: "无", kAgent: "agent 整理",
+    kSeen: "我读过这些卡片", kHalf: n => "每个子任务 " + n + " 张",
+    m: "思考方法", mPicked: n => "已选 " + n, def: "默认", mAll: "全选", mDef: "恢复默认",
+    r: "规模和模型", profile: "流程", full: "完整", economy: "经济", ipa: "每个子任务出几个点子",
+    mGen: "出点子和重写", mGrp: "分组",
+    sum: "这次运行", sQ: "问题", sC: "硬约束", sK: "卡片", sM: "思考方法", sModel: "模型",
+    sCalls: "出点子的子任务", sRw: "重写，最多", sGr: "分组，约",
+    chars: n => n + " 字", undecided: n => n + " 条待定", by: s => s === "agent" ? "agent 整理" : "你提供",
+    dev: "和测量设置不同", clean: "和测量设置一致",
+    dQ: "问题由 agent 改写", dNoC: "没有硬约束", dCards: "卡片由 agent 整理", dNoK: "没有卡片",
+    dEco: "经济流程", dM: "思考方法不是默认的四种", dIpa: n => "每个子任务 " + n + " 个点子，测量时是 10",
+    dModel: (r, m) => r + "用 " + m, rGen: "出点子", rGrp: "分组",
+    needQ: "问题", needC: "建议的约束", needK: "卡片未标记已读", needM: n => "至少选 " + n + " 种方法",
+    okMsg: "已确认。agent 正在开跑，可以关掉这个页面",
+    errMsg: "连不上 agent。复制下面的内容，粘贴到对话里：",
+    roTitle: "头脑风暴 · 开跑设置", roTag: "已确认"
+  }
+};
+let lang = I18N[D.lang] ? D.lang : "en";
+try { const saved = localStorage.getItem("brainstorm-review-lang"); if (I18N[saved]) lang = saved; } catch (e) {}
+let L = I18N[lang];
+const MIN_METHODS = D.methods.min || 3;
+const S = {
+  question: D.question || "",
+  constraints: D.constraints.map(c => ({ text: c.text, source: c.source, state: c.source === "agent" && !D.readonly ? "pending" : "keep" })),
+  cards: D.cards.map(c => ({ id: c.id, text: c.text })),
+  seen: D.cards_source !== "agent" || !!D.readonly,
+  methods: new Set(D.selected_methods || D.methods.items.filter(m => m.default).map(m => m.id)),
+  profile: D.profile, ipa: D.ideas_per_agent,
+  gen: D.models.generate, grp: D.models.group, sent: false
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const modelName = id => (D.models.choices.find(m => m.id === id) || { label: id }).label;
+const defaults = () => new Set(D.methods.items.filter(m => m.default).map(m => m.id));
+
+function keptConstraints() { return S.constraints.filter(c => c.state === "keep" && c.text.trim()); }
+function todo() {
+  // Each open item names the element to jump to, in page order.
+  const out = [];
+  if (!S.question.trim()) out.push({ label: L.needQ, el: () => $("q-edit") });
+  S.constraints.forEach((c, i) => { if (c.state === "pending") out.push({ label: L.needC, el: () => document.querySelector(`[data-row="${i}"]`) }); });
+  if (!S.seen && S.cards.length) out.push({ label: L.needK, el: () => $("k-seen-wrap") });
+  if (S.methods.size < MIN_METHODS) out.push({ label: L.needM(MIN_METHODS), el: () => $("s-m") });
+  return out;
+}
+function deviations() {
+  const out = [];
+  if (S.question.trim() !== (D.message || "").trim()) out.push(L.dQ);
+  if (!keptConstraints().length) out.push(L.dNoC);
+  if (!S.cards.length) out.push(L.dNoK); else if (D.cards_source === "agent") out.push(L.dCards);
+  if (S.profile === "economy") out.push(L.dEco);
+  const d = defaults();
+  if (S.methods.size !== d.size || [...S.methods].some(id => !d.has(id))) out.push(L.dM);
+  if (S.ipa !== 10) out.push(L.dIpa(S.ipa));
+  if (D.models.measured && S.gen !== D.models.measured) out.push(L.dModel(L.rGen, modelName(S.gen)));
+  if (D.models.measured && S.grp !== D.models.measured) out.push(L.dModel(L.rGrp, modelName(S.grp)));
+  return out;
+}
+function estimate() {
+  const levels = S.profile === "full" ? 5 : 2;
+  return { calls: 9 + 3 * levels, rewrites: 3 * levels, grouping: 3 + 2 * levels };
+}
+function head(n, title, extra) {
+  return `<div class="sec-head"><span class="n">${n}</span><h2>${esc(title)}</h2>${extra || ""}</div>`;
+}
+
+function renderQuestion() {
+  $("s-q").innerHTML = head("01", L.q) +
+    `<div class="editor" id="q-edit" contenteditable="plaintext-only" role="textbox" aria-multiline="true" aria-label="${esc(L.q)}" data-ph="${esc(L.qPh)}"></div>` +
+    (D.message ? `<details class="orig"><summary>${esc(L.orig)}</summary><pre>${esc(D.message)}</pre></details>` : "");
+  const ed = $("q-edit");
+  ed.textContent = S.question;
+  if (ed.contentEditable !== "plaintext-only") ed.contentEditable = "true";
+  ed.addEventListener("paste", e => { e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text")); });
+  ed.oninput = () => { S.question = ed.innerText.replace(/\n$/, ""); refresh(); };
+}
+function renderConstraints() {
+  const rows = S.constraints.map((c, i) => {
+    const agent = c.source === "agent";
+    const cls = "row" + (c.state === "pending" ? " pend" : "") + (c.state === "drop" ? " off" : "");
+    const acts = agent
+      ? `<button type="button" class="btn keep${c.state === "keep" ? " on" : ""}" data-k="${i}">${esc(L.keep)}</button><button type="button" class="btn drop${c.state === "drop" ? " on" : ""}" data-d="${i}">${esc(L.drop)}</button>`
+      : `<button type="button" class="btn" data-x="${i}">${esc(L.del)}</button>`;
+    return `<div class="${cls}" data-row="${i}" tabindex="-1"><span class="tag${agent ? " agent" : ""}">${esc(agent ? L.agent : L.you)}</span><textarea rows="1" data-t="${i}" aria-label="${esc(L.c)} ${i + 1}">${esc(c.text)}</textarea><span class="acts">${acts}</span></div>`;
+  }).join("");
+  $("s-c").innerHTML = head("02", L.c) + (S.constraints.length ? rows : `<div class="empty-note">${esc(L.cNone)}</div>`) +
+    `<button type="button" class="ghost" id="c-add">+ ${esc(L.add)}</button>`;
+  const sec = $("s-c");
+  sec.querySelectorAll("textarea").forEach(t => { fit(t); t.oninput = () => { S.constraints[+t.dataset.t].text = t.value; fit(t); refresh(); }; });
+  sec.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { S.constraints[+b.dataset.k].state = "keep"; refresh("c"); });
+  sec.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { S.constraints[+b.dataset.d].state = "drop"; refresh("c"); });
+  sec.querySelectorAll("[data-x]").forEach(b => b.onclick = () => { S.constraints.splice(+b.dataset.x, 1); refresh("c"); });
+  $("c-add").onclick = () => { S.constraints.push({ text: "", source: "user", state: "keep" }); refresh("c"); const all = sec.querySelectorAll("textarea"); all[all.length - 1].focus(); };
+}
+function renderCards() {
+  const agent = D.cards_source === "agent";
+  const n = S.cards.length;
+  const meta = n ? `<span class="meta">${n} · ${esc(L.kHalf(Math.max(1, Math.floor(n / 2))))}</span>` + (agent ? `<span class="tag agent">${esc(L.kAgent)}</span>` : "") : "";
+  let html = head("03", L.k, meta);
+  html += n ? S.cards.map((c, i) => `<div class="row"><span class="id">${esc(c.id)}</span><textarea rows="2" data-t="${i}" aria-label="${esc(c.id)}">${esc(c.text)}</textarea><span class="acts"><button type="button" class="btn" data-x="${i}">${esc(L.del)}</button></span></div>`).join("")
+            : `<div class="empty-note">${esc(L.kNone)}</div>`;
+  if (agent && n) html += `<label class="check${S.seen ? "" : " pend"}" id="k-seen-wrap" tabindex="-1"><input type="checkbox" id="k-seen"${S.seen ? " checked" : ""}>${esc(L.kSeen)}</label>`;
+  $("s-k").innerHTML = html;
+  const sec = $("s-k");
+  sec.querySelectorAll("textarea").forEach(t => { fit(t); t.oninput = () => { S.cards[+t.dataset.t].text = t.value; fit(t); }; });
+  sec.querySelectorAll("[data-x]").forEach(b => b.onclick = () => { S.cards.splice(+b.dataset.x, 1); refresh("k"); });
+  if ($("k-seen")) $("k-seen").onchange = e => { S.seen = e.target.checked; refresh("k"); };
+}
+function renderMethods() {
+  const items = D.methods.items.map(m => {
+    const on = S.methods.has(m.id);
+    const t = (m.i18n && m.i18n[lang]) || {};
+    return `<label class="opt${on ? " on" : ""}" title="${esc(m.text)}"><input type="checkbox" data-m="${esc(m.id)}"${on ? " checked" : ""}><span class="ot"><span class="oid">${esc(t.name || m.id)}${m.default ? `<span class="def">${esc(L.def)}</span>` : ""}</span><span class="otx">${esc(t.text || m.text)}</span></span></label>`;
+  }).join("");
+  $("s-m").innerHTML = head("04", L.m, `<span class="meta">${esc(L.mPicked(S.methods.size))}</span>`) +
+    `<div class="opts">${items}</div><div class="mini"><button type="button" class="btn" id="m-all">${esc(L.mAll)}</button><button type="button" class="btn" id="m-def">${esc(L.mDef)}</button></div>`;
+  $("s-m").querySelectorAll("[data-m]").forEach(b => b.onchange = () => { b.checked ? S.methods.add(b.dataset.m) : S.methods.delete(b.dataset.m); refresh("m"); });
+  $("m-all").onclick = () => { S.methods = new Set(D.methods.items.map(m => m.id)); refresh("m"); };
+  $("m-def").onclick = () => { S.methods = defaults(); refresh("m"); };
+}
+function renderRun() {
+  const opts = sel => D.models.choices.map(m => `<option value="${esc(m.id)}"${m.id === sel ? " selected" : ""}>${esc(m.label)}</option>`).join("");
+  $("s-r").innerHTML = head("05", L.r) +
+    `<div class="block field"><label>${esc(L.profile)}</label><div class="seg2" role="group"><button type="button" data-p="full" class="${S.profile === "full" ? "on" : ""}">${esc(L.full)}</button><button type="button" data-p="economy" class="${S.profile === "economy" ? "on" : ""}">${esc(L.economy)}</button></div></div>` +
+    `<div class="grid2 block"><div class="field"><label for="r-gen">${esc(L.mGen)}</label><select id="r-gen">${opts(S.gen)}</select></div>` +
+    `<div class="field"><label for="r-grp">${esc(L.mGrp)}</label><select id="r-grp">${opts(S.grp)}</select></div></div>` +
+    `<div class="grid2"><div class="field"><label for="r-ipa">${esc(L.ipa)}</label><input id="r-ipa" type="number" min="1" max="30" value="${S.ipa}"></div></div>`;
+  $("s-r").querySelectorAll("[data-p]").forEach(b => b.onclick = () => { S.profile = b.dataset.p; refresh("r"); });
+  $("r-gen").onchange = e => { S.gen = e.target.value; refresh(); };
+  $("r-grp").onchange = e => { S.grp = e.target.value; refresh(); };
+  $("r-ipa").oninput = e => { const v = parseInt(e.target.value, 10); if (v > 0) { S.ipa = v; refresh(); } };
+}
+function renderSummary() {
+  const e = estimate(), dev = deviations(), k = keptConstraints().length;
+  const pc = S.constraints.filter(c => c.state === "pending").length;
+  const models = S.gen === S.grp ? modelName(S.gen) : modelName(S.gen) + " / " + modelName(S.grp);
+  $("summary").innerHTML = `<h3>${esc(L.sum)}</h3><dl class="kv">` +
+    `<dt><a href="#s-q">${esc(L.sQ)}</a></dt><dd>${S.question.trim() ? esc(L.chars(S.question.trim().length)) : "—"}</dd>` +
+    `<dt><a href="#s-c">${esc(L.sC)}</a></dt><dd>${k}${pc ? " · " + esc(L.undecided(pc)) : ""}</dd>` +
+    `<dt><a href="#s-k">${esc(L.sK)}</a></dt><dd>${S.cards.length ? S.cards.length + " · " + esc(L.by(D.cards_source)) : 0}</dd>` +
+    `<dt><a href="#s-m">${esc(L.sM)}</a></dt><dd>${S.methods.size}</dd>` +
+    `<dt><a href="#s-r">${esc(L.sModel)}</a></dt><dd>${esc(models)}</dd>` +
+    `<dt>${esc(L.sCalls)}</dt><dd>${e.calls}</dd><dt>${esc(L.sRw)}</dt><dd>${e.rewrites}</dd><dt>${esc(L.sGr)}</dt><dd>${e.grouping}</dd></dl>` +
+    `<div class="dev">${dev.length ? `<h4>${esc(L.dev)}</h4><ul>${dev.map(d => `<li>${esc(d)}</li>`).join("")}</ul>` : `<h4 class="clean">${esc(L.clean)}</h4>`}</div>`;
+}
+function renderBar() {
+  if (D.readonly) {
+    $("pending").outerHTML = `<span class="done-tag" id="pending">✓ ${esc(L.roTag)}</span>`;
+    $("title").textContent = L.roTitle;
+    $("lang").innerHTML = Object.keys(I18N).map(k => `<button type="button" data-l="${k}" class="${k === lang ? "on" : ""}">${esc(I18N[k].name)}</button>`).join("");
+    $("lang").querySelectorAll("[data-l]").forEach(b => b.onclick = () => setLang(b.dataset.l));
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+    return;
+  }
+  const items = todo();
+  $("pending").textContent = S.sent ? "" : (items.length ? L.pend(items.length) : L.ready);
+  $("pending").className = "pending" + (items.length ? "" : " done");
+  $("pending").title = items.map(i => i.label).join(" · ");
+  $("go").textContent = L.go;
+  $("go").disabled = S.sent || items.length > 0;
+  $("title").textContent = L.title;
+  $("lang").innerHTML = Object.keys(I18N).map(k => `<button type="button" data-l="${k}" class="${k === lang ? "on" : ""}">${esc(I18N[k].name)}</button>`).join("");
+  $("lang").querySelectorAll("[data-l]").forEach(b => b.onclick = () => setLang(b.dataset.l));
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+}
+let jump = 0;
+function jumpToNext() {
+  const items = todo();
+  if (!items.length) return;
+  const el = items[jump % items.length].el();
+  jump += 1;
+  if (!el) return;
+  el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  const focusable = el.matches("textarea, [contenteditable], input") ? el : el.querySelector("textarea, input, [contenteditable]");
+  (focusable || el).focus({ preventScroll: true });
+}
+function setLang(k) {
+  lang = k; L = I18N[k];
+  try { localStorage.setItem("brainstorm-review-lang", k); } catch (e) {}
+  renderAll();
+}
+function fit(t) { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+function fitAll() { document.querySelectorAll(".row textarea").forEach(fit); }
+window.addEventListener("resize", fitAll);
+function refresh(part) {
+  if (part === "c") renderConstraints();
+  if (part === "k") renderCards();
+  if (part === "m") renderMethods();
+  if (part === "r") renderRun();
+  renderSummary(); renderBar();
+  if (part === "c" || part === "k") requestAnimationFrame(fitAll);
+}
+function lock() {
+  // A confirmed setup is shown, not edited.
+  if (!D.readonly) return;
+  document.body.classList.add("ro");
+  const ed = $("q-edit"); if (ed) ed.contentEditable = "false";
+  document.querySelectorAll("main textarea").forEach(t => t.readOnly = true);
+  document.querySelectorAll("main input, main select, .seg2 button").forEach(el => el.disabled = true);
+}
+function renderAll() { renderQuestion(); renderConstraints(); renderCards(); renderMethods(); renderRun(); renderSummary(); renderBar(); lock(); requestAnimationFrame(fitAll); }
+function payload() {
+  return {
+    question: S.question.trim(),
+    constraints: keptConstraints().map(c => ({ text: c.text.trim(), source: c.source })),
+    cards: S.cards.filter(c => c.text.trim()).map(c => ({ id: c.id, text: c.text.trim() })),
+    cards_source: D.cards_source, methods: D.methods.items.map(m => m.id).filter(id => S.methods.has(id)),
+    profile: S.profile, ideas_per_agent: S.ipa, models: { generate: S.gen, group: S.grp }, lang
+  };
+}
+async function confirmRun() {
+  if (todo().length) return;
+  const body = JSON.stringify(payload());
+  $("go").disabled = true; $("go").textContent = L.sending;
+  try {
+    const r = await fetch(D.confirm_url, { method: "POST", headers: { "Content-Type": "application/json", "X-Review-Token": D.token }, body });
+    if (!r.ok) throw new Error(await r.text());
+    S.sent = true;
+    $("result").className = "result ok"; $("result").textContent = L.okMsg;
+  } catch (err) {
+    $("result").className = "result err";
+    $("result").innerHTML = esc(L.errMsg) + `<textarea readonly>${esc(body)}</textarea>`;
+  }
+  renderBar();
+}
+$("run").textContent = D.run || "";
+$("go").onclick = confirmRun;
+$("pending").onclick = jumpToNext;
+renderAll();
+</script>
+</body>
+</html>

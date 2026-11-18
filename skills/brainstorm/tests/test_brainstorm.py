@@ -118,7 +118,7 @@ class RunCase(unittest.TestCase):
         args = ["init", "--dir", str(self.dir), "--question-file", str(FIXTURES / "question.txt"),
                 "--constraint", "No telemetry", "--constraint", "Two hours a week of maintainer time", "--seed", "7"]
         if cards:
-            args += ["--cards", str(FIXTURES / "cards.jsonl")]
+            args += ["--cards", str(FIXTURES / "cards.jsonl"), "--cards-source", "user"]
         return FakeHost(self.dir).cli(*args, *extra)
 
     def state(self):
@@ -234,11 +234,11 @@ class RunTests(RunCase):
         report = Path(done["report"]).read_text(encoding="utf-8")
         headings = re.findall(r"^### (\d+)\. ", report, re.M)
         self.assertEqual(len(headings), done["mechanisms"])
-        body = report[report.index("## Beyond the baseline"):]  # the contents list above has its own fold
+        body = report[report.index("## The baseline already had these"):]  # the contents list above has its own fold
         self.assertLess(body.index("<details>"), body.index("**Better README quick start**"))
         self.assertEqual(report.count("<details>"), 2)
-        self.assertIn("`round1 rewrite`", report)
-        self.assertIn("`pressure3`", report)
+        self.assertIn("Round 1 · rewrite", report)
+        self.assertIn("<sub>Pressure 3", report)
         self.assertIn("collided with the baseline", report)
         # Round 2 and pressure 3 receive what the design says they receive.
         round2 = next(a for a in host.actions if a.get("level") == "round2" and a["purpose"] == "generate")
@@ -304,11 +304,11 @@ class RunTests(RunCase):
         self.init("--profile", "economy")
         done = FakeHost(self.dir).run()
         report = Path(done["report"]).read_text(encoding="utf-8")
-        contents = report[report.index("## Contents"):report.index("## Beyond the baseline")]
+        contents = report[report.index("## Contents"):report.index("### 1. ")]
         numbers = [int(n) for n in re.findall(r"^- (\d+)\. ", contents, re.M)]
         self.assertEqual(numbers, list(range(1, done["mechanisms"] + 1)))
         heading = re.search(r"^### 1\. (.*)$", report, re.M).group(1)
-        self.assertIn(f"- 1. {heading} ·", contents)
+        self.assertIn(f"- 1. {heading}\n", contents)
         self.assertLess(contents.index(f"- {done['beyond_baseline']}. "), contents.index("<details>"))
         self.assertLess(contents.index("<details>"), contents.index(f"- {done['beyond_baseline'] + 1}. "))
 
@@ -332,8 +332,8 @@ class RunTests(RunCase):
         self.assertEqual(len(marked), 9)
         self.assertTrue(any(len(row["idea_ids"]) > 1 for row in marked))
         report = Path(done["report"]).read_text(encoding="utf-8")
-        headings = [line for line in report.splitlines() if line.startswith("### ") and "its first idea was not grouped" in line]
-        self.assertEqual(len(headings), 9)
+        marks = [line for line in report.splitlines() if line.startswith("<sub>") and "its first idea was not grouped" in line]
+        self.assertEqual(len(marks), 9)
 
     def test_pressure2_of_a_real_run_has_no_fresh_card_left(self):
         self.init()
@@ -450,7 +450,8 @@ class MethodLibraryTests(RunCase):
             prompt = Path(task["prompt"]).read_text(encoding="utf-8")
             lines = prompt.split("\n")
             self.assertEqual(lines[lines.index("Method instructions:") + 1], state["methods"][task["method"]])
-        self.assertIn("method " + tasks[0]["method"], (self.dir / "report.md").read_text(encoding="utf-8"))
+        name = bs.method_names()[tasks[0]["method"]]["en"]["name"]
+        self.assertIn(f"· {name} · agent", (self.dir / "report.md").read_text(encoding="utf-8"))
 
     def test_small_library_reuses_methods_only_after_all_were_used(self):
         rows = [{"id": f"m{n}", "text": f"method text {n}"} for n in range(1, 5)]

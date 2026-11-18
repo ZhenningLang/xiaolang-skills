@@ -1,0 +1,56 @@
+{
+ "analogy": {
+  "name": "Analogy"
+ },
+ "reverse": {
+  "name": "Reverse a premise"
+ },
+ "person": {
+  "name": "Affected person"
+ },
+ "resources": {
+  "name": "Idle resources"
+ },
+ "substitute": {
+  "name": "Substitute"
+ },
+ "combine": {
+  "name": "Combine"
+ },
+ "eliminate": {
+  "name": "Eliminate"
+ },
+ "repurpose": {
+  "name": "Repurpose"
+ },
+ "reorder": {
+  "name": "Reorder"
+ },
+ "extreme-limit": {
+  "name": "Extreme limit"
+ },
+ "lift-limit": {
+  "name": "Lift a limit"
+ },
+ "ten-times": {
+  "name": "Ten times"
+ },
+ "first-principles": {
+  "name": "First principles"
+ },
+ "contradiction": {
+  "name": "Contradiction"
+ },
+ "split": {
+  "name": "Split"
+ },
+ "make-it-worse": {
+  "name": "Make it worse"
+ },
+ "random-object": {
+  "name": "Random object"
+ },
+ "outsider": {
+  "name": "Outsider"
+ }
+}
