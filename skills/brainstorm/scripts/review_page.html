@@ -145,6 +145,12 @@ aside { position: sticky; top: 76px; align-self: start; }
   .grid2, .opts { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+body.ro .acts, body.ro #c-add, body.ro .mini, body.ro #go, body.ro .check { display: none; }
+body.ro .opt:not(.on) { display: none; }
+body.ro .opt { cursor: default; }
+body.ro .seg2 button:not(.on) { display: none; }
+body.ro .editor { background: var(--bg); }
+.done-tag { font-size: 13px; color: var(--ok); white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -188,7 +194,8 @@ const I18N = {
     dModel: (r, m) => r + ": " + m, rGen: "Idea agents", rGrp: "Grouping",
     needQ: "Question", needC: "Suggested constraint", needK: "Cards not marked as read", needM: n => "Pick at least " + n + " methods",
     okMsg: "Confirmed. The agent starts the run now; you can close this page.",
-    errMsg: "Could not reach the agent. Copy this and paste it into the chat:"
+    errMsg: "Could not reach the agent. Copy this and paste it into the chat:",
+    roTitle: "Brainstorm · run setup", roTag: "Confirmed"
   },
   zh: {
     name: "中", title: "头脑风暴 · 开跑前确认", go: "确认开跑", sending: "正在发送",
@@ -209,7 +216,8 @@ const I18N = {
     dModel: (r, m) => r + "用 " + m, rGen: "出点子", rGrp: "分组",
     needQ: "问题", needC: "建议的约束", needK: "卡片未标记已读", needM: n => "至少选 " + n + " 种方法",
     okMsg: "已确认。agent 正在开跑，可以关掉这个页面",
-    errMsg: "连不上 agent。复制下面的内容，粘贴到对话里："
+    errMsg: "连不上 agent。复制下面的内容，粘贴到对话里：",
+    roTitle: "头脑风暴 · 开跑设置", roTag: "已确认"
   }
 };
 let lang = I18N[D.lang] ? D.lang : "en";
@@ -218,10 +226,10 @@ let L = I18N[lang];
 const MIN_METHODS = D.methods.min || 3;
 const S = {
   question: D.question || "",
-  constraints: D.constraints.map(c => ({ text: c.text, source: c.source, state: c.source === "agent" ? "pending" : "keep" })),
+  constraints: D.constraints.map(c => ({ text: c.text, source: c.source, state: c.source === "agent" && !D.readonly ? "pending" : "keep" })),
   cards: D.cards.map(c => ({ id: c.id, text: c.text })),
-  seen: D.cards_source !== "agent",
-  methods: new Set(D.methods.items.filter(m => m.default).map(m => m.id)),
+  seen: D.cards_source !== "agent" || !!D.readonly,
+  methods: new Set(D.selected_methods || D.methods.items.filter(m => m.default).map(m => m.id)),
   profile: D.profile, ipa: D.ideas_per_agent,
   gen: D.models.generate, grp: D.models.group, sent: false
 };
@@ -341,6 +349,14 @@ function renderSummary() {
     `<div class="dev">${dev.length ? `<h4>${esc(L.dev)}</h4><ul>${dev.map(d => `<li>${esc(d)}</li>`).join("")}</ul>` : `<h4 class="clean">${esc(L.clean)}</h4>`}</div>`;
 }
 function renderBar() {
+  if (D.readonly) {
+    $("pending").outerHTML = `<span class="done-tag" id="pending">✓ ${esc(L.roTag)}</span>`;
+    $("title").textContent = L.roTitle;
+    $("lang").innerHTML = Object.keys(I18N).map(k => `<button type="button" data-l="${k}" class="${k === lang ? "on" : ""}">${esc(I18N[k].name)}</button>`).join("");
+    $("lang").querySelectorAll("[data-l]").forEach(b => b.onclick = () => setLang(b.dataset.l));
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+    return;
+  }
   const items = todo();
   $("pending").textContent = S.sent ? "" : (items.length ? L.pend(items.length) : L.ready);
   $("pending").className = "pending" + (items.length ? "" : " done");
@@ -380,7 +396,15 @@ function refresh(part) {
   renderSummary(); renderBar();
   if (part === "c" || part === "k") requestAnimationFrame(fitAll);
 }
-function renderAll() { renderQuestion(); renderConstraints(); renderCards(); renderMethods(); renderRun(); renderSummary(); renderBar(); requestAnimationFrame(fitAll); }
+function lock() {
+  // A confirmed setup is shown, not edited.
+  if (!D.readonly) return;
+  document.body.classList.add("ro");
+  const ed = $("q-edit"); if (ed) ed.contentEditable = "false";
+  document.querySelectorAll("main textarea").forEach(t => t.readOnly = true);
+  document.querySelectorAll("main input, main select, .seg2 button").forEach(el => el.disabled = true);
+}
+function renderAll() { renderQuestion(); renderConstraints(); renderCards(); renderMethods(); renderRun(); renderSummary(); renderBar(); lock(); requestAnimationFrame(fitAll); }
 function payload() {
   return {
     question: S.question.trim(),

@@ -136,6 +136,17 @@ class ConfirmTests(ReviewCase):
         saved = json.loads((self.dir / "review" / "confirmed.json").read_text(encoding="utf-8"))
         self.assertEqual(saved["models"], {"generate": "sonnet", "group": "opus"})
 
+    def test_confirming_writes_a_read_only_page_of_the_setup(self):
+        self.confirm(self.answer(question="Edited question", methods=["analogy", "reverse", "substitute"]))
+        page = (self.dir / "review" / "confirmed.html").read_text(encoding="utf-8")
+        data = json.loads(re.search(r'<script id="draft" type="application/json">(.*?)</script>', page, re.S).group(1))
+        self.assertTrue(data["readonly"])
+        self.assertEqual(data["question"], "Edited question")
+        self.assertEqual(data["selected_methods"], ["analogy", "reverse", "substitute"])
+        self.assertEqual(data["models"]["group"], "opus")
+        self.assertEqual(data["constraints"], [{"text": "No telemetry", "source": "user"}])
+        self.assertEqual(data["token"], "")
+
     def test_rejections(self):
         cases = {
             "methods": self.answer(methods=["analogy", "reverse"]),
@@ -262,6 +273,15 @@ class DirectInitTests(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn("--cards-source", err)
 
+    def test_direct_report_keeps_the_question(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "run"
+            host = FakeHost(run)
+            host.cli("init", "--dir", str(run), "--question", "Plain question?", "--profile", "economy", "--seed", "3")
+            done = host.run()
+            self.assertIn("> Plain question?", Path(done["report"]).read_text(encoding="utf-8"))
+            self.assertNotIn("confirmed.html", Path(done["report"]).read_text(encoding="utf-8"))
+
     def test_direct_runs_have_no_model_and_no_organise_step(self):
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp) / "run"
@@ -371,6 +391,15 @@ class OrganizeTests(StartMixin, ReviewCase):
         host, _ = self.finished(organize=lambda call, rows: "not json" if call == 1 else None)
         self.assertEqual(host.organize_calls, 2)
         self.assertIn("## Even", self.report())
+
+    def test_reviewed_report_links_the_setup_instead_of_repeating_it(self):
+        _, done = self.finished()
+        text = self.report()
+        self.assertIn("(review/confirmed.html)", text)
+        self.assertNotIn("> How can a small open-source project", text)
+        page = Path(done["report_html"]).read_text(encoding="utf-8")
+        data = json.loads(re.search(r'<script id="report" type="application/json">(.*?)</script>', page, re.S).group(1))
+        self.assertEqual(data["setup"], "review/confirmed.html")
 
     def test_chinese_report(self):
         self.finished(lang="zh")

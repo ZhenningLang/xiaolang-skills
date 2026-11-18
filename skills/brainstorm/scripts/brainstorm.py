@@ -844,7 +844,7 @@ def state_from_review(args):
     return new_state(answer["question"].strip(), [row["text"].strip() for row in answer["constraints"]],
                      answer["cards"], {key: texts[key] for key in answer["methods"]}, seed, answer["profile"],
                      answer["ideas_per_agent"], cards_source=answer["cards_source"] if answer["cards"] else None,
-                     models=answer["models"], lang=answer["lang"], organize=True)
+                     models=answer["models"], lang=answer["lang"], organize=True, setup="review/confirmed.html")
 
 
 def state_from_args(args):
@@ -918,6 +918,7 @@ def cmd_status(args):
 
 REPORT_TEXT = {
     "en": {"title": "Brainstorm results", "question": "Question", "constraints": "Hard constraints", "colon": ":",
+           "setup": "Run setup (question, hard constraints, cards, methods, models)",
            "counts": "**{beyond}** beyond the baseline · {total} mechanisms · {ideas} ideas. Nothing was scored or removed.",
            "html": "A page that is easier to read: `report.html` next to this file.",
            "contents": "Contents", "common": "The baseline already had these", "other": "Other",
@@ -929,6 +930,7 @@ REPORT_TEXT = {
            "levels": {"baseline": "Baseline", "round1": "Round 1", "round2": "Round 2", "pressure1": "Pressure 1",
                       "pressure2": "Pressure 2", "pressure3": "Pressure 3"}},
     "zh": {"title": "头脑风暴结果", "question": "问题", "constraints": "硬约束", "colon": "：",
+           "setup": "开跑设置（问题、硬约束、卡片、方法、模型）",
            "counts": "基线之外 **{beyond}** 种 · 全部 {total} 种机制 · {ideas} 个点子。没有打分，也没有删除。",
            "html": "更好读的网页版：同一目录下的 `report.html`。",
            "contents": "目录", "common": "基线已有的机制", "other": "其他",
@@ -1036,9 +1038,12 @@ def render_report(state):
     beyond = [row for group in groups for row in group["rows"]]
     returned_ids = {key for task in state["tasks"].values() if task["kind"] == "rewrite" for key in task["originals"]}
     lines = [f"# {t['title']}", ""]
-    lines += ["> " + line if line.strip() else ">" for line in state["question"].strip().splitlines()] + [""]
-    if state["constraints"]:
-        lines += [t["constraints"] + t["colon"], ""] + [f"- {one_line(item)}" for item in state["constraints"]] + [""]
+    if state.get("setup"):
+        lines += [f"[{t['setup']}]({state['setup']})", ""]
+    else:
+        lines += ["> " + line if line.strip() else ">" for line in state["question"].strip().splitlines()] + [""]
+        if state["constraints"]:
+            lines += [t["constraints"] + t["colon"], ""] + [f"- {one_line(item)}" for item in state["constraints"]] + [""]
     lines += [t["counts"].format(beyond=len(beyond), total=len(numbers), ideas=len(state["ideas"])), ""]
     if state.get("cards_source") == "agent":
         lines += [t["cards_by_agent"], ""]
@@ -1093,7 +1098,7 @@ def report_data(run_dir, state):
                            "ideas": [{key: state["ideas"][idea][key] for key in keys} for idea in row["idea_ids"]]})
     name = Path(run_dir).resolve().name
     return {"lang": state.get("lang", "en"), "run": name, "run_id": f"{name}-{state['seed']}",
-            "question": state["question"].strip(), "constraints": state["constraints"],
+            "question": state["question"].strip(), "constraints": state["constraints"], "setup": state.get("setup"),
             "counts": {"mechanisms": len(rows), "beyond": len(rows) - len(common), "ideas": len(state["ideas"])},
             "themes": [{"name": group["name"], "mechanisms": [row["mechanism_id"] for row in group["rows"]]}
                        for group in groups],

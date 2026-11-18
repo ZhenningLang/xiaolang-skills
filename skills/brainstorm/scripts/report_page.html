@@ -46,10 +46,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .export:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
 .top { max-width: 1240px; margin: 0 auto; padding: 32px 24px 8px; }
-.q { font-size: 20px; line-height: 1.6; font-weight: 600; margin: 0; max-width: 860px; overflow-wrap: anywhere; white-space: pre-wrap; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.chip { font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 2px 12px; color: var(--muted); }
-.stats { display: flex; gap: 32px; margin-top: 22px; flex-wrap: wrap; }
+.q { font-size: 20px; line-height: 1.6; font-weight: 600; margin: 0 0 22px; max-width: 860px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.top-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; }
+.setup { font-size: 14px; color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--accent) 35%, transparent); padding-bottom: 1px; }
+.setup:hover { border-bottom-color: var(--accent); }
+.stats { display: flex; gap: 32px; flex-wrap: wrap; }
 .stat b { display: block; font-size: 28px; line-height: 1.2; font-weight: 650; font-variant-numeric: tabular-nums; }
 .stat span { font-size: 13px; color: var(--muted); }
 .stat.main b { color: var(--accent); }
@@ -134,7 +135,7 @@ const R = JSON.parse(document.getElementById("report").textContent);
 // Every visible string lives here. To add a language, copy one block and translate the values.
 const I18N = {
   en: {
-    name: "EN", title: "Brainstorm results", picked: n => n + " starred", export: "Export starred",
+    name: "EN", title: "Brainstorm results", setup: "Run setup →", picked: n => n + " starred", export: "Export starred",
     beyond: "beyond the baseline", total: "mechanisms in all", ideas: "ideas",
     themes: "Themes", onlyStar: "Starred only", common: "The baseline already had these", details: "Run details",
     star: "Star", starred: "Starred", open: "Show ideas", close: "Hide", phr: n => n + (n === 1 ? " phrasing" : " phrasings"),
@@ -145,7 +146,7 @@ const I18N = {
     exportHead: "Starred mechanisms", question: "Question", constraints: "Hard constraints"
   },
   zh: {
-    name: "中", title: "头脑风暴结果", picked: n => "已加星 " + n, export: "导出加星的",
+    name: "中", title: "头脑风暴结果", setup: "开跑设置 →", picked: n => "已加星 " + n, export: "导出加星的",
     beyond: "基线之外", total: "全部机制", ideas: "个点子",
     themes: "主题", onlyStar: "只看加星", common: "基线已有的机制", details: "运行详情",
     star: "加星", starred: "已加星", open: "展开", close: "收起", phr: n => n + " 种说法",
@@ -199,11 +200,12 @@ function render() {
   $("title").textContent = L.title;
   $("run").textContent = R.run || "";
   $("lang").innerHTML = Object.keys(I18N).map(k => `<button type="button" data-l="${k}" class="${k === lang ? "on" : ""}">${esc(I18N[k].name)}</button>`).join("");
-  $("top").innerHTML = `<p class="q">${esc(R.question)}</p>` +
-    (R.constraints.length ? `<div class="chips">${R.constraints.map(c => `<span class="chip">${esc(c)}</span>`).join("")}</div>` : "") +
-    `<div class="stats"><div class="stat main"><b>${R.counts.beyond}</b><span>${esc(L.beyond)}</span></div>` +
+  // A reviewed run links its confirmed setup; only a run without one shows the question here.
+  $("top").innerHTML = (R.setup ? "" : `<p class="q">${esc(R.question)}</p>`) +
+    `<div class="top-row"><div class="stats"><div class="stat main"><b>${R.counts.beyond}</b><span>${esc(L.beyond)}</span></div>` +
     `<div class="stat"><b>${R.counts.mechanisms}</b><span>${esc(L.total)}</span></div>` +
-    `<div class="stat"><b>${R.counts.ideas}</b><span>${esc(L.ideas)}</span></div></div>`;
+    `<div class="stat"><b>${R.counts.ideas}</b><span>${esc(L.ideas)}</span></div></div>` +
+    (R.setup ? `<a class="setup" href="${esc(R.setup)}">${esc(L.setup)}</a>` : "") + `</div>`;
   $("nav").innerHTML = `<label class="filter"><input type="checkbox" id="only"${onlyStar ? " checked" : ""}>${esc(L.onlyStar)}</label><h3>${esc(L.themes)}</h3>` +
     g.map(t => `<a href="#${t.key}" data-k="${t.key}"><span>${esc(t.name || L.beyond)}</span><span class="c">${t.ids.length}</span></a>`).join("") +
     `<div class="sep"></div><a href="#common"><span>${esc(L.common)}</span><span class="c">${common.length}</span></a>` +

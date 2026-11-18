@@ -155,11 +155,21 @@ def validate_answer(draft, value):
     return value
 
 
+def confirmed_view(draft, answer):
+    """The draft as the user confirmed it, for a read-only copy of the page that the report links to."""
+    return dict(draft, readonly=True, question=answer["question"], constraints=answer["constraints"],
+                cards=answer["cards"], selected_methods=answer["methods"], profile=answer["profile"],
+                ideas_per_agent=answer["ideas_per_agent"], lang=answer["lang"],
+                models=dict(draft["models"], generate=answer["models"]["generate"], group=answer["models"]["group"]))
+
+
 def save_answer(run_dir, value):
     draft = load_draft(run_dir)
     validate_answer(draft, value)
-    path = review_dir(run_dir) / "confirmed.json"
+    folder = review_dir(run_dir)
+    path = folder / "confirmed.json"
     bs.atomic_write(path, json.dumps(value, ensure_ascii=False, indent=1) + "\n")
+    bs.atomic_write(folder / "confirmed.html", page_html(confirmed_view(draft, value)))
     return path
 
 

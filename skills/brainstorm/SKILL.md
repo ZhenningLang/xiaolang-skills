@@ -89,7 +89,7 @@ A method is one line in a `.jsonl` file: `{"id": "short-name", "text": "the inst
 
 Two files in the run directory, in the language chosen on the review page (English or Chinese):
 
-- `report.html`: the page to read. The question, the counts, a list of themes, and one card per mechanism with its short title and one-line summary; the full phrasings open on click. The user can star mechanisms and export the starred ones as Markdown. Mechanisms the baseline already produced and the run details are folded at the end.
-- `report.md`: the same content as text, in the same order and with the same numbers.
+- `report.html`: the page to read. The counts, a link to `review/confirmed.html` (a read-only copy of the review page as the user confirmed it: question, constraints, cards, methods, models), a list of themes, and one card per mechanism with its short title and one-line summary; the full phrasings open on click. The user can star mechanisms and export the starred ones as Markdown. Mechanisms the baseline already produced and the run details are folded at the end.
+- `report.md`: the same content as text, in the same order and with the same numbers. A run started without the review page shows its question and constraints at the top instead of the link.
 
 Every mechanism appears once, with all phrasings that were merged into it; each phrasing shows its level, method, agent and the cards it used. Numbers follow reading order: themes first, then the baseline's mechanisms. A mechanism the organise step left out goes into an "Other" group, never out of the report. The script refuses to write a report whose mechanism or idea count does not match the run state.
