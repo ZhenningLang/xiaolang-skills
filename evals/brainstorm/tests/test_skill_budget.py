@@ -51,7 +51,7 @@ class SkillBudgetTests(unittest.TestCase):
         host = skill_tests.FakeHost(self.skill, broken=broken, grouping=grouping)
         extra = [item for text in constraints for item in ("--constraint", text)]
         host.cli("init", "--dir", str(self.skill), "--question-file", str(QUESTION), "--seed", "7",
-                 "--profile", "economy", "--cards", str(SKILL_TESTS / "fixtures" / "cards.jsonl"), *extra)
+                 "--profile", "economy", "--cards", str(SKILL_TESTS / "fixtures" / "cards.jsonl"), "--cards-source", "user", *extra)
         return host.run()
 
     def test_control_run_is_plain_asking_at_the_requested_number_of_calls(self):

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brainstorm results</title>
+<style>
+:root {
+  --bg: oklch(97.5% 0.006 85);
+  --surface: oklch(99.5% 0.003 85);
+  --fg: oklch(24% 0.012 260);
+  --muted: oklch(52% 0.012 260);
+  --border: oklch(89% 0.008 85);
+  --accent: oklch(47% 0.13 255);
+  --accent-soft: oklch(95% 0.03 255);
+  --star: oklch(68% 0.15 75);
+  --star-soft: oklch(96% 0.05 85);
+  --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(19% 0.008 260); --surface: oklch(23% 0.009 260); --fg: oklch(93% 0.006 85);
+    --muted: oklch(70% 0.01 260); --border: oklch(33% 0.01 260); --accent: oklch(72% 0.12 255);
+    --accent-soft: oklch(30% 0.05 255); --star: oklch(80% 0.13 80); --star-soft: oklch(30% 0.05 80);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.bar { position: sticky; top: 0; z-index: 5; background: color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.bar-in { max-width: 1240px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+.bar h1 { font-size: 16px; margin: 0; font-weight: 650; }
+.bar .run { color: var(--muted); font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
+.bar .grow { flex: 1; }
+.lang { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.lang button { border: 0; background: none; padding: 2px 9px; font-size: 12px; color: var(--muted); }
+.lang button.on { background: var(--surface); color: var(--fg); font-weight: 600; }
+.picked { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.export { background: var(--accent); color: var(--surface); border: 0; border-radius: 8px; padding: 8px 16px; font-weight: 600; white-space: nowrap; }
+.export:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+.top { max-width: 1240px; margin: 0 auto; padding: 32px 24px 8px; }
+.q { font-size: 20px; line-height: 1.6; font-weight: 600; margin: 0; max-width: 860px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.chip { font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 2px 12px; color: var(--muted); }
+.stats { display: flex; gap: 32px; margin-top: 22px; flex-wrap: wrap; }
+.stat b { display: block; font-size: 28px; line-height: 1.2; font-weight: 650; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); }
+.stat.main b { color: var(--accent); }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 24px 24px 80px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
+nav { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; }
+nav h3 { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin: 0 0 8px; text-transform: uppercase; }
+nav a { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 7px; color: var(--fg); text-decoration: none; font-size: 14px; }
+nav a:hover { background: var(--surface); }
+nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav a .c { color: var(--muted); font-variant-numeric: tabular-nums; font-weight: 400; }
+nav .sep { border-top: 1px solid var(--border); margin: 10px 0; }
+.filter { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.filter input { accent-color: var(--accent); }
+
+main { min-width: 0; }
+.theme { margin-bottom: 40px; }
+.theme h2 { font-size: 19px; margin: 0 0 12px; font-weight: 650; display: flex; gap: 10px; align-items: baseline; }
+.theme h2 .c { font-size: 13px; color: var(--muted); font-weight: 400; }
+.list { display: grid; gap: 8px; }
+.m { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.m.star { border-color: var(--star); background: var(--star-soft); }
+.m-head { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 12px; padding: 14px 16px; align-items: start; }
+.num { font: 12px var(--mono); color: var(--muted); padding-top: 4px; }
+.mt { font-weight: 650; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.ml { color: var(--muted); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
+.meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.acts { display: flex; gap: 6px; align-items: center; }
+.ic { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 3px 10px; font-size: 13px; white-space: nowrap; color: var(--muted); }
+.ic:hover { border-color: var(--accent); color: var(--accent); }
+.ic.on { border-color: var(--star); color: var(--star); font-weight: 600; }
+.body { border-top: 1px dashed var(--border); padding: 4px 16px 14px 62px; }
+.idea { padding-top: 12px; }
+.idea h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.idea p { margin: 0 0 6px; font-size: 14.5px; line-height: 1.75; overflow-wrap: anywhere; white-space: pre-wrap; }
+.idea .src { font-size: 12px; color: var(--muted); }
+.hidden { display: none !important; }
+
+details.more { margin-top: 8px; }
+details.more > summary { cursor: pointer; font-size: 19px; font-weight: 650; list-style: none; display: flex; gap: 10px; align-items: baseline; margin-bottom: 12px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "▸"; color: var(--muted); font-size: 14px; }
+details.more[open] > summary::before { content: "▾"; }
+details.more > summary .c { font-size: 13px; color: var(--muted); font-weight: 400; }
+table { border-collapse: collapse; font-size: 14px; margin: 8px 0 16px; }
+th, td { border-bottom: 1px solid var(--border); padding: 6px 14px 6px 0; text-align: left; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.small { font-size: 13px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 16px 64px; }
+  nav { position: static; max-height: none; display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
+  nav h3, nav .sep { display: none; }
+  nav a { flex: none; background: var(--surface); border: 1px solid var(--border); }
+  .filter { flex: none; margin: 0; }
+  .top { padding: 20px 16px 4px; }
+  .q { font-size: 17px; }
+  .bar-in { padding: 10px 16px; flex-wrap: wrap; gap: 8px 12px; }
+  .bar .run, .bar .grow { display: none; }
+  .picked { margin-left: auto; }
+  .m-head { grid-template-columns: 28px minmax(0, 1fr); }
+  .m-head .acts { grid-column: 2; }
+  .body { padding-left: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <h1 id="title"></h1><span class="run" id="run"></span><span class="grow"></span>
+  <span class="lang" id="lang"></span>
+  <span class="picked" id="picked"></span>
+  <button class="export" id="export" type="button"></button>
+</div></div>
+<div class="top" id="top"></div>
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script id="report" type="application/json">__REPORT__</script>
+<script>
+const R = JSON.parse(document.getElementById("report").textContent);
+// Every visible string lives here. To add a language, copy one block and translate the values.
+const I18N = {
+  en: {
+    name: "EN", title: "Brainstorm results", picked: n => n + " starred", export: "Export starred",
+    beyond: "beyond the baseline", total: "mechanisms in all", ideas: "ideas",
+    themes: "Themes", onlyStar: "Starred only", common: "The baseline already had these", details: "Run details",
+    star: "Star", starred: "Starred", open: "Show ideas", close: "Hide", phr: n => n + (n === 1 ? " phrasing" : " phrasings"),
+    agent: n => "agent " + n, cards: "cards", rewrite: "rewrite",
+    level: "Level", lIdeas: "Ideas", lNew: "New beyond baseline", lFail: "Failed agents", seed: "Seed", profile: "Profile",
+    failures: "Dropped or partial outputs", unthemed: "Other",
+    levels: { baseline: "Baseline", round1: "Round 1", round2: "Round 2", pressure1: "Pressure 1", pressure2: "Pressure 2", pressure3: "Pressure 3" },
+    exportHead: "Starred mechanisms", question: "Question", constraints: "Hard constraints"
+  },
+  zh: {
+    name: "中", title: "头脑风暴结果", picked: n => "已加星 " + n, export: "导出加星的",
+    beyond: "基线之外", total: "全部机制", ideas: "个点子",
+    themes: "主题", onlyStar: "只看加星", common: "基线已有的机制", details: "运行详情",
+    star: "加星", starred: "已加星", open: "展开", close: "收起", phr: n => n + " 种说法",
+    agent: n => "子任务 " + n, cards: "卡片", rewrite: "重写",
+    level: "阶段", lIdeas: "点子", lNew: "基线之外新增", lFail: "失败", seed: "随机种子", profile: "流程",
+    failures: "丢弃或不完整的输出", unthemed: "其他",
+    levels: { baseline: "基线", round1: "第一轮", round2: "第二轮", pressure1: "加压 1", pressure2: "加压 2", pressure3: "加压 3" },
+    exportHead: "加星的机制", question: "问题", constraints: "硬约束"
+  }
+};
+let lang = I18N[R.lang] ? R.lang : "en";
+const KEY = "brainstorm-report:" + (R.run_id || R.run || "");
+let stars = new Set(), onlyStar = false;
+try { stars = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); const s = localStorage.getItem("brainstorm-review-lang"); if (I18N[s]) lang = s; } catch (e) {}
+let L = I18N[lang];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const M = Object.fromEntries(R.mechanisms.map(m => [m.id, m]));
+const lvl = k => L.levels[k] || k;
+const methodName = id => { const m = (R.methods || {})[id]; return (m && m[lang] && m[lang].name) || id; };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...stars])); } catch (e) {} };
+
+function groups() {
+  // Themes from the organiser; any beyond-baseline mechanism it missed lands in a trailing group, so nothing is hidden.
+  const beyond = R.mechanisms.filter(m => !m.in_baseline);
+  const seen = new Set();
+  const out = (R.themes || []).map((t, i) => {
+    const ids = t.mechanisms.filter(id => M[id] && !M[id].in_baseline && !seen.has(id));
+    ids.forEach(id => seen.add(id));
+    return { key: "t" + i, name: t.name, ids };
+  }).filter(g => g.ids.length);
+  const rest = beyond.filter(m => !seen.has(m.id)).map(m => m.id);
+  if (rest.length) out.push({ key: "t-rest", name: out.length ? L.unthemed : "", ids: rest });
+  return out;
+}
+function card(m) {
+  const on = stars.has(m.id);
+  const levels = m.levels.map(lvl).join(" · ");
+  return `<article class="m${on ? " star" : ""}" id="${esc(m.id)}" data-id="${esc(m.id)}">
+    <div class="m-head"><span class="num">${m.n}</span>
+      <div><div class="mt">${esc(m.title || m.label)}</div>${m.title ? `<div class="ml">${esc(m.label)}</div>` : ""}
+        <div class="meta">${esc(L.phr(m.ideas.length))} · ${esc(levels)}</div></div>
+      <div class="acts"><button type="button" class="ic${on ? " on" : ""}" data-star="${esc(m.id)}" aria-pressed="${on}">${on ? "★ " + esc(L.starred) : "☆ " + esc(L.star)}</button>
+        <button type="button" class="ic" data-open="${esc(m.id)}" aria-expanded="false">${esc(L.open)}</button></div></div>
+    <div class="body hidden">${m.ideas.map(i => `<div class="idea"><h4>${esc(i.title)}</h4><p>${esc(i.text)}</p>
+      <div class="src">${esc([lvl(i.level) + (i.returned ? " · " + L.rewrite : ""), i.method ? methodName(i.method) : "", L.agent(i.agent), i.cards_used && i.cards_used.length ? L.cards + " " + i.cards_used.join(", ") : ""].filter(Boolean).join(" · "))}</div></div>`).join("")}</div></article>`;
+}
+function render() {
+  const g = groups();
+  const common = R.mechanisms.filter(m => m.in_baseline);
+  $("title").textContent = L.title;
+  $("run").textContent = R.run || "";
+  $("lang").innerHTML = Object.keys(I18N).map(k => `<button type="button" data-l="${k}" class="${k === lang ? "on" : ""}">${esc(I18N[k].name)}</button>`).join("");
+  $("top").innerHTML = `<p class="q">${esc(R.question)}</p>` +
+    (R.constraints.length ? `<div class="chips">${R.constraints.map(c => `<span class="chip">${esc(c)}</span>`).join("")}</div>` : "") +
+    `<div class="stats"><div class="stat main"><b>${R.counts.beyond}</b><span>${esc(L.beyond)}</span></div>` +
+    `<div class="stat"><b>${R.counts.mechanisms}</b><span>${esc(L.total)}</span></div>` +
+    `<div class="stat"><b>${R.counts.ideas}</b><span>${esc(L.ideas)}</span></div></div>`;
+  $("nav").innerHTML = `<label class="filter"><input type="checkbox" id="only"${onlyStar ? " checked" : ""}>${esc(L.onlyStar)}</label><h3>${esc(L.themes)}</h3>` +
+    g.map(t => `<a href="#${t.key}" data-k="${t.key}"><span>${esc(t.name || L.beyond)}</span><span class="c">${t.ids.length}</span></a>`).join("") +
+    `<div class="sep"></div><a href="#common"><span>${esc(L.common)}</span><span class="c">${common.length}</span></a>` +
+    `<a href="#details"><span>${esc(L.details)}</span></a>`;
+  $("main").innerHTML = g.map(t => `<section class="theme" id="${t.key}"><h2>${esc(t.name || L.beyond)}<span class="c">${t.ids.length}</span></h2><div class="list">${t.ids.map(id => card(M[id])).join("")}</div></section>`).join("") +
+    `<details class="more" id="common"><summary>${esc(L.common)}<span class="c">${common.length}</span></summary><div class="list">${common.map(card).join("")}</div></details>` +
+    `<details class="more" id="details"><summary>${esc(L.details)}</summary>` +
+    `<table><tr><th>${esc(L.level)}</th><th class="r">${esc(L.lIdeas)}</th><th class="r">${esc(L.lNew)}</th><th class="r">${esc(L.lFail)}</th></tr>` +
+    R.summary.map(s => `<tr><td>${esc(lvl(s.level))}</td><td class="r">${s.ideas}</td><td class="r">${s.new_mechanisms_beyond_baseline}</td><td class="r">${s.failed_agents}</td></tr>`).join("") + `</table>` +
+    `<div class="small">${esc(L.profile)}: ${esc(R.profile)} · ${esc(L.seed)}: ${esc(R.seed)}</div>` +
+    (R.failures.length ? `<h4>${esc(L.failures)}</h4><ul class="small">${R.failures.map(f => `<li>${esc(f.task)} · ${esc(f.reason)}</li>`).join("")}</ul>` : "") + `</details>`;
+  wire(); applyFilter(); renderBar();
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+}
+function wire() {
+  document.querySelectorAll("[data-star]").forEach(b => b.onclick = () => {
+    const id = b.dataset.star; stars.has(id) ? stars.delete(id) : stars.add(id); save();
+    const el = document.querySelector(`article[data-id="${CSS.escape(id)}"]`); const on = stars.has(id);
+    el.classList.toggle("star", on); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on);
+    b.textContent = on ? "★ " + L.starred : "☆ " + L.star; applyFilter(); renderBar();
+  });
+  document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => {
+    const body = b.closest("article").querySelector(".body"); const open = body.classList.toggle("hidden") === false;
+    b.textContent = open ? L.close : L.open; b.setAttribute("aria-expanded", open);
+  });
+  document.querySelectorAll("[data-l]").forEach(b => b.onclick = () => { lang = b.dataset.l; L = I18N[lang]; try { localStorage.setItem("brainstorm-review-lang", lang); } catch (e) {} render(); });
+  $("only").onchange = e => { onlyStar = e.target.checked; applyFilter(); };
+}
+function applyFilter() {
+  document.querySelectorAll("article.m").forEach(a => a.classList.toggle("hidden", onlyStar && !stars.has(a.dataset.id)));
+  document.querySelectorAll("section.theme").forEach(s => s.classList.toggle("hidden", onlyStar && !s.querySelector("article.m:not(.hidden)")));
+}
+function renderBar() {
+  $("picked").textContent = L.picked(stars.size);
+  $("export").textContent = L.export;
+  $("export").disabled = !stars.size;
+}
+function exportStars() {
+  const picked = R.mechanisms.filter(m => stars.has(m.id));
+  const lines = [`# ${L.exportHead}`, "", `${L.question}: ${R.question}`, ""];
+  if (R.constraints.length) lines.push(`${L.constraints}:`, ...R.constraints.map(c => "- " + c), "");
+  picked.forEach(m => {
+    lines.push(`## ${m.n}. ${m.title || m.label}`, "", m.label, "");
+    m.ideas.forEach(i => lines.push(`### ${i.title}`, "", i.text.trim(), ""));
+  });
+  const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/markdown" }));
+  const a = document.createElement("a"); a.href = url; a.download = (R.run || "brainstorm") + "-starred.md"; a.click();
+}
+$("export").onclick = exportStars;
+const spy = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) document.querySelectorAll("nav a[data-k]").forEach(a => a.classList.toggle("on", a.dataset.k === e.target.id));
+}), { rootMargin: "-80px 0px -70% 0px" });
+render();
+document.querySelectorAll("section.theme").forEach(s => spy.observe(s));
+</script>
+</body>
+</html>

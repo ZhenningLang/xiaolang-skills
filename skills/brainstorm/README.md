@@ -56,7 +56,9 @@ The method texts are in English. Every measurement before 2026-11-16 used Chines
 - **Do not use it** to choose between known options, to fix a bug, or for a quick list of a few ideas.
 - **It is expensive.** The second counted run used 31 idea calls and 12 grouping calls, about 43 sub-agent calls. The script stops and asks before the most expensive part.
 
-Ask your agent to brainstorm a question and give it your hard constraints (things no idea may break). If you give none, the agent asks once and suggests a few; "none" is a fine answer. If you have notes or source material, hand them over: the agent cuts them into cards and each sub-agent gets a random half. You get `report.md`: a contents list with one line per mechanism, then every mechanism with all the ideas grouped under it and where each idea came from.
+Ask your agent to brainstorm a question. If you have notes or source material, hand them over: the agent cuts them into cards and each sub-agent gets a random half. Before anything runs, the agent opens a local review page. On it you edit the question the agent drafted, keep or drop the hard constraints it suggests (things no idea may break), read the cards, tick the thinking methods (the four measured ones are ticked by default), and pick the models. The page lists every way your choices differ from the measured setup. Nothing runs until you press start.
+
+At the end you get `report.html`: the mechanisms sorted into themes, each with a short title and a one-line summary, the full ideas one click away. Star the ones worth a closer look and export them. `report.md` holds the same content as text. Both pages are in English or Chinese.
 
 Two profiles: **full** (default) runs every stage in the table above, and it is what the measurements below measured; **economy** stops after round 2, is cheaper, and was not measured on its own.
 
