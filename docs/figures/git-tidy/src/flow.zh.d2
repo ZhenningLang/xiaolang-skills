@@ -1,0 +1,12 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "a short linear flow with one loop back; a quiet style reads best", "surface": "repo-doc"}
+direction: down
+plan: "plan\n只读：fetch 后逐项判\n可删或保留" { class: box }
+list: "清单\n可删几项，保留的\n按原因分组" { class: store }
+you: "你或用户\n决定删不删" { class: decision }
+apply: "apply\n再判一遍，仍可删且\n提交号没变才删" { class: new }
+record: "恢复记录\n每项一条现成命令" { class: store }
+plan -> list
+list -> you
+you -> apply: "删" { class: hero }
+apply -> record
+apply -> plan: "验收：再跑一次 plan"

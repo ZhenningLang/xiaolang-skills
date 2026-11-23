@@ -9,6 +9,7 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 | Skill | What it does | Status |
 |:---|:---|:---|
 | [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on eight questions; on six new real-world questions it reached another 67 to 118 mechanisms. On the first two: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care (Chinese method texts; the English texts shipped now reached 33 to 39 in one run). See [what the skill adds](skills/brainstorm/README.md#2-what-the-skill-adds) |
+| [git-tidy](skills/git-tidy/README.md) | Cleans up finished worktrees and branches, deleting only what cannot lose work | v1. On 12 built scenarios it deleted nothing that should stay and kept nothing that could go; `git branch --merged` would delete 6 that should stay and miss 2. See [evidence](skills/git-tidy/README.md#3-evidence) |
 
 Each skill has its own README in its folder: what it does, when to use it, and how far it has been tested.
 
@@ -30,6 +31,7 @@ Each skill has its own README in its folder: what it does, when to use it, and h
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
 claude plugin install brainstorm@xiaolang-skills
+claude plugin install git-tidy@xiaolang-skills
 ```
 
 **kilo, opencode, kimi code, Grok Bot, or Claude Code without plugins**:

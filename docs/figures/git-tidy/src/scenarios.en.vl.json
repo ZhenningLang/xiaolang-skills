@@ -1,0 +1,207 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "cells read from the result file",
+      "surface": "repo-doc"
+    },
+    "source": "evals/git-tidy/results/2026-11-23-scenarios.json"
+  },
+  "title": "12 cleanup scenarios: what each way of choosing would delete",
+  "data": {
+    "values": [
+      {
+        "scenario": "Merge commit (should delete)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Merge commit (should delete)",
+        "tool": "git branch --merged",
+        "result": "right"
+      },
+      {
+        "scenario": "Fast-forward (should delete)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Fast-forward (should delete)",
+        "tool": "git branch --merged",
+        "result": "right"
+      },
+      {
+        "scenario": "Squash merge (should delete)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Squash merge (should delete)",
+        "tool": "git branch --merged",
+        "result": "keeps what could go"
+      },
+      {
+        "scenario": "Rebase merge (should delete)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Rebase merge (should delete)",
+        "tool": "git branch --merged",
+        "result": "keeps what could go"
+      },
+      {
+        "scenario": "Not merged (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Not merged (should keep)",
+        "tool": "git branch --merged",
+        "result": "right"
+      },
+      {
+        "scenario": "Merged, then new commit (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Merged, then new commit (should keep)",
+        "tool": "git branch --merged",
+        "result": "right"
+      },
+      {
+        "scenario": "Worktree: uncommitted edit (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Worktree: uncommitted edit (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      },
+      {
+        "scenario": "Worktree: untracked file (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Worktree: untracked file (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      },
+      {
+        "scenario": "Worktree: only copy of .env (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Worktree: only copy of .env (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      },
+      {
+        "scenario": "Shared branch (develop) (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Shared branch (develop) (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      },
+      {
+        "scenario": "Remote branch with open PR (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Remote branch with open PR (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      },
+      {
+        "scenario": "Merged into unpushed local main (should keep)",
+        "tool": "git-tidy",
+        "result": "right"
+      },
+      {
+        "scenario": "Merged into unpushed local main (should keep)",
+        "tool": "git branch --merged",
+        "result": "deletes what should stay"
+      }
+    ]
+  },
+  "width": 260,
+  "height": {
+    "step": 26
+  },
+  "mark": {
+    "type": "rect",
+    "stroke": "white",
+    "strokeWidth": 2
+  },
+  "encoding": {
+    "x": {
+      "field": "tool",
+      "type": "nominal",
+      "title": "",
+      "sort": [
+        "git-tidy",
+        "git branch --merged"
+      ],
+      "axis": {
+        "orient": "top",
+        "labelAngle": 0
+      }
+    },
+    "y": {
+      "field": "scenario",
+      "type": "nominal",
+      "title": null,
+      "sort": [
+        "Merge commit (should delete)",
+        "Fast-forward (should delete)",
+        "Squash merge (should delete)",
+        "Rebase merge (should delete)",
+        "Not merged (should keep)",
+        "Merged, then new commit (should keep)",
+        "Worktree: uncommitted edit (should keep)",
+        "Worktree: untracked file (should keep)",
+        "Worktree: only copy of .env (should keep)",
+        "Shared branch (develop) (should keep)",
+        "Remote branch with open PR (should keep)",
+        "Merged into unpushed local main (should keep)"
+      ],
+      "axis": {
+        "labelLimit": 400
+      }
+    },
+    "color": {
+      "field": "result",
+      "type": "nominal",
+      "title": "Result",
+      "scale": {
+        "domain": [
+          "right",
+          "deletes what should stay",
+          "keeps what could go"
+        ],
+        "range": [
+          "#9fd3b4",
+          "#e8776b",
+          "#f2c26b"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "labelLimit": 300
+      }
+    }
+  }
+}

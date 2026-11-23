@@ -12,7 +12,18 @@
       "description": "Divergent brainstorming with isolated parallel sub-agents (v1; scored by a person on one question, counted against plain asking on two).",
       "source": "./",
       "strict": false,
-      "skills": ["./skills/brainstorm"]
+      "skills": [
+        "./skills/brainstorm"
+      ]
+    },
+    {
+      "name": "git-tidy",
+      "description": "Clean up finished worktrees and branches, deleting only what cannot lose work; recognises squash and rebase merges (v1; checked on 12 built scenarios).",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/git-tidy"
+      ]
     }
   ]
 }

@@ -9,6 +9,7 @@
 | 技能 | 做什么 | 状态 |
 |:---|:---|:---|
 | [brainstorm](skills/brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题。和反复直接问比过八道题的计数；在六道真实新题上多 67 到 118 个机制。前两道题里：它能想到反复直接问想不到的机制，在认真量过的那道题上多 46 到 62 个（中文方法原文；现在发布的英文方法原文跑过一次，多 33 到 39 个）。见[用了技能之后的提升](skills/brainstorm/README.zh.md#二用了技能之后的提升) |
+| [git-tidy](skills/git-tidy/README.zh.md) | 清理做完的 worktree 和分支，只删不会丢东西的 | v1。在 12 个搭出来的场景里，没删一个该留的，也没留一个能删的；`git branch --merged` 会删掉 6 个该留的、漏掉 2 个能删的。见[证据](skills/git-tidy/README.zh.md#3-证据) |
 
 每个技能在自己的目录里有一份 README：做什么、什么时候用、测到什么程度。
 
@@ -30,6 +31,7 @@
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
 claude plugin install brainstorm@xiaolang-skills
+claude plugin install git-tidy@xiaolang-skills
 ```
 
 **kilo、opencode、kimi code、Grok Bot，以及不想用插件的 Claude Code**：
