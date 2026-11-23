@@ -1,6 +1,6 @@
 # Figures of the brainstorm README
 
-The pictures in [skills/brainstorm/README.md](../../../skills/brainstorm/README.md) and its Chinese page. Each one has an English and a Chinese file.
+The pictures in [skills/think-brainstorm/README.md](../../../skills/think-brainstorm/README.md) and its Chinese page. Each one has an English and a Chinese file.
 
 | Figure | What it shows | Definition in `src/` |
 |:---|:---|:---|

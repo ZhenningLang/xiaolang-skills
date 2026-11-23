@@ -1,6 +1,6 @@
 """Measure the brainstorm skill against plain repeated asking at the same number of sub-agent calls.
 
-Standard library only; it drives skills/brainstorm/scripts/brainstorm.py and never calls a model itself.
+Standard library only; it drives skills/think-brainstorm/scripts/brainstorm.py and never calls a model itself.
 The host dispatches the sub-agent tasks, exactly as it does for the skill.
 
   direct-init  start a control run: N batches of 3 agents, no cards, no method, no rounds
@@ -22,7 +22,7 @@ from pathlib import Path
 import random
 import sys
 
-SKILL_SCRIPT = Path(__file__).resolve().parents[2] / "skills" / "brainstorm" / "scripts" / "brainstorm.py"
+SKILL_SCRIPT = Path(__file__).resolve().parents[2] / "skills" / "think-brainstorm" / "scripts" / "brainstorm.py"
 IMPORT_PREFIX = "skill:"
 IMPORT_BATCH_OFFSET = 1000
 
