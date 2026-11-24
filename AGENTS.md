@@ -2,7 +2,7 @@
 
 This is a public collection of agent skills. Anyone can read every file.
 
-- Each skill lives in `skills/<name>/SKILL.md`. Frontmatter has exactly `name` and `description`; every supported host needs both.
+- Each skill lives in `skills/<name>/SKILL.md`. A skill that helps you think is named `think-<x>`; its folders under `evals/` and `docs/figures/` use `<x>` alone, since `evals/<x>` is a Python package. Frontmatter has exactly `name` and `description`; every supported host needs both.
 - A skill must work on its own. Never reference skills, tools, paths or config that only exist on the author's machine.
 - Name the host-specific tool only when unavoidable. Say "spawn N sub-agents in one reply" instead of naming `Agent`, `task` or `subagent`.
 - When a skill uses sub-agents, forbid fork-style sub-agents that inherit the parent conversation.

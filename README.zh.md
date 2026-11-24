@@ -8,7 +8,7 @@
 
 | 技能 | 做什么 | 状态 |
 |:---|:---|:---|
-| [brainstorm](skills/brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题。和反复直接问比过八道题的计数；在六道真实新题上多 67 到 118 个机制。前两道题里：它能想到反复直接问想不到的机制，在认真量过的那道题上多 46 到 62 个（中文方法原文；现在发布的英文方法原文跑过一次，多 33 到 39 个）。见[用了技能之后的提升](skills/brainstorm/README.zh.md#二用了技能之后的提升) |
+| [think-brainstorm](skills/think-brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题。和反复直接问比过八道题的计数；在六道真实新题上多 67 到 118 个机制。前两道题里：它能想到反复直接问想不到的机制，在认真量过的那道题上多 46 到 62 个（中文方法原文；现在发布的英文方法原文跑过一次，多 33 到 39 个）。见[用了技能之后的提升](skills/think-brainstorm/README.zh.md#二用了技能之后的提升) |
 
 每个技能在自己的目录里有一份 README：做什么、什么时候用、测到什么程度。
 
@@ -29,7 +29,7 @@
 
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
-claude plugin install brainstorm@xiaolang-skills
+claude plugin install think-brainstorm@xiaolang-skills
 ```
 
 **kilo、opencode、kimi code、Grok Bot，以及不想用插件的 Claude Code**：
@@ -43,6 +43,8 @@ cd xiaolang-skills
 ```
 
 `install.sh` 默认用软链，`git pull` 之后自动生效。已经存在、且不是它装的同名目录，它不会碰。
+
+**brainstorm 已改名为 think-brainstorm。** 改名前装过的：用插件装的，先 `claude plugin uninstall brainstorm@xiaolang-skills`，再装 `think-brainstorm@xiaolang-skills`；用 `install.sh` 装的，`git pull` 后删掉旧链接（`rm ~/.agents/skills/brainstorm ~/.claude/skills/brainstorm`，只在它们指向本仓库时删），再跑一次 `./install.sh`。
 
 ## 许可证
 

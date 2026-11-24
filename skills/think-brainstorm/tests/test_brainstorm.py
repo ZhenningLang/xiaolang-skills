@@ -1,4 +1,4 @@
-"""Tests for scripts/brainstorm.py. Run: python3 -m unittest discover -s skills/brainstorm/tests < /dev/null"""
+"""Tests for scripts/brainstorm.py. Run: python3 -m unittest discover -s skills/think-brainstorm/tests < /dev/null"""
 
 import contextlib
 import io

@@ -8,7 +8,7 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 
 | Skill | What it does | Status |
 |:---|:---|:---|
-| [brainstorm](skills/brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on eight questions; on six new real-world questions it reached another 67 to 118 mechanisms. On the first two: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care (Chinese method texts; the English texts shipped now reached 33 to 39 in one run). See [what the skill adds](skills/brainstorm/README.md#2-what-the-skill-adds) |
+| [think-brainstorm](skills/think-brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on eight questions; on six new real-world questions it reached another 67 to 118 mechanisms. On the first two: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care (Chinese method texts; the English texts shipped now reached 33 to 39 in one run). See [what the skill adds](skills/think-brainstorm/README.md#2-what-the-skill-adds) |
 
 Each skill has its own README in its folder: what it does, when to use it, and how far it has been tested.
 
@@ -29,7 +29,7 @@ Each skill has its own README in its folder: what it does, when to use it, and h
 
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
-claude plugin install brainstorm@xiaolang-skills
+claude plugin install think-brainstorm@xiaolang-skills
 ```
 
 **kilo, opencode, kimi code, Grok Bot, or Claude Code without plugins**:
@@ -43,6 +43,8 @@ cd xiaolang-skills
 ```
 
 `install.sh` uses symlinks by default, so `git pull` updates the skills in place. It never touches an existing folder it did not create.
+
+**brainstorm is now think-brainstorm.** If you installed it before the rename: with the plugin, run `claude plugin uninstall brainstorm@xiaolang-skills` and install `think-brainstorm@xiaolang-skills`; with `install.sh`, after `git pull` remove the old links (`rm ~/.agents/skills/brainstorm ~/.claude/skills/brainstorm`, only if they point into this repository) and run `./install.sh` again.
 
 ## License
 

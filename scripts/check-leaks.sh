@@ -17,10 +17,13 @@ patterns=(
   'cloud-workspace'
 )
 
+# skills published here that share a prefix with the patterns above
+public='think-(brainstorm|compare)'
+
 joined="$(IFS='|'; echo "${patterns[*]}")"
 hits="$( { git ls-files; git ls-files --others --exclude-standard; } \
   | grep -v '^scripts/check-leaks\.sh$' \
-  | while IFS= read -r f; do [[ -f "$f" ]] && grep -nEIH "$joined" "$f" || true; done )"
+  | while IFS= read -r f; do [[ -f "$f" ]] && LC_ALL=C sed -E "s/$public//g" "$f" | grep -nEI "$joined" | sed "s|^|$f:|" || true; done )"
 if [[ -n "$hits" ]]; then
   echo "private references found:" >&2
   echo "$hits" >&2
