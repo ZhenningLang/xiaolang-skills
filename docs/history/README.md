@@ -1,6 +1,6 @@
 # History
 
-Design notes written before v1 of the brainstorm skill was released (November 2026). They are in Chinese and are kept as a record only. **They do not describe the skill as shipped.** For the current state read [skills/brainstorm/README.md](../../skills/brainstorm/README.md).
+Design notes written before v1 of the brainstorm skill was released (November 2026). They are in Chinese and are kept as a record only. **They do not describe the skill as shipped.** For the current state read [skills/think-brainstorm/README.md](../../skills/think-brainstorm/README.md).
 
 ## What the notes planned and what shipped
 
