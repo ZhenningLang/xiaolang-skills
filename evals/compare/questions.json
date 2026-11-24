@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "about": "Eight common technology-selection questions, written for this evaluation. Each gives the candidates and a few facts about the situation, as a user would. None comes from a real project.",
+  "questions": [
+    {
+      "id": "database",
+      "text": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?"
+    },
+    {
+      "id": "api-style",
+      "text": "We are designing the API for a new mobile app (iOS and Android) and a web front end. The same backend will also be called by three internal services written in Go. The mobile screens often need data from several resources at once, and the mobile team complains about slow screens on bad networks. Team of six backend developers who have only built REST APIs before. Should the API be REST, GraphQL or gRPC?"
+    },
+    {
+      "id": "repo-layout",
+      "text": "Our company has 30 engineers working on 6 services (4 in TypeScript, 2 in Go) and a shared TypeScript library of types and API clients. Today every service has its own repository, and a change to the shared library takes days to roll out because each service has to bump the version. CI is GitHub Actions. Should we move to a monorepo or stay with one repository per service?"
+    },
+    {
+      "id": "message-queue",
+      "text": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?"
+    },
+    {
+      "id": "frontend-framework",
+      "text": "We are building an internal admin dashboard: around 40 screens of tables, forms and charts, used by 200 employees. The team is five developers who mostly write backend Python; only one has written any React, nobody has used Vue. The dashboard must be maintained for at least five years. Should we build it with React or Vue?"
+    },
+    {
+      "id": "container-platform",
+      "text": "Our startup runs 8 small web services and 2 background workers in Docker containers, about 20 containers in total, on AWS. Two developers handle infrastructure part-time; neither has run Kubernetes in production. We need zero-downtime deploys, autoscaling for one public API, and we want to keep the monthly bill low. Should we use Kubernetes on Amazon EKS, Amazon ECS on Fargate, or a platform such as Render or Fly.io?"
+    },
+    {
+      "id": "cache",
+      "text": "Our web application (Python, 12 app servers behind a load balancer) needs a shared store for user sessions, per-user API rate limiting, and caching of rendered product pages. Losing the cache is fine; losing sessions logs everyone out, which we want to avoid. Should we use Redis or Memcached?"
+    },
+    {
+      "id": "search",
+      "text": "We run an online shop with 200,000 products and plan search with typo tolerance, filters by category, price and brand, and results in under 100 ms. Product data lives in PostgreSQL. Team of three developers, no dedicated ops person, a tight budget, and about 50,000 searches a day. Should we use PostgreSQL full-text search, self-hosted OpenSearch (or Elasticsearch), or a hosted service such as Algolia?"
+    }
+  ]
+}

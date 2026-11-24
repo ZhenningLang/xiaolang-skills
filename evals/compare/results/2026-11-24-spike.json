@@ -1,0 +1,558 @@
+{
+  "label": "Spike: the first two questions, to check that the rubric tells the two answers apart",
+  "date": "2026-11-24",
+  "setup": {
+    "answer_models": [
+      "claude-opus-5-5"
+    ],
+    "answer_models_reported": [
+      "claude-opus-5-5"
+    ],
+    "judges": [
+      "openai/gpt-6.1-sol (variant high) via kilo run"
+    ],
+    "skill_sha256": [
+      "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9"
+    ],
+    "rubric_sha256": "3e6416e4bf039b4ea3ac2b482330a2e91a630a777049cf6e1fc66681c8bd5179",
+    "orders": "each pair judged twice, labels A and B swapped",
+    "answer_cost_usd": 0.2917
+  },
+  "counts": {
+    "judgments": 4,
+    "preferred_skill": 2,
+    "preferred_plain": 2,
+    "tie": 0,
+    "preferred_label_A": 2,
+    "preferred_label_B": 2,
+    "questions": 2,
+    "questions_skill_both_orders": 1,
+    "questions_plain_both_orders": 1,
+    "questions_split_or_tie": 0,
+    "questions_separated": 1,
+    "skill_total_higher": 2,
+    "plain_total_higher": 1,
+    "equal_total": 1
+  },
+  "mean_scores": {
+    "skill": {
+      "C1": 2.0,
+      "C2": 2.0,
+      "C3": 2.0,
+      "C4": 2.0,
+      "C5": 2.0,
+      "C6": 0.75,
+      "total": 10.75
+    },
+    "plain": {
+      "C1": 2.0,
+      "C2": 2.0,
+      "C3": 2.0,
+      "C4": 2.0,
+      "C5": 1.0,
+      "C6": 1.25,
+      "total": 10.25
+    }
+  },
+  "per_question": {
+    "database": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 9
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 0,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "B",
+          "totals": {
+            "skill": 10,
+            "plain": 9
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 0,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        2,
+        1
+      ],
+      "separates": true
+    },
+    "message-queue": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 12
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 2
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "plain",
+      "score_gap_skill_minus_plain": [
+        -1,
+        0
+      ],
+      "separates": false
+    }
+  },
+  "questions": [
+    {
+      "id": "database",
+      "text": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?"
+    },
+    {
+      "id": "message-queue",
+      "text": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?"
+    }
+  ],
+  "rubric": "You are grading two answers to the same technology-selection question. Someone has to choose between the candidates and then defend the choice to their team. Judge which answer helps them more.\n\nScore each answer on its own against the six criteria below, 0, 1 or 2 each. Then say which answer you prefer overall.\n\nRules for grading:\n\n- Do not reward length. A shorter answer that does the job scores as well as a longer one.\n- Do not reward formatting. A table, headings or labels earn nothing by themselves; judge what the answer says.\n- The order of the two answers means nothing.\n- Grade with your own knowledge of the candidates. A factual error costs points under C6 even when it sounds confident.\n\nCriteria:\n\n- C1 Criteria first. 2: names the criteria this choice turns on, tied to the situation described, and compares on them. 1: some criteria, but generic or mixed with ones that do not separate the candidates. 0: a loose list of pros and cons, or a verdict with little comparison.\n- C2 Concrete comparison. 2: for each criterion, states differences between the candidates that someone could check (named features, limits, operational work, rough numbers). 1: partly concrete, partly vague adjectives such as \"more flexible\" or \"better ecosystem\". 0: mostly vague.\n- C3 Uses the situation. 2: uses the facts given in the question (team skills, scale, budget, operations capacity, stated needs) and lets the hard constraints outweigh minor preferences. 1: mentions the facts but the comparison does not really depend on them. 0: a generic answer that would read the same for any team.\n- C4 Clear verdict. 2: ends with one recommendation, or an explicit tie with a safe default and what would break the tie. 1: a lean, but hedged until it is hard to act on. 0: \"it depends\" with no choice.\n- C5 Conditions. 2: says what the recommendation relies on and names when another candidate would be the better choice. 1: a vague caveat. 0: none.\n- C6 Accuracy and honesty. 2: no factual errors about the candidates, and claims that are uncertain or rest on facts not given are marked as such. 1: a minor error, or uncertain claims stated as certain. 0: an error that could change the decision.\n\nReply with one JSON object and nothing else, in this shape:\n\n{\"A\": {\"C1\": 0, \"C2\": 0, \"C3\": 0, \"C4\": 0, \"C5\": 0, \"C6\": 0, \"notes\": \"one or two sentences\"},\n \"B\": {\"C1\": 0, \"C2\": 0, \"C3\": 0, \"C4\": 0, \"C5\": 0, \"C6\": 0, \"notes\": \"one or two sentences\"},\n \"preference\": \"A\" or \"B\" or \"tie\",\n \"reason\": \"one or two sentences on why\"}\n",
+  "answers": {
+    "database.skill": {
+      "question_id": "database",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?",
+      "answer": "# PostgreSQL vs MySQL vs MongoDB for a multi-tenant B2B SaaS\n\n## 1. Candidates\n\nPostgreSQL, MySQL and MongoDB, as you listed them. Each would run as a managed service: RDS, Aurora or Cloud SQL for the first two, Atlas for MongoDB.\n\n## 2. Dimensions\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Relational integrity and transactions | Invoices, line items and permissions need foreign keys, multi-row atomic writes and joins. Money data cannot drift. | **High (hard constraint)** |\n| Team familiarity | Four developers, two of them with Postgres production experience and none with MongoDB. Operational mistakes early on cost more than any feature gap. | **High** |\n| Per-customer custom fields | This is the one area where a flexible schema is actually needed. | Medium |\n| Tenant isolation support | With multi-tenancy, one missed `WHERE tenant_id = ?` leaks one customer's data to another. Help from the database reduces that risk. | Medium |\n| Schema migration safety | A young product changes its schema often. | Low–Medium |\n| Reporting and analytics queries | B2B customers ask for exports, aggregates and dashboards early. | Low–Medium |\n\nI dropped three dimensions because they don't separate the candidates:\n- **Managed availability**: all three are mature managed offerings.\n- **Scale under 1 TB**: all three handle this comfortably on a single primary.\n- **Decimal money types**: `NUMERIC`, `DECIMAL` and `Decimal128` all exist.\n\n## 3. Comparison\n\n| Dimension | PostgreSQL | MySQL | MongoDB | Winner |\n|---|---|---|---|---|\n| Relational integrity and transactions | Full foreign keys, ACID, rich joins, `CHECK` and exclusion constraints | Full foreign keys and ACID on InnoDB, good joins, `CHECK` enforced since 8.0.16 | No foreign keys. Multi-document transactions exist (since 4.0) but are not the default path. Joins go through `$lookup`. Integrity becomes application code. | PostgreSQL ≈ MySQL (Postgres slightly ahead on constraint options) |\n| Team familiarity | 2 of 4 have run it in production | Unknown `[unverified]`. Your message implies nobody has production experience with it. | 0 of 4 | **PostgreSQL** |\n| Custom fields | `JSONB` with GIN indexes. You can query, index and constrain the JSON alongside relational columns. | `JSON` type. Indexing goes through generated columns or multi-valued indexes, which is workable but clunkier. | Native strength: arbitrary fields per document | MongoDB, with **PostgreSQL** a close second that is good enough for this need |\n| Tenant isolation | Native Row-Level Security can enforce `tenant_id` filtering inside the database | No RLS. Isolation must be enforced in the app, through views or with schema-per-tenant. | No RLS equivalent for tenant filtering. Isolation is app-enforced or uses database-per-tenant. | **PostgreSQL** |\n| Migration safety | Transactional DDL, so a failed migration rolls back cleanly | DDL is not transactional, so a failed migration can leave a partial state. Online DDL is good. | No schema migrations as such, but data shape drifts and backfills are manual | **PostgreSQL** |\n| Reporting queries | Window functions, CTEs, strong planner, many BI connectors | Window functions and CTEs since 8.0, good BI support | Aggregation pipeline is capable but unfamiliar, and BI connectivity is weaker | PostgreSQL (MySQL close) |\n\n**Tally on the weighted dimensions:**\n- PostgreSQL wins or ties both high-weight dimensions and wins 3 of the 4 others.\n- MongoDB wins only on custom fields. PostgreSQL's `JSONB` already covers that need adequately.\n\n## Verdict\n\n**Recommended: PostgreSQL**\n\nWhy:\n1. Your core data (accounts, invoices, line items, permissions) is relational and financial, which rules out MongoDB on the hard constraint. MongoDB would push referential integrity into your code for its one advantage, a flexible schema, and you only need that for a minority of your data.\n2. Half your team has already run Postgres in production. Neither alternative has comparable experience on the team.\n3. Postgres covers custom fields with `JSONB` and tenant isolation with Row-Level Security. These are exactly the two needs that separate your product from a generic CRUD app, and MySQL handles both less well.\n\nSuggested shape:\n- Shared tables with a `tenant_id` column on every row\n- RLS policies keyed on a session variable\n- A `custom_fields JSONB` column with GIN indexes on the entities customers can extend\n\n**Holds when:**\n- Custom fields stay a secondary feature rather than the bulk of the data model.\n- You stay on one managed Postgres provider (RDS, Aurora, Cloud SQL, Neon, etc.).\n\n**If that changes:**\n- **Choose MySQL** if your organisation already has a MySQL operations team, tooling or vendor commitment, or if you specifically need Vitess or PlanetScale for horizontal sharding. Both are unlikely at under 1 TB. You would then handle tenant isolation strictly in the application layer.\n- **Reconsider MongoDB** only if the product turns into mostly schemaless, customer-defined documents with little cross-entity integrity. That is not what you've described. Even then, hiring or training for MongoDB operations would be a prerequisite.",
+      "cost_usd": 0.0775836,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3803,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 2351,
+        "output_tokens_details": {
+          "thinking_tokens": 417
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3803,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2351,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3803,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3803
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:24:54+00:00",
+      "finished": "2026-11-24T06:25:24+00:00"
+    },
+    "database.plain": {
+      "question_id": "database",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?",
+      "answer": "**Use PostgreSQL.** For your situation it's a clear call, not a close one.\n\n## Why PostgreSQL\n\n- **Your data is relational.** Accounts, invoices, line items and permissions are classic relational data with foreign keys, joins and transactional integrity. An invoice and its line items must commit atomically. Postgres handles this natively.\n- **Custom fields fit in JSONB.** This is usually the argument for MongoDB, but Postgres covers it well. Add a `custom_fields JSONB` column on the relevant tables, index it with GIN (or expression indexes on hot keys), and validate with CHECK constraints or in the app layer. You get schemaless flexibility where you need it and a strict schema everywhere else.\n- **Multi-tenancy tooling.** Row-Level Security (RLS) lets the database enforce `tenant_id` isolation, so a missing `WHERE tenant_id = ?` in application code doesn't leak data across tenants. MySQL has no equivalent.\n- **Team experience.** Two of your four developers have run it in production. Nobody has run MongoDB. Operational familiarity matters more than most feature comparisons, especially when something breaks at 2 a.m.\n- **Scale is a non-issue.** Under 1 TB is comfortably single-primary territory on any managed offering (RDS/Aurora, Cloud SQL, AlloyDB, Azure Flexible Server, Neon, Supabase). You won't need sharding for years, if ever. Citus is available if you eventually do.\n\n## Why not the others\n\n- **MySQL** would work. It's a reasonable relational database, and nothing here would fail on it. But it has weaker JSON indexing and querying, no RLS, and less expressive SQL (partial indexes, richer constraints, `RETURNING`, better CTE and window support historically). Your team's experience is also with Postgres. No upside justifies switching.\n- **MongoDB** is a mismatch. Invoicing is a multi-entity transactional domain. You'd either embed and duplicate data or reimplement joins and referential integrity in application code. Mongo has multi-document transactions now, but they aren't its sweet spot. The one thing it does better, flexible fields, is already covered by JSONB. And no one on the team has operated it.\n\n## Suggestions for getting started\n\n1. **Tenancy model:** start with a shared schema plus a `tenant_id` column on every tenant-owned table, enforced with RLS. Make `tenant_id` the leading column in composite indexes and keys. Avoid schema-per-tenant unless you have a specific isolation requirement, because it gets painful past a few hundred tenants.\n2. **Custom fields:** use JSONB on the entity, plus a `custom_field_definitions` table per tenant (name, type, required) so the app can validate input and render UI. Avoid EAV (entity-attribute-value) tables; they're harder to query and slower.\n3. **Money:** use `NUMERIC` (or integer minor units) for amounts. Never use floats.\n4. **Migrations:** pick a migration tool on day one (Flyway, Alembic, Prisma, sqitch, or whatever matches your stack) and enable `pg_stat_statements` for query visibility.\n5. **Version:** start on the latest major version your managed provider supports.\n\nIf you tell me your backend language/framework and cloud provider, I can sketch a starter schema with RLS policies and a custom-fields pattern.",
+      "cost_usd": 0.0427658,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2471,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1143,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2471,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1143,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2471,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2471
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:25:39+00:00",
+      "finished": "2026-11-24T06:25:59+00:00"
+    },
+    "message-queue.skill": {
+      "question_id": "message-queue",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?",
+      "answer": "# Order event bus: Kafka vs RabbitMQ vs SNS+SQS\n\n## 1. Candidates\n\n| # | Candidate | Note |\n|---|---|---|\n| A | Self-managed Kafka on EC2 | |\n| B | Amazon MSK (Serverless or Provisioned) | Treated separately from A because the ops burden is very different |\n| C | RabbitMQ (Amazon MQ for RabbitMQ, or self-run) | |\n| D | Amazon SNS fan-out to SQS queues | |\n| E | Amazon Kinesis Data Streams `[inferred]` | Not on your list, but it is AWS's managed replayable log, so it targets your exact requirements |\n\n**Load:** 2,000 msg/s × at most 2 KB is about 4 MB/s, roughly 10 TB/month. That is modest for every candidate. Throughput does not decide this choice. Replay, fan-out and ops burden do.\n\n## 2. Dimensions\n\n| Dimension | Weight | Why it matters here |\n|---|---|---|\n| Ops burden for a 2-person team with no Kafka experience | **High (hard constraint)** | Whatever you run, these two people get paged for it. A broker they can't operate is a liability. |\n| 7-day replay | **High (hard requirement)** | This is a stated need and it separates log-based systems from queues. |\n| Multiple independent consumers | High | Several consumers each need the full stream at their own pace. |\n| Per-order ordering | Medium | Order events (created, paid, shipped) usually need ordering per order ID. |\n| Cost at ~4 MB/s | Medium | Baseline cost differs a lot between options. |\n| Ecosystem and portability | Low–Medium | Matters only if you need Kafka Connect, Kafka Streams, or a multi-cloud exit. |\n\n## 3. Comparison\n\n| Dimension | A: Self-managed Kafka | B: MSK | C: RabbitMQ | D: SNS+SQS | E: Kinesis `[inferred]` | Winner |\n|---|---|---|---|---|---|---|\n| Ops burden | You patch, scale, rebalance and monitor brokers and disks. You also need KRaft/ZooKeeper knowledge you don't have. | Serverless: no brokers to manage, but you still handle Kafka concepts (partitions, consumer groups, client tuning). Provisioned: you size brokers and storage. | Amazon MQ handles the hosts, but queue and cluster behavior under backlog is still yours to manage. | Fully serverless, almost nothing to operate. | Fully managed. You pick on-demand or a shard count. Consumers need KCL (checkpoints in DynamoDB) or Lambda. | **D**, then E, then B-Serverless |\n| 7-day replay | Native: set retention, reset offsets. | Native. On Serverless, check that the retention limit covers 7 days `[unverified]`. | Classic and quorum queues delete messages once acked, so no replay. RabbitMQ Streams can replay, but Amazon MQ support for it is `[unverified]`. | SQS deletes on consume, so no replay. Workarounds: archive to S3 through Firehose and write a replay tool, or use SNS FIFO archive/replay (FIFO throughput limits apply `[unverified]` at 2k/s). | Native: retention up to 365 days, read from `AT_TIMESTAMP`. | **A/B/E tie** |\n| Multiple consumers | Consumer groups, each with its own offset. | Same as A. | Fan-out exchange with one queue per consumer works, but replay is still missing. | One SQS queue per consumer subscribed to the topic. Clean fan-out. | Up to 20 enhanced fan-out consumers, each with its own 2 MB/s per shard. | **tie A/B/D/E**. C is acceptable. |\n| Per-order ordering | Partition key = order ID. | Same as A. | Ordering holds per queue, but redeliveries and competing consumers can break it. | Standard SQS has no ordering guarantee. FIFO gives per-group order but has lower throughput limits. | Partition key = order ID gives per-shard order. | **A/B/E** |\n| Cost (rough, us-east-1) | EC2 + EBS for 3+ brokers, plus a lot of engineer time. | Serverless has a fixed cluster-hour baseline (a few hundred $/month) plus throughput. Provisioned costs similar or more. | Small Amazon MQ cluster, low hundreds of $/month. | Per-request pricing: about 5B messages × (1 publish + N deliveries), so it grows with consumer count. | Provisioned at about 5–6 shards plus 7-day retention plus EFO is about low hundreds of $/month. On-demand costs more. `[unverified: use the AWS calculator]` | **E**, depending on consumer count for D |\n| Ecosystem and portability | Full Kafka ecosystem, portable. | Full Kafka API, portable. | AMQP, portable, but not a log. | AWS-only. | AWS-only, proprietary API. | **A/B** |\n\n## Verdict\n\n**Recommended: Amazon Kinesis Data Streams [inferred].** If you want to stay within your original three options, pick **MSK Serverless**. Do not self-manage Kafka, and do not use RabbitMQ.\n\n**Why:**\n1. Replay is a hard requirement, and only log-based systems (Kafka/MSK, Kinesis) provide it natively. RabbitMQ classic and quorum queues and SNS+SQS would need a separate archive-and-replay mechanism that you would have to build and maintain.\n2. With two ops people who are new to Kafka, the ops dimension rules out self-managed Kafka. It also tilts the choice from MSK toward Kinesis, which has fewer concepts to learn and nothing broker-shaped to tune.\n3. At about 4 MB/s, Kinesis handles fan-out (enhanced fan-out), per-order ordering (partition key) and 7-day retention cheaply. You can also attach Lambda consumers without writing consumer code.\n\n**This holds when:**\n- You are comfortable being AWS-only.\n- You don't need Kafka Connect, Kafka Streams, or existing Kafka clients.\n- You have 20 or fewer consumers that each need dedicated throughput.\n\n**If that changes:**\n- **You need the Kafka ecosystem or portability** (Connect sinks, Debezium CDC, a future multi-cloud move): choose **MSK Serverless**. First confirm its retention limit covers 7 days; otherwise use MSK Provisioned with tiered storage.\n- **Replay turns out to be rare** (\"nice to have after a bug\") and simplicity matters most: choose **SNS + SQS**, with an extra Firehose subscription that archives to S3. Accept that replay means a script re-publishing from S3.\n- **Throughput grows by 10× or more, or you reach dozens of consumers**: re-evaluate MSK, because Kinesis per-shard and enhanced fan-out costs scale linearly.\n- **RabbitMQ** wins only if you need complex routing (topic or header exchanges, per-message priority) more than replay, which is not the case here.\n\nBefore committing, verify two things: MSK Serverless retention limits, and SNS FIFO throughput at 2,000 msg/s.",
+      "cost_usd": 0.1090876,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3796,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 3929,
+        "output_tokens_details": {
+          "thinking_tokens": 1437
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3796,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 3929,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3796,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3796
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:24:54+00:00",
+      "finished": "2026-11-24T06:25:39+00:00"
+    },
+    "message-queue.plain": {
+      "question_id": "message-queue",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?",
+      "answer": "## Recommendation: Amazon Kinesis Data Streams, or Amazon MSK if you specifically want Kafka\n\nThe 7-day replay requirement decides this. You need a **retained log** that each consumer reads at its own position, not a queue that deletes messages once they are consumed. That rules out plain SQS/SNS and RabbitMQ's classic queues. Given a two-person ops team, it also rules out self-managed Kafka.\n\n### Option by option\n\n**Self-managed Kafka: no.** Broker sizing, partition rebalancing, upgrades, disk management and monitoring are a real job. A team new to Kafka will learn it during an incident.\n\n**RabbitMQ: poor fit.** Classic and quorum queues delete messages on ack, so replay isn't native. RabbitMQ Streams do support replay, but then you're running a log system on a broker built mainly for queuing. Your team would still own clustering and upgrades, unless you use Amazon MQ, which has its own limits.\n\n**SQS + SNS: easy fan-out, weak replay.** SNS fanning out to one SQS queue per consumer is simple and nearly ops-free, and 2,000 msg/s is easy. But consumed messages are gone. Replay means archiving to S3 (for example SNS → Firehose → S3) and building your own replay tool. SNS FIFO topics have built-in archive and replay, but you take on FIFO throughput limits and cost. Choose this only if replay is rare and you're fine with a custom S3-based process.\n\n**Amazon MSK: good if Kafka matters to you.** It's a real Kafka log with consumer groups and offset or timestamp replay, and AWS runs the brokers. You still choose partition counts, handle client configuration and consumer-group behavior, and pick broker or storage sizes (or use Express brokers or Serverless; check current retention limits for Serverless). It's a good choice if you want Kafka-ecosystem tools like Kafka Connect, Debezium or Flink-on-Kafka, or portability off AWS.\n\n**Kinesis Data Streams: best fit for your constraints.** It wasn't on your list, but it's essentially a managed log with almost no ops:\n- **Throughput:** 2,000 msg/s × 2 KB ≈ 4 MB/s peak. Each shard accepts 1 MB/s or 1,000 records/s of writes, so you need about 4 shards plus headroom. On-demand mode scales shards for you.\n- **Replay:** set retention to 7 days (up to 365 is available, at extra cost beyond 24h). A consumer can re-read from any point with an `AT_TIMESTAMP` iterator.\n- **Multiple consumers:** use enhanced fan-out so each consumer gets its own 2 MB/s per shard instead of sharing read throughput.\n- **Ops:** no brokers or disks to manage. It integrates with IAM, CloudWatch and Lambda, and the KCL handles checkpointing.\n- **Trade-offs:** it's AWS-specific, ordering is per shard (partition key), and the KCL is less familiar than Kafka clients.\n\n### Bottom line\n\n1. **Default choice: Kinesis Data Streams** (on-demand mode, 7-day retention, enhanced fan-out). It meets every requirement with the least work for your team.\n2. **Choose MSK instead** if you expect to need Kafka-ecosystem tools or want to avoid AWS lock-in. Budget time for your team to learn Kafka concepts such as partitions, consumer groups and offsets.\n3. **Choose SNS + SQS** only if replay is a rare emergency and an S3-archive-and-republish process is acceptable.\n\nWhichever you pick, make consumers **idempotent** (for example, deduplicate on order event ID). Every option is at-least-once, and replay deliberately re-delivers events.",
+      "cost_usd": 0.062229799999999995,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2464,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 2119,
+        "output_tokens_details": {
+          "thinking_tokens": 833
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2464,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2119,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2464,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2464
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:25:39+00:00",
+      "finished": "2026-11-24T06:26:07+00:00"
+    }
+  },
+  "judgments": {
+    "database.first": {
+      "question_id": "database",
+      "order": "first",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "7a8c6b09497942641745edba93a59e743b85e12c52eaefddfc8e09851fad8d2d",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:31:03+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares situation-specific criteria with checkable features, prioritizes relational integrity and existing PostgreSQL experience, and gives explicit conditions for choosing alternatives. However, MySQL experience is unknown, not absent as the verdict asserts, and calling MongoDB ruled out by a hard constraint overstates the stated requirements.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 0,\n    \"C6\": 1,\n    \"notes\": \"Gives a clear, well-supported PostgreSQL recommendation using concrete differences in integrity, JSON indexing and tenant isolation. It does not identify when MySQL or MongoDB would become preferable, and its categorical claims about future sharding needs and EAV performance exceed what the supplied facts establish.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A better equips someone to defend the decision by distinguishing decisive criteria from non-differentiators and explaining when another candidate would win. B supports the same sensible choice but omits those decision boundaries.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares situation-specific criteria with checkable features, prioritizes relational integrity and existing PostgreSQL experience, and gives explicit conditions for choosing alternatives. However, MySQL experience is unknown, not absent as the verdict asserts, and calling MongoDB ruled out by a hard constraint overstates the stated requirements."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 0,
+          "C6": 1,
+          "notes": "Gives a clear, well-supported PostgreSQL recommendation using concrete differences in integrity, JSON indexing and tenant isolation. It does not identify when MySQL or MongoDB would become preferable, and its categorical claims about future sharding needs and EAV performance exceed what the supplied facts establish."
+        },
+        "preference": "A",
+        "reason": "A better equips someone to defend the decision by distinguishing decisive criteria from non-differentiators and explaining when another candidate would win. B supports the same sensible choice but omits those decision boundaries."
+      }
+    },
+    "database.second": {
+      "question_id": "database",
+      "order": "second",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "562cf60a04cced9c8a71d512eb54c296dbe2e656befd404675c13fcb545e51e5",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:31:41+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 0,\n    \"C6\": 1,\n    \"notes\": \"Connects relational integrity, JSONB, tenant isolation and existing PostgreSQL experience to a concrete recommendation. It does not identify when another database would become preferable, and its assurance that data volume alone makes sharding unnecessary is too categorical.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"Provides situation-specific criteria, checkable comparisons and explicit conditions for choosing another candidate. However, treating relational financial data as a hard constraint that rules out MongoDB is materially misleading given its transaction support, and the verdict incorrectly treats the team's unspecified MySQL experience as absent.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B narrowly provides more help defending the choice because it explains the priorities and identifies circumstances that would reverse the recommendation. Its PostgreSQL recommendation remains well supported, but the categorical MongoDB exclusion and unsupported MySQL-experience claim should not be repeated to the team.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 0,
+          "C6": 1,
+          "notes": "Connects relational integrity, JSONB, tenant isolation and existing PostgreSQL experience to a concrete recommendation. It does not identify when another database would become preferable, and its assurance that data volume alone makes sharding unnecessary is too categorical."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "Provides situation-specific criteria, checkable comparisons and explicit conditions for choosing another candidate. However, treating relational financial data as a hard constraint that rules out MongoDB is materially misleading given its transaction support, and the verdict incorrectly treats the team's unspecified MySQL experience as absent."
+        },
+        "preference": "B",
+        "reason": "B narrowly provides more help defending the choice because it explains the priorities and identifies circumstances that would reverse the recommendation. Its PostgreSQL recommendation remains well supported, but the categorical MongoDB exclusion and unsupported MySQL-experience claim should not be repeated to the team."
+      }
+    },
+    "message-queue.first": {
+      "question_id": "message-queue",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "e8883b8f6e8391a3e40fa831ae7972dadb4f642120f37a82cf6270d3a673d623",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:32:44+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 2,\n    \"notes\": \"Centers the choice on replay, independent consumers, and operational burden, with concrete mechanisms and a clear Kinesis recommendation plus MSK fallback. It distinguishes RabbitMQ Streams and SNS FIFO archive/replay from ordinary queue behavior and flags relevant uncertainties.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Provides actionable comparisons, a clear recommendation, and explicit conditions for switching candidates. However, its monthly traffic estimates silently assume sustained peak throughput, its cost ranking lacks sufficient assumptions about consumer count and utilization, and attaching Lambda does not eliminate writing event-processing code.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"Both support a defensible selection, but A reaches the recommendation with fewer unsupported claims. B's extra cost analysis risks misleading the team because the question supplies peak traffic, not average utilization or a precise consumer count.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 2,
+          "notes": "Centers the choice on replay, independent consumers, and operational burden, with concrete mechanisms and a clear Kinesis recommendation plus MSK fallback. It distinguishes RabbitMQ Streams and SNS FIFO archive/replay from ordinary queue behavior and flags relevant uncertainties."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Provides actionable comparisons, a clear recommendation, and explicit conditions for switching candidates. However, its monthly traffic estimates silently assume sustained peak throughput, its cost ranking lacks sufficient assumptions about consumer count and utilization, and attaching Lambda does not eliminate writing event-processing code."
+        },
+        "preference": "A",
+        "reason": "Both support a defensible selection, but A reaches the recommendation with fewer unsupported claims. B's extra cost analysis risks misleading the team because the question supplies peak traffic, not average utilization or a precise consumer count."
+      }
+    },
+    "message-queue.second": {
+      "question_id": "message-queue",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "151bb6733dee396003984285ce97aa58b7c8dc23f0c0a6408f41ae7d32e36058",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:33:21+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Defines relevant priorities, compares concrete capabilities, and gives both a recommendation and an explicit fallback within the original candidates. However, its monthly volume assumes continuous peak traffic without saying so, its cost ranking is insufficiently grounded, and its verdict overlooks the native SNS FIFO archive/replay option acknowledged earlier.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Uses replay, independent consumption, throughput, and limited operational capacity to support an actionable recommendation with concrete technical details and switching conditions. Its final restriction of SNS/SQS to a custom S3 replay process is too strong given the native SNS FIFO archive/replay capability it correctly mentions.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B provides a slightly more defensible explanation of the operational and replay trade-offs without relying on A's speculative cost ranking or treating peak traffic as established monthly volume. Both should evaluate SNS FIFO's native replay more seriously before dismissing that candidate.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Defines relevant priorities, compares concrete capabilities, and gives both a recommendation and an explicit fallback within the original candidates. However, its monthly volume assumes continuous peak traffic without saying so, its cost ranking is insufficiently grounded, and its verdict overlooks the native SNS FIFO archive/replay option acknowledged earlier."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Uses replay, independent consumption, throughput, and limited operational capacity to support an actionable recommendation with concrete technical details and switching conditions. Its final restriction of SNS/SQS to a custom S3 replay process is too strong given the native SNS FIFO archive/replay capability it correctly mentions."
+        },
+        "preference": "B",
+        "reason": "B provides a slightly more defensible explanation of the operational and replay trade-offs without relying on A's speculative cost ranking or treating peak traffic as established monthly volume. Both should evaluate SNS FIFO's native replay more seriously before dismissing that candidate."
+      }
+    }
+  }
+}

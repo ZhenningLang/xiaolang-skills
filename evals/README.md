@@ -1,6 +1,6 @@
 # Evaluation tools for the brainstorm skill
 
-git-tidy has its own, much smaller tool: see [git-tidy/README.md](git-tidy/README.md). The rest of this page is about brainstorm.
+git-tidy and think-compare have their own, much smaller tools: see [git-tidy/README.md](git-tidy/README.md) and [compare/README.md](compare/README.md). The rest of this page is about brainstorm.
 
 These tools measure the skill. They are not a skill and nothing here is installed with one.
 Python 3.13 and the standard library only. File locking requires POSIX; Windows is not supported.

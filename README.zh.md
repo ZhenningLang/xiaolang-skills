@@ -9,6 +9,7 @@
 | 技能 | 做什么 | 状态 |
 |:---|:---|:---|
 | [think-brainstorm](skills/think-brainstorm/README.zh.md) | 头脑风暴：先把点子撑开，再谈好坏 | v1。人工评分只做过一道题。和反复直接问比过八道题的计数；在六道真实新题上多 67 到 118 个机制。前两道题里：它能想到反复直接问想不到的机制，在认真量过的那道题上多 46 到 62 个（中文方法原文；现在发布的英文方法原文跑过一次，多 33 到 39 个）。见[用了技能之后的提升](skills/think-brainstorm/README.zh.md#二用了技能之后的提升) |
+| [think-compare](skills/think-compare/README.zh.md) | 在已有的几个选项里选一个：先定维度，每个维度给胜者，最后给一个带前提的裁决 | v1。和直接问比，八道技术选型题，另一家公司的模型两种顺序盲评：16 次评判里 11 次偏好用技能的回答，8 道题里 5 道两种顺序都偏好它（直接问 2 道）。满分 12 的平均分 10.875 对 10.5，差距主要在写明前提和写出查得到的差别。见[证据](skills/think-compare/README.zh.md#3-证据) |
 
 ## 工具
 
@@ -39,6 +40,7 @@
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
 claude plugin install think-brainstorm@xiaolang-skills
+claude plugin install think-compare@xiaolang-skills
 claude plugin install git-tidy@xiaolang-skills   # /git-tidy 命令；git tidy 程序本身用下面的 install.sh 装
 ```
 

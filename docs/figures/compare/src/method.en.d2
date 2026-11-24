@@ -1,0 +1,11 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "four steps in a line with one way out; a quiet style reads best", "surface": "repo-doc"}
+direction: right
+cands: "1. Candidates\nthe ones given, plus one or two\nmarked [inferred] if missing" { class: box }
+dims: "2. Dimensions first\n4 to 8, each with why it matters;\ndrop any that does not separate" { class: new }
+table: "3. One row per dimension\na checkable difference per cell,\na winner or a tie" { class: box }
+verdict: "4. Verdict\none choice, what it relies on,\nwhen to switch" { class: hero }
+research: "Candidates not known yet:\nresearch first, then compare" { class: box }
+cands -> dims
+dims -> table
+table -> verdict
+cands -> research: "not settled"

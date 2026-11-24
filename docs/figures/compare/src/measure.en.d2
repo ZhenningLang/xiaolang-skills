@@ -1,0 +1,12 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "two arms joining at one blind judge; a quiet style reads best", "surface": "repo-doc"}
+direction: right
+q: "8 common technology-\nselection questions" { class: store }
+skill: "Claude with the skill\nSKILL.md in the system prompt" { class: new }
+plain: "Claude, plain asking\nthe question alone" { class: box }
+judge: "Judge from another company\nlabels A and B only,\nevery pair in both orders" { class: decision }
+counts: "Result file\nscores, preferences,\nevery answer and reply" { class: hero }
+q -> skill
+q -> plain
+skill -> judge
+plain -> judge
+judge -> counts

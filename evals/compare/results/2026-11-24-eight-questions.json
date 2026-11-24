@@ -1,0 +1,2034 @@
+{
+  "label": "All eight questions, skill against plain asking, judged blind in both orders",
+  "date": "2026-11-24",
+  "setup": {
+    "answer_models": [
+      "claude-opus-5-5"
+    ],
+    "answer_models_reported": [
+      "claude-opus-5-5"
+    ],
+    "judges": [
+      "openai/gpt-6.1-sol (variant high) via kilo run"
+    ],
+    "skill_sha256": [
+      "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9"
+    ],
+    "rubric_sha256": "3e6416e4bf039b4ea3ac2b482330a2e91a630a777049cf6e1fc66681c8bd5179",
+    "orders": "each pair judged twice, labels A and B swapped",
+    "answer_cost_usd": 1.1204
+  },
+  "counts": {
+    "judgments": 16,
+    "preferred_skill": 11,
+    "preferred_plain": 5,
+    "tie": 0,
+    "preferred_label_A": 7,
+    "preferred_label_B": 9,
+    "questions": 8,
+    "questions_skill_both_orders": 5,
+    "questions_plain_both_orders": 2,
+    "questions_split_or_tie": 1,
+    "questions_separated": 3,
+    "skill_total_higher": 6,
+    "plain_total_higher": 1,
+    "equal_total": 9
+  },
+  "mean_scores": {
+    "skill": {
+      "C1": 2.0,
+      "C2": 2.0,
+      "C3": 2.0,
+      "C4": 2.0,
+      "C5": 2.0,
+      "C6": 0.875,
+      "total": 10.875
+    },
+    "plain": {
+      "C1": 2.0,
+      "C2": 1.875,
+      "C3": 2.0,
+      "C4": 2.0,
+      "C5": 1.75,
+      "C6": 0.875,
+      "total": 10.5
+    }
+  },
+  "per_question": {
+    "database": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 9
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 0,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "B",
+          "totals": {
+            "skill": 10,
+            "plain": 9
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 0,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        2,
+        1
+      ],
+      "separates": true
+    },
+    "api-style": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "plain",
+      "score_gap_skill_minus_plain": [
+        0,
+        0
+      ],
+      "separates": false
+    },
+    "repo-layout": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        0,
+        0
+      ],
+      "separates": false
+    },
+    "message-queue": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 12
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 2
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "A"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": "plain",
+      "score_gap_skill_minus_plain": [
+        -1,
+        0
+      ],
+      "separates": false
+    },
+    "frontend-framework": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 10
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 1,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 10
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 1,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        1,
+        1
+      ],
+      "separates": true
+    },
+    "container-platform": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "plain",
+          "preferred_label": "B"
+        }
+      ],
+      "preferred_both_orders": null,
+      "score_gap_skill_minus_plain": [
+        0,
+        0
+      ],
+      "separates": false
+    },
+    "cache": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 10
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 11,
+            "plain": 10
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        1,
+        1
+      ],
+      "separates": true
+    },
+    "search": {
+      "orders": [
+        {
+          "order": "first",
+          "skill_label": "B",
+          "totals": {
+            "skill": 11,
+            "plain": 11
+          },
+          "scores": {
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            },
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 1
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "B"
+        },
+        {
+          "order": "second",
+          "skill_label": "A",
+          "totals": {
+            "skill": 10,
+            "plain": 10
+          },
+          "scores": {
+            "skill": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            },
+            "plain": {
+              "C1": 2,
+              "C2": 2,
+              "C3": 2,
+              "C4": 2,
+              "C5": 2,
+              "C6": 0
+            }
+          },
+          "preferred": "skill",
+          "preferred_label": "A"
+        }
+      ],
+      "preferred_both_orders": "skill",
+      "score_gap_skill_minus_plain": [
+        0,
+        0
+      ],
+      "separates": false
+    }
+  },
+  "questions": [
+    {
+      "id": "database",
+      "text": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?"
+    },
+    {
+      "id": "api-style",
+      "text": "We are designing the API for a new mobile app (iOS and Android) and a web front end. The same backend will also be called by three internal services written in Go. The mobile screens often need data from several resources at once, and the mobile team complains about slow screens on bad networks. Team of six backend developers who have only built REST APIs before. Should the API be REST, GraphQL or gRPC?"
+    },
+    {
+      "id": "repo-layout",
+      "text": "Our company has 30 engineers working on 6 services (4 in TypeScript, 2 in Go) and a shared TypeScript library of types and API clients. Today every service has its own repository, and a change to the shared library takes days to roll out because each service has to bump the version. CI is GitHub Actions. Should we move to a monorepo or stay with one repository per service?"
+    },
+    {
+      "id": "message-queue",
+      "text": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?"
+    },
+    {
+      "id": "frontend-framework",
+      "text": "We are building an internal admin dashboard: around 40 screens of tables, forms and charts, used by 200 employees. The team is five developers who mostly write backend Python; only one has written any React, nobody has used Vue. The dashboard must be maintained for at least five years. Should we build it with React or Vue?"
+    },
+    {
+      "id": "container-platform",
+      "text": "Our startup runs 8 small web services and 2 background workers in Docker containers, about 20 containers in total, on AWS. Two developers handle infrastructure part-time; neither has run Kubernetes in production. We need zero-downtime deploys, autoscaling for one public API, and we want to keep the monthly bill low. Should we use Kubernetes on Amazon EKS, Amazon ECS on Fargate, or a platform such as Render or Fly.io?"
+    },
+    {
+      "id": "cache",
+      "text": "Our web application (Python, 12 app servers behind a load balancer) needs a shared store for user sessions, per-user API rate limiting, and caching of rendered product pages. Losing the cache is fine; losing sessions logs everyone out, which we want to avoid. Should we use Redis or Memcached?"
+    },
+    {
+      "id": "search",
+      "text": "We run an online shop with 200,000 products and plan search with typo tolerance, filters by category, price and brand, and results in under 100 ms. Product data lives in PostgreSQL. Team of three developers, no dedicated ops person, a tight budget, and about 50,000 searches a day. Should we use PostgreSQL full-text search, self-hosted OpenSearch (or Elasticsearch), or a hosted service such as Algolia?"
+    }
+  ],
+  "rubric": "You are grading two answers to the same technology-selection question. Someone has to choose between the candidates and then defend the choice to their team. Judge which answer helps them more.\n\nScore each answer on its own against the six criteria below, 0, 1 or 2 each. Then say which answer you prefer overall.\n\nRules for grading:\n\n- Do not reward length. A shorter answer that does the job scores as well as a longer one.\n- Do not reward formatting. A table, headings or labels earn nothing by themselves; judge what the answer says.\n- The order of the two answers means nothing.\n- Grade with your own knowledge of the candidates. A factual error costs points under C6 even when it sounds confident.\n\nCriteria:\n\n- C1 Criteria first. 2: names the criteria this choice turns on, tied to the situation described, and compares on them. 1: some criteria, but generic or mixed with ones that do not separate the candidates. 0: a loose list of pros and cons, or a verdict with little comparison.\n- C2 Concrete comparison. 2: for each criterion, states differences between the candidates that someone could check (named features, limits, operational work, rough numbers). 1: partly concrete, partly vague adjectives such as \"more flexible\" or \"better ecosystem\". 0: mostly vague.\n- C3 Uses the situation. 2: uses the facts given in the question (team skills, scale, budget, operations capacity, stated needs) and lets the hard constraints outweigh minor preferences. 1: mentions the facts but the comparison does not really depend on them. 0: a generic answer that would read the same for any team.\n- C4 Clear verdict. 2: ends with one recommendation, or an explicit tie with a safe default and what would break the tie. 1: a lean, but hedged until it is hard to act on. 0: \"it depends\" with no choice.\n- C5 Conditions. 2: says what the recommendation relies on and names when another candidate would be the better choice. 1: a vague caveat. 0: none.\n- C6 Accuracy and honesty. 2: no factual errors about the candidates, and claims that are uncertain or rest on facts not given are marked as such. 1: a minor error, or uncertain claims stated as certain. 0: an error that could change the decision.\n\nReply with one JSON object and nothing else, in this shape:\n\n{\"A\": {\"C1\": 0, \"C2\": 0, \"C3\": 0, \"C4\": 0, \"C5\": 0, \"C6\": 0, \"notes\": \"one or two sentences\"},\n \"B\": {\"C1\": 0, \"C2\": 0, \"C3\": 0, \"C4\": 0, \"C5\": 0, \"C6\": 0, \"notes\": \"one or two sentences\"},\n \"preference\": \"A\" or \"B\" or \"tie\",\n \"reason\": \"one or two sentences on why\"}\n",
+  "answers": {
+    "database.skill": {
+      "question_id": "database",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?",
+      "answer": "# PostgreSQL vs MySQL vs MongoDB for a multi-tenant B2B SaaS\n\n## 1. Candidates\n\nPostgreSQL, MySQL and MongoDB, as you listed them. Each would run as a managed service: RDS, Aurora or Cloud SQL for the first two, Atlas for MongoDB.\n\n## 2. Dimensions\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Relational integrity and transactions | Invoices, line items and permissions need foreign keys, multi-row atomic writes and joins. Money data cannot drift. | **High (hard constraint)** |\n| Team familiarity | Four developers, two of them with Postgres production experience and none with MongoDB. Operational mistakes early on cost more than any feature gap. | **High** |\n| Per-customer custom fields | This is the one area where a flexible schema is actually needed. | Medium |\n| Tenant isolation support | With multi-tenancy, one missed `WHERE tenant_id = ?` leaks one customer's data to another. Help from the database reduces that risk. | Medium |\n| Schema migration safety | A young product changes its schema often. | Low–Medium |\n| Reporting and analytics queries | B2B customers ask for exports, aggregates and dashboards early. | Low–Medium |\n\nI dropped three dimensions because they don't separate the candidates:\n- **Managed availability**: all three are mature managed offerings.\n- **Scale under 1 TB**: all three handle this comfortably on a single primary.\n- **Decimal money types**: `NUMERIC`, `DECIMAL` and `Decimal128` all exist.\n\n## 3. Comparison\n\n| Dimension | PostgreSQL | MySQL | MongoDB | Winner |\n|---|---|---|---|---|\n| Relational integrity and transactions | Full foreign keys, ACID, rich joins, `CHECK` and exclusion constraints | Full foreign keys and ACID on InnoDB, good joins, `CHECK` enforced since 8.0.16 | No foreign keys. Multi-document transactions exist (since 4.0) but are not the default path. Joins go through `$lookup`. Integrity becomes application code. | PostgreSQL ≈ MySQL (Postgres slightly ahead on constraint options) |\n| Team familiarity | 2 of 4 have run it in production | Unknown `[unverified]`. Your message implies nobody has production experience with it. | 0 of 4 | **PostgreSQL** |\n| Custom fields | `JSONB` with GIN indexes. You can query, index and constrain the JSON alongside relational columns. | `JSON` type. Indexing goes through generated columns or multi-valued indexes, which is workable but clunkier. | Native strength: arbitrary fields per document | MongoDB, with **PostgreSQL** a close second that is good enough for this need |\n| Tenant isolation | Native Row-Level Security can enforce `tenant_id` filtering inside the database | No RLS. Isolation must be enforced in the app, through views or with schema-per-tenant. | No RLS equivalent for tenant filtering. Isolation is app-enforced or uses database-per-tenant. | **PostgreSQL** |\n| Migration safety | Transactional DDL, so a failed migration rolls back cleanly | DDL is not transactional, so a failed migration can leave a partial state. Online DDL is good. | No schema migrations as such, but data shape drifts and backfills are manual | **PostgreSQL** |\n| Reporting queries | Window functions, CTEs, strong planner, many BI connectors | Window functions and CTEs since 8.0, good BI support | Aggregation pipeline is capable but unfamiliar, and BI connectivity is weaker | PostgreSQL (MySQL close) |\n\n**Tally on the weighted dimensions:**\n- PostgreSQL wins or ties both high-weight dimensions and wins 3 of the 4 others.\n- MongoDB wins only on custom fields. PostgreSQL's `JSONB` already covers that need adequately.\n\n## Verdict\n\n**Recommended: PostgreSQL**\n\nWhy:\n1. Your core data (accounts, invoices, line items, permissions) is relational and financial, which rules out MongoDB on the hard constraint. MongoDB would push referential integrity into your code for its one advantage, a flexible schema, and you only need that for a minority of your data.\n2. Half your team has already run Postgres in production. Neither alternative has comparable experience on the team.\n3. Postgres covers custom fields with `JSONB` and tenant isolation with Row-Level Security. These are exactly the two needs that separate your product from a generic CRUD app, and MySQL handles both less well.\n\nSuggested shape:\n- Shared tables with a `tenant_id` column on every row\n- RLS policies keyed on a session variable\n- A `custom_fields JSONB` column with GIN indexes on the entities customers can extend\n\n**Holds when:**\n- Custom fields stay a secondary feature rather than the bulk of the data model.\n- You stay on one managed Postgres provider (RDS, Aurora, Cloud SQL, Neon, etc.).\n\n**If that changes:**\n- **Choose MySQL** if your organisation already has a MySQL operations team, tooling or vendor commitment, or if you specifically need Vitess or PlanetScale for horizontal sharding. Both are unlikely at under 1 TB. You would then handle tenant isolation strictly in the application layer.\n- **Reconsider MongoDB** only if the product turns into mostly schemaless, customer-defined documents with little cross-entity integrity. That is not what you've described. Even then, hiring or training for MongoDB operations would be a prerequisite.",
+      "cost_usd": 0.0775836,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3803,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 2351,
+        "output_tokens_details": {
+          "thinking_tokens": 417
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3803,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2351,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3803,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3803
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:24:54+00:00",
+      "finished": "2026-11-24T06:25:24+00:00"
+    },
+    "database.plain": {
+      "question_id": "database",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We are starting a B2B SaaS product: multi-tenant, mostly relational data (accounts, invoices, line items, permissions), some per-customer custom fields. Team of four backend developers; two have used PostgreSQL in production, nobody has run MongoDB. We expect under 1 TB of data in the first three years and will run on a managed cloud database. Should we use PostgreSQL, MySQL or MongoDB?",
+      "answer": "**Use PostgreSQL.** For your situation it's a clear call, not a close one.\n\n## Why PostgreSQL\n\n- **Your data is relational.** Accounts, invoices, line items and permissions are classic relational data with foreign keys, joins and transactional integrity. An invoice and its line items must commit atomically. Postgres handles this natively.\n- **Custom fields fit in JSONB.** This is usually the argument for MongoDB, but Postgres covers it well. Add a `custom_fields JSONB` column on the relevant tables, index it with GIN (or expression indexes on hot keys), and validate with CHECK constraints or in the app layer. You get schemaless flexibility where you need it and a strict schema everywhere else.\n- **Multi-tenancy tooling.** Row-Level Security (RLS) lets the database enforce `tenant_id` isolation, so a missing `WHERE tenant_id = ?` in application code doesn't leak data across tenants. MySQL has no equivalent.\n- **Team experience.** Two of your four developers have run it in production. Nobody has run MongoDB. Operational familiarity matters more than most feature comparisons, especially when something breaks at 2 a.m.\n- **Scale is a non-issue.** Under 1 TB is comfortably single-primary territory on any managed offering (RDS/Aurora, Cloud SQL, AlloyDB, Azure Flexible Server, Neon, Supabase). You won't need sharding for years, if ever. Citus is available if you eventually do.\n\n## Why not the others\n\n- **MySQL** would work. It's a reasonable relational database, and nothing here would fail on it. But it has weaker JSON indexing and querying, no RLS, and less expressive SQL (partial indexes, richer constraints, `RETURNING`, better CTE and window support historically). Your team's experience is also with Postgres. No upside justifies switching.\n- **MongoDB** is a mismatch. Invoicing is a multi-entity transactional domain. You'd either embed and duplicate data or reimplement joins and referential integrity in application code. Mongo has multi-document transactions now, but they aren't its sweet spot. The one thing it does better, flexible fields, is already covered by JSONB. And no one on the team has operated it.\n\n## Suggestions for getting started\n\n1. **Tenancy model:** start with a shared schema plus a `tenant_id` column on every tenant-owned table, enforced with RLS. Make `tenant_id` the leading column in composite indexes and keys. Avoid schema-per-tenant unless you have a specific isolation requirement, because it gets painful past a few hundred tenants.\n2. **Custom fields:** use JSONB on the entity, plus a `custom_field_definitions` table per tenant (name, type, required) so the app can validate input and render UI. Avoid EAV (entity-attribute-value) tables; they're harder to query and slower.\n3. **Money:** use `NUMERIC` (or integer minor units) for amounts. Never use floats.\n4. **Migrations:** pick a migration tool on day one (Flyway, Alembic, Prisma, sqitch, or whatever matches your stack) and enable `pg_stat_statements` for query visibility.\n5. **Version:** start on the latest major version your managed provider supports.\n\nIf you tell me your backend language/framework and cloud provider, I can sketch a starter schema with RLS policies and a custom-fields pattern.",
+      "cost_usd": 0.0427658,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2471,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1143,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2471,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1143,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2471,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2471
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:25:39+00:00",
+      "finished": "2026-11-24T06:25:59+00:00"
+    },
+    "api-style.skill": {
+      "question_id": "api-style",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We are designing the API for a new mobile app (iOS and Android) and a web front end. The same backend will also be called by three internal services written in Go. The mobile screens often need data from several resources at once, and the mobile team complains about slow screens on bad networks. Team of six backend developers who have only built REST APIs before. Should the API be REST, GraphQL or gRPC?",
+      "answer": "# REST vs GraphQL vs gRPC for a mobile, web and internal-Go backend\n\n## 1. Candidates\n\n- **REST**: resource endpoints over JSON/HTTP, which the team already knows.\n- **GraphQL**: a single schema where clients pick the fields and resources they need per screen.\n- **gRPC**: Protobuf contracts over HTTP/2.\n- **[inferred] Hybrid**: GraphQL for mobile and web, with a simpler protocol for the three Go services.\n- **[inferred] REST plus BFF**: REST with screen-shaped aggregate endpoints built for the mobile app.\n\nOne premise needs checking. The plan assumes the slow screens come from **too many round trips and over-fetching**. That is `[unverified]`. If the cause is slow server queries or large images, none of these protocols will fix it. A trace of one slow screen would confirm the cause.\n\n## 2. Dimensions\n\n| # | Dimension | Why it matters here | Weight |\n|---|---|---|---|\n| 1 | Round trips and payload size on bad networks | This is the stated pain. Screens need several resources, and on high-latency links every extra round trip costs hundreds of ms. | **High (×3)** |\n| 2 | Client reach (browser, iOS, Android) | A web front end is a hard requirement, so browser support is a constraint, not a preference. | **High (×2)** |\n| 3 | Team familiarity and ramp-up | Six developers have only built REST. Mistakes in a new paradigm (N+1 queries, schema design) become production problems. | **High (×2)** |\n| 4 | Fit for the three internal Go services | These are real consumers, but secondary to the user-facing apps. | Medium |\n| 5 | Caching | REST gets HTTP and CDN caching for free. The other two need extra work. | Medium |\n| 6 | Operational and security complexity | Rate limiting, query cost, and observability all differ by protocol. | Medium |\n| 7 | Typed contracts and codegen for clients | Four client platforms (iOS, Android, web, Go) benefit from generated types. | Low–Medium |\n\n## 3. Comparison\n\n| Dimension | REST | GraphQL | gRPC | Winner |\n|---|---|---|---|---|\n| **Round trips and payload (×3)** | One request per resource by default. Aggregation needs custom endpoints or `?include=` conventions maintained by hand per screen. | One request per screen with exactly the fields the screen asks for. This is the problem GraphQL was designed for. | Compact binary payloads and HTTP/2 multiplexing. Still one RPC per method unless you design screen-specific RPCs by hand. | **GraphQL** |\n| **Client reach (×2)** | Works natively everywhere. | Works over plain HTTP everywhere. Mature clients exist (Apollo iOS/Kotlin, Apollo/urql/Relay). | Browsers cannot speak native gRPC, so web needs gRPC-Web or Connect plus a proxy or compatible server. Mobile libraries work but add binary size. | **REST ≈ GraphQL** (gRPC loses) |\n| **Team familiarity (×2)** | Zero ramp-up. | Moderate ramp-up: schema design, resolvers, DataLoader for N+1, pagination conventions. Most of it is learnable in weeks. | Moderate ramp-up: Protobuf, codegen pipeline, HTTP/2 debugging, and proxies for web. | **REST** |\n| **Internal Go services** | Fine, with `net/http` and an OpenAPI client. | Workable with `genqlient`, but awkward for service-to-service calls. | Best fit: first-class Go support, fast, strongly typed, streaming. | **gRPC** |\n| **Caching** | HTTP caching, ETags, and CDN work out of the box. | POST queries bypass HTTP caches. Persisted queries over GET restore some of this. Client-side normalized caches are strong. | No HTTP caching; it must be built at the application level. | **REST** |\n| **Ops and security** | Mature tooling. Per-endpoint rate limits and metrics are straightforward. | Needs query depth and complexity limits, persisted queries, and per-field tracing. A single endpoint hides which operation is slow unless you instrument it. | Good tooling, but needs proxies for web, and the binary payloads are harder to inspect ad hoc. | **REST** |\n| **Typed contracts and codegen** | OpenAPI works, but it is often a second source of truth that drifts from the code. | The schema is the contract, with strong codegen on all platforms. | The `.proto` file is the contract, with excellent codegen. | **GraphQL ≈ gRPC** |\n\n**Weighted tally:**\n\n- **GraphQL** wins the heaviest dimension and ties on client reach.\n- **REST** wins familiarity, caching and ops, but loses the dimension that is the actual complaint.\n- **gRPC** wins only the internal-service dimension and fails the browser constraint without extra infrastructure.\n\n## 4. Verdict\n\n**Recommended: GraphQL for the mobile and web clients. Keep the internal Go services on plain REST for now, and move them to gRPC only if they need it.**\n\nWhy:\n\n1. **It fixes the stated problem.** One request per screen with no over-fetching addresses multi-resource screens on bad networks. With REST, the team would hand-build that aggregation per screen, which in effect means reinventing a worse GraphQL.\n2. **The learning cost is bounded.** The new concepts are schema design, DataLoader, complexity limits and persisted queries. That is one paradigm shift, not two. Introducing gRPC at the same time would double the ramp-up for a REST-only team.\n3. **It avoids gRPC's browser tax.** Making gRPC the main API would force a gRPC-Web or Connect proxy layer for the web front end just to reach parity.\n4. **The internal services don't drive the choice.** Three Go callers can use the existing service layer through a few REST endpoints, which the team already knows. gRPC can be added later without touching the client API.\n\nMake it work by:\n\n- Using **persisted queries from day one**. They give you GET caching, block arbitrary queries, and make each operation identifiable in metrics.\n- Enforcing **DataLoader** (batched resolvers) in code review, so N+1 queries don't erase the latency gains.\n- Instrumenting **per-operation tracing**, so a slow screen can be traced to a specific resolver.\n\n**Holds when:**\n\n- Tracing confirms the slow screens come from round trips and over-fetching.\n- Screens keep needing varied combinations of resources.\n- The team can spend a few weeks ramping up before launch.\n\n**If that changes:**\n\n- **Slowness comes from server latency or media, not round trips:** choose **REST**, and fix queries, compression and images. The protocol is not the bottleneck.\n- **Only a handful of screens need aggregation and the deadline is tight:** choose **REST plus a few BFF aggregate endpoints**. It is cheaper in the short term, but expect it to sprawl as the app grows.\n- **The internal Go services need high-throughput, streaming or strict-latency calls:** add **gRPC internally**, keeping GraphQL as the client API. This hybrid is the common end state.\n- **No web front end, and the mobile team wants binary payloads:** gRPC or Connect becomes competitive. That is not your situation today.",
+      "cost_usd": 0.0970156,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3782,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 3331,
+        "output_tokens_details": {
+          "thinking_tokens": 823
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3782,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 3331,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3782,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3782
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:34:18+00:00",
+      "finished": "2026-11-24T06:34:57+00:00"
+    },
+    "api-style.plain": {
+      "question_id": "api-style",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We are designing the API for a new mobile app (iOS and Android) and a web front end. The same backend will also be called by three internal services written in Go. The mobile screens often need data from several resources at once, and the mobile team complains about slow screens on bad networks. Team of six backend developers who have only built REST APIs before. Should the API be REST, GraphQL or gRPC?",
+      "answer": "## Recommendation: REST, designed for the mobile screens. Don't adopt GraphQL or gRPC yet.\n\nThe mobile complaint is about round trips and payload size on bad networks. You can fix that without changing paradigms. A six-person team that only knows REST will ship faster and safer if it stays on REST and designs it well. Switching to GraphQL means taking on a new paradigm while also building a new product.\n\n### How to fix the slow screens in REST\n\n1. **Screen-oriented aggregate endpoints (a light BFF).** For the five to ten heaviest mobile screens, add endpoints that return everything a screen needs in one call, such as `GET /v1/screens/home` or `GET /v1/orders/{id}?include=items,customer,shipment`. One round trip instead of four or six is most of the win on high-latency networks.\n2. **Payload control.** Support sparse fieldsets (`?fields=id,name,thumbnailUrl`) and `include=` for related resources. JSON:API conventions give you this for free.\n3. **Transport basics.** Use HTTP/2 or HTTP/3 so requests multiplex, gzip or brotli compression, cursor pagination, and small default page sizes.\n4. **Caching.** Use `ETag` / `If-None-Match` so unchanged data costs a 304, plus `Cache-Control` on stable resources. Clients can then render cached data immediately.\n5. **Contract-first with OpenAPI.** Generate the iOS, Android, TypeScript and Go clients from the spec. You get most of the typed-client benefit people cite for gRPC and GraphQL.\n\n### Internal Go services\n\nHave them call the same REST API through a generated Go client. Add gRPC only for a specific internal path that needs it: high-volume service-to-service calls, streaming, or strict latency budgets. Running two API stacks from day one doubles the auth, observability, error-model and versioning work for a small team.\n\n### When I'd choose differently\n\n- **GraphQL** makes sense if the aggregate endpoints multiply out of control. Signs of this: many screens, frequent UI changes, mobile and web needing different shapes of the same data, and the backend becoming a bottleneck for front-end iteration. If you adopt it, put it as a gateway in front of the REST services rather than rewriting them, and plan for its specific costs: N+1 queries (dataloaders), query cost limits, HTTP caching that's harder, and per-field authorization.\n- **gRPC as the main API** fits only if the clients were mostly internal services. For browsers it needs gRPC-Web or Connect plus a proxy, so it's a poor fit as the primary interface for web and mobile.\n\n### Practical next step\n\nList the mobile screens and count the API calls each one makes today. Build aggregate endpoints for the worst offenders, then measure on a throttled network profile such as 3G or high-latency LTE. If that resolves the complaints, you're done. If the team keeps adding one-off screen endpoints every sprint, that's the signal to put GraphQL in front.",
+      "cost_usd": 0.0451178,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2450,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1269,
+        "output_tokens_details": {
+          "thinking_tokens": 263
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2450,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1269,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2450,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2450
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:36:11+00:00",
+      "finished": "2026-11-24T06:36:30+00:00"
+    },
+    "repo-layout.skill": {
+      "question_id": "repo-layout",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "Our company has 30 engineers working on 6 services (4 in TypeScript, 2 in Go) and a shared TypeScript library of types and API clients. Today every service has its own repository, and a change to the shared library takes days to roll out because each service has to bump the version. CI is GitHub Actions. Should we move to a monorepo or stay with one repository per service?",
+      "answer": "# Monorepo vs. one repo per service\n\n## 1. Candidates\n\n- **A. Full monorepo**: all 6 services and the shared library in one repo.\n- **B. Stay polyrepo as-is**: the current setup.\n- **C. Polyrepo plus automated version bumps** `[inferred]`: keep the repos, but have Renovate or Dependabot open and auto-merge library bump PRs in each service.\n- **D. TypeScript monorepo, Go stays separate** `[inferred]`: the shared library and the 4 TypeScript services move into one workspace repo. The 2 Go services keep their own repos.\n\n## 2. Dimensions\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Shared-lib propagation time | This is the stated pain: days per change | **High (×3)** |\n| Atomic cross-cutting changes | Changing a type or API client and every caller in one PR, reviewed and tested together | High (×2) |\n| CI complexity and cost on GitHub Actions | A monorepo needs affected-only builds, or every PR rebuilds everything | Medium |\n| Migration cost | Effort and disruption for 30 people moving off the current setup | Medium |\n| Tooling fit across TS and Go | One repo has to host two build systems (pnpm/tsc and `go build`) | Medium |\n| Deploy independence and blast radius | A bad library change shouldn't silently break services that weren't ready | Medium |\n\nI dropped \"team ownership boundaries\": CODEOWNERS handles them equally well in any of the options, so it doesn't separate the candidates.\n\n## 3. Comparison\n\n| Dimension | A. Full monorepo | B. Polyrepo as-is | C. Polyrepo + Renovate | D. TS monorepo, Go separate | Winner |\n|---|---|---|---|---|---|\n| Shared-lib propagation | Immediate, consumers build against source at HEAD | Days, a manual bump in each of up to 6 repos | Hours, but still N PRs and N CI runs, and failures land after the lib is published | Immediate for the TS services | **A / D** |\n| Atomic changes | Lib and all callers change in one PR | Impossible, it's lib release → bump → fix in each repo | Impossible, breakages are found after publish | Atomic for TS. A Go API contract change still needs 2 PRs `[unverified: depends on whether the lib's clients target the Go services]` | **A** (D close) |\n| CI on GitHub Actions | Needs path filters plus Turborepo or Nx affected detection plus Go path triggers. Two toolchains in one pipeline | Simple and already working | Simple, plus bot config | Needs one toolchain (pnpm + Turborepo/Nx). Go CI is unchanged | **B / C** (D the simpler of the monorepos) |\n| Migration cost | Highest: 7 repos merged, history kept, CI rewritten for everything | Zero | About a day of setup | Medium: 5 repos, one ecosystem | **B**, then **C** |\n| Tooling fit | Mixed: pnpm workspaces and Go modules coexist without sharing anything | Each repo is native | Each repo is native | Each repo is homogeneous and native | **D / B / C** |\n| Blast radius | A lib change hits every consumer at once. That is mitigated because CI tests all affected consumers before merge | Each service opts in on its own schedule | Opt-in, auto-merge only on green | Same as A for TS. Go is isolated | **tie**: monorepo catches breakage before merge, polyrepo delays exposure. Neither is clearly safer |\n\nOn the two high-weight dimensions, A and D win clearly. B and C win only on cost and simplicity. C reduces the delay but keeps version skew, and it still finds breakages after the library is published, so it treats the symptom rather than the cause.\n\n## Verdict\n\n**Recommended: D.** Move the shared library and the 4 TypeScript services into a pnpm-workspace monorepo with Turborepo or Nx. Leave the 2 Go services in their own repos for now.\n\nWhy:\n1. It removes the actual pain. The 4 services that consume the TypeScript library build against it directly, so there are no version bumps at all.\n2. You get atomic changes and pre-merge testing of every affected consumer where it matters, which is the shared types and clients.\n3. It uses one toolchain, which keeps the GitHub Actions setup tractable: Turborepo/Nx affected detection plus a remote cache. Migration is about 5 repos, not 7.\n4. It is reversible and incremental. You can add the Go services later with path-filtered workflows if it proves worthwhile.\n\nHolds when:\n- The Go services don't import the shared TypeScript library, which is likely since they can't consume TS code directly `[unverified]`.\n- Each TypeScript service can still deploy independently through per-app deploy workflows triggered by affected paths.\n\nIf that changes:\n- **Choose A (full monorepo)** if the Go services' API contracts change together with the TS clients often, for example if you generate both from OpenAPI or protobuf in the shared library. In that case the atomic-change benefit extends to Go and is worth the mixed toolchain.\n- **Choose C (Renovate auto-merge)** if a migration isn't possible this quarter. Use it as a stopgap: it turns days into hours within about a day of setup, but it leaves skew and post-publish breakage in place.\n- **Stay with B** only if library changes are rare. Given that you call the delay a recurring problem, that doesn't appear to be the case.",
+      "cost_usd": 0.0761596,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3780,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 2289,
+        "output_tokens_details": {
+          "thinking_tokens": 421
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3780,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2289,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3780,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3780
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:34:18+00:00",
+      "finished": "2026-11-24T06:34:48+00:00"
+    },
+    "repo-layout.plain": {
+      "question_id": "repo-layout",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "Our company has 30 engineers working on 6 services (4 in TypeScript, 2 in Go) and a shared TypeScript library of types and API clients. Today every service has its own repository, and a change to the shared library takes days to roll out because each service has to bump the version. CI is GitHub Actions. Should we move to a monorepo or stay with one repository per service?",
+      "answer": "**Recommendation: move to a monorepo.** At 30 engineers and 7 repos with a shared library that changes often, the monorepo solves your actual problem directly, and the usual downsides don't apply much at your size.\n\n## Why it fits your situation\n\n- **The pain is version-bump latency on a shared library.** In a monorepo the library is a workspace dependency (`\"@company/shared\": \"workspace:*\"`). A change to a type or API client and every consumer that uses it can land in **one PR**, type-checked and tested together. \"Days\" becomes \"one merge.\"\n- **Atomic cross-cutting changes.** Renaming a field in an API client and updating all callers happens in one commit, and CI catches breakage before merge, not after a consumer bumps the version a week later.\n- **30 engineers and 6 services is a comfortable size.** Monorepo scaling problems like git performance, CI fan-out, and ownership sprawl appear at hundreds of engineers. They won't affect you for a long time.\n- **GitHub Actions handles this well** with path filters and affected-project detection.\n\n## The mixed TS/Go part\n\nIt's less of a problem than it looks:\n\n- The shared library is TypeScript, so the Go services likely don't consume it directly. Check how they relate to it:\n  - **If the Go services expose or consume APIs described by those shared types**, put the contract in a language-neutral source of truth (OpenAPI or protobuf) in the monorepo and generate TS clients/types and Go structs from it. This is the biggest long-term win, because today TS and Go can drift silently.\n  - **If they're independent**, they can live in the monorepo with their own `go.mod` and CI jobs. A `go.work` file at the root ties them together. They cost almost nothing.\n- Don't adopt Bazel or similar polyglot build systems. That's overkill here.\n\n## Suggested setup\n\n```\n/apps/            # 4 TS services\n/services-go/     # 2 Go services (or keep them all in /apps)\n/packages/shared  # types + API clients\n/contracts/       # OpenAPI/proto, if you go that route\npnpm-workspace.yaml\nturbo.json        # or nx.json\ngo.work\n.github/CODEOWNERS\n```\n\n- **pnpm workspaces + Turborepo** (or Nx) for the TS side: task caching, plus `turbo run test --filter=...[origin/main]` to build/test only what changed and its dependents.\n- **GitHub Actions**: one workflow that computes affected projects and fans out to a matrix. Use `dorny/paths-filter` or Turbo/Nx's affected output. Run Go jobs only when `services-go/**` or `contracts/**` change.\n- **Deploys stay per service.** A monorepo doesn't mean a monolithic deploy. Each service keeps its own deploy workflow, triggered when that service or one of its dependencies changes.\n- **CODEOWNERS** to keep per-team review ownership you have today.\n- **Remote caching** (Turbo remote cache or Nx Cloud) once CI times start to matter.\n\n## Costs to plan for\n\n- **CI design is the real work.** Without affected-only builds, every PR runs everything and people get annoyed fast. Get this right in the first week.\n- **\"Always on latest\" is a discipline change.** A shared-lib change must keep all consumers green in the same PR. That's the point, but authors of shared code now carry more responsibility. Good tests in the library help.\n- **Repo permissions get coarser.** GitHub has no per-directory read access. If any service needs restricted access (contractors, compliance), that's the one real reason to keep it separate.\n- **Migration effort**: roughly a few days to a couple of weeks of one or two people's time.\n\n## When I'd say stay polyrepo\n\n- Services are owned by organizationally separate groups with different release cadences and little shared code.\n- You have hard access-control requirements per service.\n- The shared library rarely changes. Yours evidently changes often.\n\nIf you stayed polyrepo, the mitigation would be Renovate/Dependabot auto-PRs with auto-merge on green CI for the shared package, plus contract tests. That shrinks \"days\" to \"hours\" but keeps the coordination overhead and the drift risk.\n\n## Migration path\n\n1. Create the monorepo and import the shared library and **one** TS service with `git subtree` or `git filter-repo` to preserve history.\n2. Get workspace linking, affected-only CI, and that service's deploy working end to end.\n3. Move the remaining TS services one at a time, then the Go services.\n4. Optionally, introduce OpenAPI/proto contracts and codegen for TS↔Go boundaries.\n5. Archive the old repos as read-only.\n\nIf you share how the Go services interact with the shared library and how deploys are triggered today, I can sketch the concrete `turbo.json` and GitHub Actions workflow.",
+      "cost_usd": 0.0523378,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2450,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1630,
+        "output_tokens_details": {
+          "thinking_tokens": 18
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2450,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1630,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2450,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2450
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:36:11+00:00",
+      "finished": "2026-11-24T06:36:34+00:00"
+    },
+    "message-queue.skill": {
+      "question_id": "message-queue",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?",
+      "answer": "# Order event bus: Kafka vs RabbitMQ vs SNS+SQS\n\n## 1. Candidates\n\n| # | Candidate | Note |\n|---|---|---|\n| A | Self-managed Kafka on EC2 | |\n| B | Amazon MSK (Serverless or Provisioned) | Treated separately from A because the ops burden is very different |\n| C | RabbitMQ (Amazon MQ for RabbitMQ, or self-run) | |\n| D | Amazon SNS fan-out to SQS queues | |\n| E | Amazon Kinesis Data Streams `[inferred]` | Not on your list, but it is AWS's managed replayable log, so it targets your exact requirements |\n\n**Load:** 2,000 msg/s × at most 2 KB is about 4 MB/s, roughly 10 TB/month. That is modest for every candidate. Throughput does not decide this choice. Replay, fan-out and ops burden do.\n\n## 2. Dimensions\n\n| Dimension | Weight | Why it matters here |\n|---|---|---|\n| Ops burden for a 2-person team with no Kafka experience | **High (hard constraint)** | Whatever you run, these two people get paged for it. A broker they can't operate is a liability. |\n| 7-day replay | **High (hard requirement)** | This is a stated need and it separates log-based systems from queues. |\n| Multiple independent consumers | High | Several consumers each need the full stream at their own pace. |\n| Per-order ordering | Medium | Order events (created, paid, shipped) usually need ordering per order ID. |\n| Cost at ~4 MB/s | Medium | Baseline cost differs a lot between options. |\n| Ecosystem and portability | Low–Medium | Matters only if you need Kafka Connect, Kafka Streams, or a multi-cloud exit. |\n\n## 3. Comparison\n\n| Dimension | A: Self-managed Kafka | B: MSK | C: RabbitMQ | D: SNS+SQS | E: Kinesis `[inferred]` | Winner |\n|---|---|---|---|---|---|---|\n| Ops burden | You patch, scale, rebalance and monitor brokers and disks. You also need KRaft/ZooKeeper knowledge you don't have. | Serverless: no brokers to manage, but you still handle Kafka concepts (partitions, consumer groups, client tuning). Provisioned: you size brokers and storage. | Amazon MQ handles the hosts, but queue and cluster behavior under backlog is still yours to manage. | Fully serverless, almost nothing to operate. | Fully managed. You pick on-demand or a shard count. Consumers need KCL (checkpoints in DynamoDB) or Lambda. | **D**, then E, then B-Serverless |\n| 7-day replay | Native: set retention, reset offsets. | Native. On Serverless, check that the retention limit covers 7 days `[unverified]`. | Classic and quorum queues delete messages once acked, so no replay. RabbitMQ Streams can replay, but Amazon MQ support for it is `[unverified]`. | SQS deletes on consume, so no replay. Workarounds: archive to S3 through Firehose and write a replay tool, or use SNS FIFO archive/replay (FIFO throughput limits apply `[unverified]` at 2k/s). | Native: retention up to 365 days, read from `AT_TIMESTAMP`. | **A/B/E tie** |\n| Multiple consumers | Consumer groups, each with its own offset. | Same as A. | Fan-out exchange with one queue per consumer works, but replay is still missing. | One SQS queue per consumer subscribed to the topic. Clean fan-out. | Up to 20 enhanced fan-out consumers, each with its own 2 MB/s per shard. | **tie A/B/D/E**. C is acceptable. |\n| Per-order ordering | Partition key = order ID. | Same as A. | Ordering holds per queue, but redeliveries and competing consumers can break it. | Standard SQS has no ordering guarantee. FIFO gives per-group order but has lower throughput limits. | Partition key = order ID gives per-shard order. | **A/B/E** |\n| Cost (rough, us-east-1) | EC2 + EBS for 3+ brokers, plus a lot of engineer time. | Serverless has a fixed cluster-hour baseline (a few hundred $/month) plus throughput. Provisioned costs similar or more. | Small Amazon MQ cluster, low hundreds of $/month. | Per-request pricing: about 5B messages × (1 publish + N deliveries), so it grows with consumer count. | Provisioned at about 5–6 shards plus 7-day retention plus EFO is about low hundreds of $/month. On-demand costs more. `[unverified: use the AWS calculator]` | **E**, depending on consumer count for D |\n| Ecosystem and portability | Full Kafka ecosystem, portable. | Full Kafka API, portable. | AMQP, portable, but not a log. | AWS-only. | AWS-only, proprietary API. | **A/B** |\n\n## Verdict\n\n**Recommended: Amazon Kinesis Data Streams [inferred].** If you want to stay within your original three options, pick **MSK Serverless**. Do not self-manage Kafka, and do not use RabbitMQ.\n\n**Why:**\n1. Replay is a hard requirement, and only log-based systems (Kafka/MSK, Kinesis) provide it natively. RabbitMQ classic and quorum queues and SNS+SQS would need a separate archive-and-replay mechanism that you would have to build and maintain.\n2. With two ops people who are new to Kafka, the ops dimension rules out self-managed Kafka. It also tilts the choice from MSK toward Kinesis, which has fewer concepts to learn and nothing broker-shaped to tune.\n3. At about 4 MB/s, Kinesis handles fan-out (enhanced fan-out), per-order ordering (partition key) and 7-day retention cheaply. You can also attach Lambda consumers without writing consumer code.\n\n**This holds when:**\n- You are comfortable being AWS-only.\n- You don't need Kafka Connect, Kafka Streams, or existing Kafka clients.\n- You have 20 or fewer consumers that each need dedicated throughput.\n\n**If that changes:**\n- **You need the Kafka ecosystem or portability** (Connect sinks, Debezium CDC, a future multi-cloud move): choose **MSK Serverless**. First confirm its retention limit covers 7 days; otherwise use MSK Provisioned with tiered storage.\n- **Replay turns out to be rare** (\"nice to have after a bug\") and simplicity matters most: choose **SNS + SQS**, with an extra Firehose subscription that archives to S3. Accept that replay means a script re-publishing from S3.\n- **Throughput grows by 10× or more, or you reach dozens of consumers**: re-evaluate MSK, because Kinesis per-shard and enhanced fan-out costs scale linearly.\n- **RabbitMQ** wins only if you need complex routing (topic or header exchanges, per-message priority) more than replay, which is not the case here.\n\nBefore committing, verify two things: MSK Serverless retention limits, and SNS FIFO throughput at 2,000 msg/s.",
+      "cost_usd": 0.1090876,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3796,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 3929,
+        "output_tokens_details": {
+          "thinking_tokens": 1437
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3796,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 3929,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3796,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3796
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:24:54+00:00",
+      "finished": "2026-11-24T06:25:39+00:00"
+    },
+    "message-queue.plain": {
+      "question_id": "message-queue",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We need to pass order events between services: about 2,000 messages per second at peak, each under 2 KB. Several consumers need the same events, and we would like to replay the last 7 days after a bug. Everything runs on AWS, and our ops team is two people who have never run Kafka. Should we use Kafka (self-managed or Amazon MSK), RabbitMQ, or Amazon SQS with SNS?",
+      "answer": "## Recommendation: Amazon Kinesis Data Streams, or Amazon MSK if you specifically want Kafka\n\nThe 7-day replay requirement decides this. You need a **retained log** that each consumer reads at its own position, not a queue that deletes messages once they are consumed. That rules out plain SQS/SNS and RabbitMQ's classic queues. Given a two-person ops team, it also rules out self-managed Kafka.\n\n### Option by option\n\n**Self-managed Kafka: no.** Broker sizing, partition rebalancing, upgrades, disk management and monitoring are a real job. A team new to Kafka will learn it during an incident.\n\n**RabbitMQ: poor fit.** Classic and quorum queues delete messages on ack, so replay isn't native. RabbitMQ Streams do support replay, but then you're running a log system on a broker built mainly for queuing. Your team would still own clustering and upgrades, unless you use Amazon MQ, which has its own limits.\n\n**SQS + SNS: easy fan-out, weak replay.** SNS fanning out to one SQS queue per consumer is simple and nearly ops-free, and 2,000 msg/s is easy. But consumed messages are gone. Replay means archiving to S3 (for example SNS → Firehose → S3) and building your own replay tool. SNS FIFO topics have built-in archive and replay, but you take on FIFO throughput limits and cost. Choose this only if replay is rare and you're fine with a custom S3-based process.\n\n**Amazon MSK: good if Kafka matters to you.** It's a real Kafka log with consumer groups and offset or timestamp replay, and AWS runs the brokers. You still choose partition counts, handle client configuration and consumer-group behavior, and pick broker or storage sizes (or use Express brokers or Serverless; check current retention limits for Serverless). It's a good choice if you want Kafka-ecosystem tools like Kafka Connect, Debezium or Flink-on-Kafka, or portability off AWS.\n\n**Kinesis Data Streams: best fit for your constraints.** It wasn't on your list, but it's essentially a managed log with almost no ops:\n- **Throughput:** 2,000 msg/s × 2 KB ≈ 4 MB/s peak. Each shard accepts 1 MB/s or 1,000 records/s of writes, so you need about 4 shards plus headroom. On-demand mode scales shards for you.\n- **Replay:** set retention to 7 days (up to 365 is available, at extra cost beyond 24h). A consumer can re-read from any point with an `AT_TIMESTAMP` iterator.\n- **Multiple consumers:** use enhanced fan-out so each consumer gets its own 2 MB/s per shard instead of sharing read throughput.\n- **Ops:** no brokers or disks to manage. It integrates with IAM, CloudWatch and Lambda, and the KCL handles checkpointing.\n- **Trade-offs:** it's AWS-specific, ordering is per shard (partition key), and the KCL is less familiar than Kafka clients.\n\n### Bottom line\n\n1. **Default choice: Kinesis Data Streams** (on-demand mode, 7-day retention, enhanced fan-out). It meets every requirement with the least work for your team.\n2. **Choose MSK instead** if you expect to need Kafka-ecosystem tools or want to avoid AWS lock-in. Budget time for your team to learn Kafka concepts such as partitions, consumer groups and offsets.\n3. **Choose SNS + SQS** only if replay is a rare emergency and an S3-archive-and-republish process is acceptable.\n\nWhichever you pick, make consumers **idempotent** (for example, deduplicate on order event ID). Every option is at-least-once, and replay deliberately re-delivers events.",
+      "cost_usd": 0.062229799999999995,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2464,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 2119,
+        "output_tokens_details": {
+          "thinking_tokens": 833
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2464,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2119,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2464,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2464
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:25:39+00:00",
+      "finished": "2026-11-24T06:26:07+00:00"
+    },
+    "frontend-framework.skill": {
+      "question_id": "frontend-framework",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We are building an internal admin dashboard: around 40 screens of tables, forms and charts, used by 200 employees. The team is five developers who mostly write backend Python; only one has written any React, nobody has used Vue. The dashboard must be maintained for at least five years. Should we build it with React or Vue?",
+      "answer": "# React vs Vue for a 40-screen internal admin dashboard\n\n## 1. Candidates\n\n- **React**\n- **Vue (Vue 3)**\n- **Server-rendered Python (Django/FastAPI templates + HTMX)** `[inferred]`. Your team is backend Python, and the work is mostly CRUD with tables, forms and charts, so this is worth naming. I compare it only briefly because you asked about React vs Vue.\n\n## 2. Dimensions and weights\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Ramp-up for Python backend devs | Four of five devs start from zero, so time to productivity is real cost | High |\n| Existing in-team expertise / bus factor | One React person is a reviewer and pattern-setter, but also a single point of failure | Medium |\n| Admin-grade components (data grids, forms, charts) | 40 screens of tables and forms. A strong grid and form library saves months | High |\n| Opinionated structure | Non-frontend devs make fewer architectural mistakes when the framework picks routing, state and conventions | Medium |\n| 5-year stability and upgrade cost | The app must survive at least one major version cycle | High |\n| Hiring and help pool over 5 years | Replacing people, contractors, docs, and AI-assistant quality | Medium |\n\nI dropped performance. At 200 internal users, neither framework will be the bottleneck.\n\n## 3. Comparison\n\n| Dimension | React | Vue | Winner |\n|---|---|---|---|\n| Ramp-up | JSX, hooks rules, `useEffect` pitfalls, and memoization are a common stumbling block for non-frontend devs | HTML-like templates, `v-model` for forms, and reactivity that \"just works\". It is generally reported as gentler for backend devs | **Vue** |\n| In-team expertise | One person has *some* React. That helps, but only one person and the depth is unknown `[unverified]` | Zero experience | **React** (slightly) |\n| Admin components | MUI + MUI X DataGrid, Ant Design, Mantine, AG Grid, TanStack Table, React Hook Form, plus admin frameworks like react-admin and Refine | Element Plus, Ant Design Vue, PrimeVue, Vuetify, Naive UI, and AG Grid also supports Vue. Good coverage, but a smaller pool of choices and integrations | **React** |\n| Opinionated structure | Unopinionated. You must choose router, data fetching, forms and state yourselves, which is risky with one experienced dev | Official Vue Router and Pinia, plus single-file components. Much of the convention is decided for you | **Vue** |\n| 5-year stability | Upgrades have mostly been incremental. The ecosystem shifts (Server Components, framework-first guidance) matter little for a client-side admin SPA | The Vue 2→3 migration (2020–2023, Vue 2 EOL Dec 2023) was painful for many teams. Vue 3 has been stable since, but that history is a real data point | **React** (slightly) |\n| Hiring / help pool | Much larger job market, more Stack Overflow answers, and stronger AI code generation | Smaller, though healthy. It varies by region `[unverified for your location]` | **React** |\n\nWeighted tally:\n- **React** wins two of the high-weight dimensions (admin components, stability) and both medium-weight hiring dimensions.\n- **Vue** wins the high-weight ramp-up dimension and medium-weight structure.\n\nVue's ramp-up advantage is real, but it is a one-time cost of a few weeks. React's advantages compound over five years.\n\n## Verdict\n\n**Recommended: React**, narrowly, with mandatory guardrails.\n\nWhy:\n1. Over a 5-year horizon, the larger ecosystem and hiring pool outweigh a ramp-up difference measured in weeks.\n2. Your one React developer can set conventions and review code. Vue would start everyone at zero.\n3. For tables-and-forms-heavy screens, React has the deepest choice of grids, form libraries and admin frameworks.\n\nTo neutralize React's main weakness (no built-in structure), decide the stack up front and don't let it drift. For example:\n- Vite\n- React Router or TanStack Router\n- TanStack Query for server data\n- React Hook Form + Zod\n- One component kit (MUI or Mantine or Ant Design)\n- One chart library\n\nOr adopt **Refine** or **react-admin**, which give you that structure for CRUD screens directly.\n\nHolds when:\n- The React developer stays and is willing to own frontend architecture for the first 6–12 months.\n- You commit to a fixed, opinionated stack as above.\n\nIf that changes:\n- **Choose Vue** if the React dev is leaving or doesn't want the lead role, or if you won't enforce a stack. In that case Vue's built-in conventions and gentler learning curve matter more than React's ecosystem.\n- **Consider server-rendered Python + HTMX** if most screens are plain CRUD with little rich client-side interaction. It keeps all five devs in their strongest language and removes a whole build-and-deploy layer. I'd prototype 2–3 of your most complex screens in it before deciding.",
+      "cost_usd": 0.0791636,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3763,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 2446,
+        "output_tokens_details": {
+          "thinking_tokens": 700
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3763,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2446,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3763,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3763
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:34:48+00:00",
+      "finished": "2026-11-24T06:35:20+00:00"
+    },
+    "frontend-framework.plain": {
+      "question_id": "frontend-framework",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We are building an internal admin dashboard: around 40 screens of tables, forms and charts, used by 200 employees. The team is five developers who mostly write backend Python; only one has written any React, nobody has used Vue. The dashboard must be maintained for at least five years. Should we build it with React or Vue?",
+      "answer": "## Recommendation: React\n\nThe deciding factors are your five-year horizon and the one developer who already knows React.\n\n**Why React wins here**\n\n1. **You already have a starting point.** One person who has written React can set up the project structure, review early PRs, and catch beginner mistakes. With Vue, all five of you start from zero.\n2. **Five years favors the larger ecosystem.** React has more admin-focused libraries:\n   - Frameworks: React Admin, Refine\n   - Tables: TanStack Table, AG Grid\n   - Component kits: MUI, Ant Design, Mantine, shadcn/ui\n   - Charts: Recharts, ECharts wrappers\n\n   Over five years some libraries will be abandoned. A bigger ecosystem means more maintained replacements.\n3. **Hiring and turnover.** Over five years the team will change. React developers are much easier to hire, and backend developers are more likely to have picked up some React elsewhere.\n4. **Upgrade track record.** React has evolved fairly incrementally: class components still work, and hooks were opt-in. Vue's 2→3 migration was a multi-year disruption for many teams. Vue 3 is stable now, so this isn't disqualifying, but it's a relevant data point for a five-year commitment.\n\n**The honest case for Vue:** single-file components and templates often feel more natural to backend developers, and Vue is less of a \"pick 15 libraries yourself\" ecosystem. If your React developer were leaving, or the team strongly preferred templates, Vue would be a perfectly defensible choice. Either framework will handle 40 CRUD screens fine.\n\n**How to make React work for a Python-heavy team:** reduce the decisions people have to make.\n- Use **Refine** or **React Admin** on top of **Ant Design** or **MUI**. They give you tables, forms, filters, auth and routing out of the box, so most screens become configuration.\n- Add **TanStack Query** for server state. Avoid Redux or other global state libraries.\n- Use **TypeScript**, and generate API types from your backend's OpenAPI schema (FastAPI and DRF can both emit one). This is the biggest long-term maintainability win.\n- Have your React developer build the first 3–4 screens as reference patterns that everyone else copies.\n\n**Worth asking before committing:** do you need a single-page app at all? For internal tables, forms and charts, a Python team might be more productive and maintain things more easily with server-rendered pages: Django plus **HTMX**, with a small chart library where needed, or even a heavily customized Django admin. You would have one language, one codebase, and no frontend build chain to keep updated for five years. If the screens are mostly standard CRUD without rich client-side interactivity, I'd seriously consider this over either framework.\n\nIf it has to be one of the two, choose React with an admin framework.",
+      "cost_usd": 0.0430098,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2429,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1172,
+        "output_tokens_details": {
+          "thinking_tokens": 239
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2429,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1172,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2429,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2429
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:36:30+00:00",
+      "finished": "2026-11-24T06:36:48+00:00"
+    },
+    "container-platform.skill": {
+      "question_id": "container-platform",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "Our startup runs 8 small web services and 2 background workers in Docker containers, about 20 containers in total, on AWS. Two developers handle infrastructure part-time; neither has run Kubernetes in production. We need zero-downtime deploys, autoscaling for one public API, and we want to keep the monthly bill low. Should we use Kubernetes on Amazon EKS, Amazon ECS on Fargate, or a platform such as Render or Fly.io?",
+      "answer": "# EKS vs. ECS on Fargate vs. Render/Fly.io\n\n## Candidates\n\n1. **Kubernetes on Amazon EKS**\n2. **Amazon ECS on Fargate**\n3. **A managed platform: Render or Fly.io.** Treated as one candidate, with differences noted where they matter.\n\n## Dimensions and weights\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Operational burden | Two part-time people, no production Kubernetes experience. Whatever you pick must run itself most of the time. | **High** (close to a hard constraint) |\n| Fit with existing AWS resources | You already run on AWS. Databases, queues, S3 and IAM are probably there. | **High** if you use RDS, SQS etc.; low if not |\n| Monthly cost at ~20 containers | You stated this as a goal. | Medium |\n| Zero-downtime deploys | This is a requirement, so the question is how easily you get it. | Medium (all three can do it) |\n| Autoscaling for one public API | This is a requirement, so the question is how much setup it takes. | Medium |\n| Lock-in and future headroom | Can you grow or move later without a rewrite? | Low (Docker images stay portable) |\n\n## Comparison\n\n| Dimension | EKS | ECS on Fargate | Render / Fly.io | Winner |\n|---|---|---|---|---|\n| Operational burden | You must handle cluster version upgrades (roughly every 14 months per version before extended-support fees), add-ons, an ingress controller, the autoscaler, RBAC and Helm or manifests. That is a steep curve for part-time staff with no Kubernetes experience. EKS Auto Mode reduces some of this `[unverified for your setup]`. | No nodes and no cluster upgrades. You write task definitions, services and an ALB once with Terraform or CDK. There are fewer concepts to learn. | Git push or image deploy, with almost no infrastructure code. This is the lowest burden of the three. | **Render/Fly**, with ECS close behind |\n| Fit with AWS resources | Native VPC, IAM roles for pods, private access to RDS. | Native VPC, task IAM roles, Secrets Manager, CloudWatch. Private access to RDS, ElastiCache and SQS. | Runs outside your VPC. Reaching RDS means exposing it publicly or building a tunnel or VPN. You pay cross-cloud latency and AWS egress, and you need static AWS keys instead of IAM roles. | **ECS** (EKS ties on capability but costs more effort) |\n| Monthly cost (rough, us-east-1, small tasks) `[unverified, check current pricing]` | Control plane about $73/month per cluster, plus nodes or Fargate, plus ALB. This is the most expensive at your scale. | 20 tasks at 0.25 vCPU / 0.5 GB come to about $180/month. Add about $20+ for the ALB. ARM (Graviton) and Fargate Spot for the workers cut this further. Watch the NAT Gateway (about $32/month per AZ plus data) and public IPv4 charges. | Render: about $7 to $25 per service per month, plus a paid workspace plan for autoscaling `[unverified]`. Fly: small machines cost a few dollars each. Similar total or cheaper, **unless** cross-cloud egress and database access add cost. | **Tie between ECS and Render/Fly.** EKS loses. |\n| Zero-downtime deploys | Rolling updates with readiness probes. Works well once you configure it. | Rolling deploys behind the ALB with health checks and a deployment circuit breaker for automatic rollback. Blue/green is available too. | Built in: Render does health-checked zero-downtime deploys, and Fly offers rolling and blue-green strategies. | **Render/Fly** (least setup). ECS is a close second. |\n| Autoscaling one API | Needs HPA plus metrics-server, and Karpenter or Cluster Autoscaler for nodes. That is two layers to tune. | Application Auto Scaling with target tracking on CPU or ALB requests per target. A few lines of Terraform, one layer. | Render: autoscaling by CPU or memory on paid plans. Fly: autostart/autostop or a metrics-based autoscaler. Both are simple but give you less control. | **ECS**, nearly tied with Render/Fly |\n| Lock-in and headroom | Most portable. Most headroom if you ever need service mesh or complex scheduling. | AWS-specific, but the Docker images move freely. Handles far beyond 20 containers. | Platform-specific. Fly has had a mixed reliability record `[unverified, check their recent status history]`. You may outgrow it, but migrating off is mostly a matter of moving the same images. | **EKS**, but this dimension has low weight |\n\n## Verdict\n\n**Recommended: Amazon ECS on Fargate**\n\n**Why:**\n1. **EKS's main advantage, portability and power, is something you don't need yet.** It wins only the low-weight dimension and loses on operational burden and cost. Learning Kubernetes in production with two part-time people is the most likely way to miss your zero-downtime goal.\n2. **ECS gives you both requirements with little infrastructure.** ALB rolling deploys with a circuit breaker and target-tracking autoscaling are standard, well-documented setups with no cluster to maintain.\n3. **You're already on AWS.** ECS keeps private networking and IAM roles for your data stores. Moving compute off AWS while your data stays there adds latency, egress fees and a weaker security setup.\n\n**Holds when:**\n- Your services depend on AWS resources (RDS, SQS, S3, ElastiCache) that you plan to keep.\n- Someone is willing to write about 300 to 500 lines of Terraform or CDK once.\n\n**If that changes:**\n- **If your AWS footprint is thin** (for example, you could move the database to the platform's managed Postgres), **choose Render.** It has the lowest operational burden and comparable cost, and its deploy and autoscaling story is simpler. Prefer Render over Fly unless you need multi-region edge deployment.\n- **Choose EKS later** only if you outgrow ECS, for example by needing Kubernetes-native tooling or a multi-cloud requirement, or once you have a dedicated platform engineer. Your Docker images move over unchanged.\n\n**Cost tips for ECS:**\n- Use Graviton/ARM tasks.\n- Run the two workers on Fargate Spot if they tolerate interruption.\n- Share one ALB across all 8 services with host- or path-based rules.\n- Use VPC endpoints instead of a NAT Gateway where you can.\n- Right-size task CPU and memory after a week of CloudWatch metrics.",
+      "cost_usd": 0.09231160000000001,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3819,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 3081,
+        "output_tokens_details": {
+          "thinking_tokens": 787
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3819,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 3081,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3819,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3819
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:34:57+00:00",
+      "finished": "2026-11-24T06:35:35+00:00"
+    },
+    "container-platform.plain": {
+      "question_id": "container-platform",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "Our startup runs 8 small web services and 2 background workers in Docker containers, about 20 containers in total, on AWS. Two developers handle infrastructure part-time; neither has run Kubernetes in production. We need zero-downtime deploys, autoscaling for one public API, and we want to keep the monthly bill low. Should we use Kubernetes on Amazon EKS, Amazon ECS on Fargate, or a platform such as Render or Fly.io?",
+      "answer": "# Recommendation: ECS on Fargate\n\nFor your situation, **ECS on Fargate** is the best fit. **EKS** would add work and cost that you don't need. **Render or Fly.io** are reasonable only if most of your AWS footprint is the containers themselves.\n\n## Why not EKS\n\n- **Operational load.** Kubernetes requires ongoing work: cluster version upgrades about every 14 months under standard support, add-ons (ingress controller, cluster autoscaler or Karpenter, metrics server), IAM-to-RBAC mapping, and node patching unless you also use Fargate. That is a heavy load for two part-time people with no Kubernetes production experience. Most of the risk is in the incidents you won't know how to debug.\n- **Cost.** You pay about $73/month per cluster for the control plane before any workloads run. Extended support for older versions costs about 6× that, which teams who fall behind on upgrades tend to discover.\n- **Scale.** At 20 containers, you get no benefit from Kubernetes's flexibility. The usual reasons to choose it are multi-cloud portability, a large ecosystem of operators, or a team that already knows it. None of those apply to you.\n\n## Why ECS on Fargate\n\n- **No servers or control plane to manage.** AWS patches the hosts and runs the scheduler. There's no cluster fee.\n- **Zero-downtime deploys are built in.** Rolling deploys behind an ALB use `minimumHealthyPercent: 100` and `maximumPercent: 200`, combined with ALB health checks. Turn on the **deployment circuit breaker with rollback** so a bad image reverts automatically. If you later want blue/green, ECS supports it natively.\n- **Autoscaling is simple.** Service Auto Scaling with a target-tracking policy on CPU, or on ALB `RequestCountPerTarget`, for the public API is a few lines of configuration.\n- **It fits your existing AWS setup.** Your services reach RDS, ElastiCache, SQS, and S3 privately inside your VPC. Task IAM roles replace stored credentials. Secrets come from Secrets Manager or SSM.\n\n### Rough monthly cost\n\nThese are us-east-1 list prices, so verify them for your region.\n\n| Item | Estimate |\n|---|---|\n| 20 tasks at 0.25 vCPU / 0.5 GB, running 24/7 | ~$9 each → **~$180** |\n| Background workers on **Fargate Spot** (if interruptible) | ~70% off those tasks |\n| One shared ALB, using host/path routing for all 8 services | ~$20–30 |\n| CloudWatch Logs (set a retention period) | $5–30 |\n\n**Cost traps to avoid:**\n- **NAT Gateways** cost about $32/month each plus $0.045/GB processed. That often exceeds your compute bill. Use VPC endpoints for ECR, S3, and logs, or a single NAT. Don't create one per availability zone unless you need to.\n- **Separate ALBs per service.** One ALB can serve all 8 services.\n- **Unlimited log retention.**\n- **Savings.** A Compute Savings Plan takes about 20–50% off Fargate once your usage is stable.\n\n### How to make it manageable for two people\n\n- Define everything in **Terraform or CDK**. Avoid console click-ops so the setup is reproducible and reviewable.\n- Use one reusable module or construct for \"web service\", meaning a task definition, service, target group, and listener rule. Each of the 8 services then becomes about 15 lines of configuration.\n- Deploy with GitHub Actions: build, push to ECR, then run the official `amazon-ecs-deploy-task-definition` action, authenticating through OIDC rather than long-lived keys.\n- Have containers handle SIGTERM gracefully. Set the ALB deregistration delay to about 30 seconds instead of the 300-second default so deploys finish quickly.\n\n## When Render or Fly.io would be the right choice\n\nChoose them if your infrastructure is mostly \"containers plus a Postgres database\" and you'd be willing to move the database too. They offer the simplest developer experience: push to deploy, previews, and zero-downtime deploys by default. Be aware of these trade-offs:\n\n- **Cross-cloud latency and egress costs** if your database and other services remain in AWS. This is usually the deciding factor.\n- **Pricing per service grows quickly** with 20 containers. On Render, 20 small or standard instances easily reach $150–500 or more, and autoscaling requires a paid workspace plan. Fly is cheaper for raw compute but asks more of you operationally than Render does.\n- **Less control** over networking, compliance (VPC isolation, audit requirements), and IAM-based access to AWS resources.\n\n## When to reconsider EKS\n\nRevisit EKS if you grow to dozens of services with a dedicated platform engineer, need Kubernetes-specific tooling such as operators, service mesh, or Argo, or have a real multi-cloud requirement. Moving from ECS later is straightforward because your images, health checks, and twelve-factor configuration all carry over.\n\n**Bottom line:** use ECS on Fargate with one shared ALB, Fargate Spot for the workers, target-tracking autoscaling on the API, and Terraform or CDK for the setup. You get zero-downtime deploys and autoscaling with almost no cluster to operate, at roughly $250–400/month for compute and networking if you avoid the NAT and logging traps.",
+      "cost_usd": 0.0693018,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2483,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 2465,
+        "output_tokens_details": {
+          "thinking_tokens": 624
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2483,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2465,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2483,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2483
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:36:34+00:00",
+      "finished": "2026-11-24T06:37:05+00:00"
+    },
+    "cache.skill": {
+      "question_id": "cache",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "Our web application (Python, 12 app servers behind a load balancer) needs a shared store for user sessions, per-user API rate limiting, and caching of rendered product pages. Losing the cache is fine; losing sessions logs everyone out, which we want to avoid. Should we use Redis or Memcached?",
+      "answer": "# Redis vs Memcached for sessions, rate limiting and page cache\n\n## Candidates\n\n- **Redis**, or its API-compatible fork **Valkey**\n- **Memcached**\n- **Hybrid** `[inferred]`: Redis for sessions and rate limits, Memcached for the page cache\n\n## Dimensions\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Session survival | Your one hard requirement: a restart or node loss must not log everyone out | **High** (hard constraint) |\n| Rate-limiting primitives | 12 servers must agree on counts atomically | High |\n| Cache isolation from sessions | Cache pressure must never push sessions out of memory | High |\n| Cache throughput at scale | Page caching is the highest-volume workload | Medium |\n| Operational footprint | Number of systems to run, monitor and upgrade | Medium |\n| Python ecosystem fit | Ready-made session and cache backends save custom code | Low (both are well supported) |\n\n## Comparison\n\n| Dimension | Redis | Memcached | Hybrid | Winner |\n|---|---|---|---|---|\n| Session survival | Has persistence (RDB/AOF), replicas and Sentinel/Cluster failover. A primary restart doesn't lose sessions. | Memory only, with no persistence and no replication. A restart wipes it, and losing one node loses that node's share of sessions. | Same as Redis for sessions | **Redis / Hybrid** |\n| Rate limiting | Atomic `INCR` + `EXPIRE`, Lua scripts, and sorted sets for sliding windows, all in one round trip | Atomic `incr`/`add` with a TTL, which is enough for fixed windows. Sliding windows or token buckets need extra logic and are racy across keys. | Same as Redis | **Redis / Hybrid** |\n| Cache isolation | Fine if cache runs on a separate instance with `allkeys-lru`, but a shared instance risks evicting sessions | Cache-only use is its natural fit | Isolated by design | **Hybrid**, with Redis matching it if run as two instances |\n| Cache throughput | Single-threaded command execution, with I/O threads available. Easily handles typical product-page traffic. `[unverified for your load]` | Multithreaded, which scales better per node for very large, simple get/set workloads | Gets Memcached's strength | **Memcached / Hybrid**, a tie at moderate scale |\n| Operational footprint | One technology, one client, one set of dashboards | One technology, but it can't meet the session requirement on its own | Two systems, two clients, two failure modes | **Redis** |\n| Python fit | `redis-py`, and built-in or official backends for Django cache/sessions, Flask-Session and rate-limit libraries | `pymemcache` and Django cache support. Sessions stored only in a cache backend are discouraged for durability reasons. | Both | **Redis** |\n\nMemcached fails the hard constraint (session survival) outright. That rules it out as the only store.\n\n## Verdict\n\n**Recommended: Redis (or Valkey), deployed as two separately configured instances.**\n\n1. **Sessions + rate limits:** a primary with a replica, Sentinel or managed failover, AOF (`everysec`) or RDB persistence, and `maxmemory-policy noeviction`. Give sessions a TTL equal to your session lifetime.\n2. **Page cache:** a separate instance with no persistence, `allkeys-lru`, and a `maxmemory` sized to your hot set.\n\nWhy:\n1. It is the only single-technology option that meets the \"don't log everyone out\" requirement.\n2. It gives clean, atomic rate limiting across all 12 servers, including sliding windows.\n3. Separate instances give you the same isolation the hybrid would, with one technology to operate.\n\nHolds when:\n- Page-cache traffic is in the normal range for a web app, roughly tens of thousands of ops/sec per node or less.\n- Your team is fine running Redis with replication, or you use a managed service such as ElastiCache, Memorystore or Upstash.\n\nIf that changes:\n- **Page-cache volume is very large**, or you already run Memcached: choose the **Hybrid**. Keep Redis for sessions and rate limits, and move the page cache to Memcached.\n- **Redis licensing matters to you:** Redis moved to SSPL/RSAL in 2024 and added AGPL in 2025. Choose **Valkey**, which is a drop-in replacement with the same design.\n- **Losing sessions on a full outage is acceptable after all:** a single Redis instance is fine. Memcached still loses here, because of the rate-limiting gap.",
+      "cost_usd": 0.0715156,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3762,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 2064,
+        "output_tokens_details": {
+          "thinking_tokens": 492
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3762,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2064,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3762,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3762
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:35:20+00:00",
+      "finished": "2026-11-24T06:35:46+00:00"
+    },
+    "cache.plain": {
+      "question_id": "cache",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "Our web application (Python, 12 app servers behind a load balancer) needs a shared store for user sessions, per-user API rate limiting, and caching of rendered product pages. Losing the cache is fine; losing sessions logs everyone out, which we want to avoid. Should we use Redis or Memcached?",
+      "answer": "**Use Redis.** Each of your three workloads favors it, and the session requirement settles it.\n\n## Why\n\n**Sessions (the deciding factor).** Memcached keeps everything in memory only. It has no persistence and no replication. If a node restarts or evicts entries under memory pressure, those sessions are gone and the users are logged out. That is the outcome you said you want to avoid. Redis gives you:\n- **Persistence**: AOF (`appendfsync everysec` loses at most about 1 second of writes) and/or RDB snapshots, so a restart reloads the sessions.\n- **Replication and failover**: a primary plus replicas with Sentinel, or a managed service such as ElastiCache, MemoryDB, or Upstash, so a node failure doesn't wipe the data.\n- **Expiry without surprise eviction**: set TTLs on session keys and choose an eviction policy that won't drop them (more on this below).\n\n**Rate limiting.** Rate limiting across 12 servers needs atomic shared counters. Redis handles this natively:\n- Fixed window: `INCR` + `EXPIRE`, run in a pipeline or a Lua script so the pair is atomic.\n- Sliding window: sorted sets (`ZADD`/`ZREMRANGEBYSCORE`/`ZCARD`) in a Lua script, or a library like `limits` or `redis-cell`.\n\nMemcached does have `incr`, but it has no scripting and no sorted sets, and eviction can silently reset counters.\n\n**Page cache.** Both products handle this well. Memcached's multithreaded design can be slightly more memory- and CPU-efficient for large blobs at very high throughput. At 12 app servers you are almost certainly nowhere near the point where that difference matters, and running a second system just for the cache isn't worth the operational cost.\n\n## Recommended setup\n\nThe workloads have different durability needs, so keep them from interfering with each other:\n\n1. **Separate the cache from sessions and rate limits.** The best option is two Redis instances or logical deployments:\n   - **Sessions + rate limits**: AOF on, replicas plus failover, `maxmemory-policy noeviction` or `volatile-ttl`, sized with headroom.\n   - **Page cache**: persistence off, `maxmemory-policy allkeys-lru` (or `allkeys-lfu`), loss is acceptable.\n\n   If you have to use a single instance, put a TTL on every key and use `volatile-lru`. Be aware that a cache spike can still push out sessions, which is why separate instances are better.\n2. **Python clients**: use `redis-py` (it includes asyncio support). Use `redis.sentinel.Sentinel` or a cluster client so failover happens transparently.\n3. **Sessions**: whatever your framework uses (Django's `django.contrib.sessions.backends.cache` pointed at a Redis cache alias, `Flask-Session`, or Starlette middleware). Set session TTLs that match your login policy.\n4. **Be clear about the limits of persistence.** AOF with `everysec` plus async replication can lose about a second of writes during a crash or failover. For sessions that is fine, since at worst a few recently logged-in users log in again. If you ever need zero loss, look at MemoryDB or store sessions in your primary database with Redis in front as a cache.\n\n## When Memcached would make sense\nMemcached makes sense only for a pure, very large, multi-threaded cache tier where data loss is fine and you need nothing beyond get/set. Your sessions and rate limiting fall outside that, so Redis is the right single choice here.",
+      "cost_usd": 0.0434178,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2430,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 1192,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2430,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1192,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2430,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2430
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:36:48+00:00",
+      "finished": "2026-11-24T06:37:06+00:00"
+    },
+    "search.skill": {
+      "question_id": "search",
+      "arm": "skill",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": "ffa1bc97a2a89ba66851424a8018dba638dc8c68d66d94d28d728a7cc865d3c9",
+      "prompt": "We run an online shop with 200,000 products and plan search with typo tolerance, filters by category, price and brand, and results in under 100 ms. Product data lives in PostgreSQL. Team of three developers, no dedicated ops person, a tight budget, and about 50,000 searches a day. Should we use PostgreSQL full-text search, self-hosted OpenSearch (or Elasticsearch), or a hosted service such as Algolia?",
+      "answer": "# PostgreSQL FTS vs. self-hosted OpenSearch vs. Algolia\n\n## Candidates\n\n- **A. PostgreSQL search**: `tsvector` full-text search plus the `pg_trgm` extension for typo tolerance, running inside your existing database.\n- **B. Self-hosted OpenSearch or Elasticsearch**.\n- **C. Algolia**, a hosted service.\n- **D. Typesense Cloud or Meilisearch Cloud** `[inferred]`. These are hosted engines built for this exact use case: typo tolerance and facets out of the box, at a much lower price than Algolia. Leaving them out would skew the comparison.\n\n**Load check:** 50,000 searches a day averages about 0.6 queries per second, with peaks of perhaps 5–10. With 200,000 products, the whole index fits in a few hundred MB. **Performance is not a deciding factor here.** All four options meet 100 ms at this scale, so the decision comes down to operations, cost and search quality.\n\n## Dimensions and weights\n\n| Dimension | Why it matters here | Weight |\n|---|---|---|\n| Operations burden | You have three developers and no ops person. Anything that pages you at night is a real cost. | **High (near-hard constraint)** |\n| Running cost | The budget is tight. | **High** |\n| Typo tolerance and relevance | This is the core requirement. Weak typo handling means lost sales. | **High** |\n| Filters and facets (category, price, brand, with counts) | This is the core requirement. | Medium |\n| Data sync from Postgres | Every external engine needs a sync pipeline that has to stay correct. | Medium |\n| Reversibility and lock-in | You are a small team and may outgrow your first choice. | Low |\n\nI dropped **latency** and **scalability** because they don't separate the options at this scale.\n\n## Comparison\n\n| Dimension | A. Postgres | B. Self-hosted OpenSearch | C. Algolia | D. Typesense/Meilisearch Cloud `[inferred]` | Winner |\n|---|---|---|---|---|---|\n| Operations burden | No new system. You add a GIN index and maybe a read replica. | A JVM cluster to run: 2–3 nodes, heap tuning, upgrades, snapshots, security patches. Three developers would be running it as a side job. | None. | Close to none. A managed node and you're done. | A ≈ C ≈ D; **B clearly loses** |\n| Running cost | About $0 extra, or the cost of a read replica if you want to keep search load off the primary. | Roughly $100–300/month for VMs, plus real engineering time `[unverified, depends on host]`. | Pay-per-request. 50k searches a day is about 1.5M a month, and search-as-you-type typically multiplies that 3–5×. At roughly $0.50 per 1,000 requests, that likely lands in the hundreds to over $1,000 a month `[unverified, check current pricing]`. | A small cluster is roughly $30–150/month, priced by resources, not requests `[unverified]`. | **A**, then D |\n| Typo tolerance and relevance | `pg_trgm` similarity is workable but crude. You'll hand-tune thresholds, and short or multi-word queries are hit-and-miss. Ranking needs custom SQL. | Strong: fuzzy matching, synonyms and full scoring control. You have to configure it yourself. | Excellent out of the box, tuned for e-commerce. | Very good out of the box. Typo tolerance is the default behavior. | **C**, then D, then B; A is last |\n| Filters and facets | Filtering is easy in SQL. Facet counts take extra `GROUP BY` queries, which are fine at 200k rows but are custom code. | Native aggregations. | Native facets. | Native facets. | B ≈ C ≈ D; A works with more code |\n| Data sync | None. Search always reflects the current data. | You need an indexing pipeline, such as triggers, an outbox table or CDC, plus reindex jobs. | Same pipeline work, through their API. | Same pipeline work, through their API. | **A** |\n| Reversibility and lock-in | Least to undo. The SQL stays useful even if you move later. | Open source and portable. | Proprietary API, and pricing rises with traffic. | Open source, so you can self-host later. | A ≈ B ≈ D; C is weakest |\n\n**Weighted result:**\n\n- **B** loses on the near-hard ops constraint and has no compensating win.\n- **C** wins on quality but is expensive for a tight budget, and its request-based pricing grows with your traffic.\n- **A** wins on cost, ops and sync, but is weakest on the core typo-tolerance requirement.\n- **D** comes second on almost everything, with no serious weakness.\n\n## Verdict\n\n**Recommended:** Start with **A (Postgres + `pg_trgm` + `tsvector` + `unaccent`)** as a time-boxed spike of 1–2 weeks. If it fails the quality bar, move to **D (Typesense Cloud or Meilisearch Cloud)**. Don't self-host OpenSearch.\n\n**Why:**\n1. Postgres adds zero infrastructure, zero sync pipeline and almost zero cost. That matches your two strongest constraints exactly.\n2. At 200,000 products and about 10 queries per second at peak, Postgres easily meets 100 ms with the right indexes. The open question is search *quality*, not speed.\n3. If quality falls short, D gives you Algolia-like typo tolerance and facets for a fraction of the price, with no ops work. That makes it a cheap and reversible fallback.\n\n**How to test the spike:**\n- Collect 50–100 real queries from your logs or support tickets, including misspellings, brand names and partial words.\n- Count how many return the right product in the top five results.\n- Check p95 latency with the filters and facet counts applied.\n- If typo queries miss often, or you find yourself writing a growing pile of ranking SQL, stop and switch to D.\n\n**This holds while:**\n- the catalog stays in the hundreds of thousands, not millions;\n- you need one language, or a few;\n- the team stays small and has no ops role.\n\n**Choose differently when:**\n- **Search drives a large share of revenue and you can afford it:** choose **C (Algolia)**. Its built-in merchandising, analytics and A/B testing can pay for themselves through conversion.\n- **You hire an ops or platform engineer, or need complex relevance work** (personalization, learning-to-rank, many languages): choose **B (OpenSearch)**.\n- **The spike shows Postgres search is clearly poor from day one:** skip straight to **D**. You'd lose only the 1–2 weeks of the spike.",
+      "cost_usd": 0.0936476,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 3811,
+        "cache_read_input_tokens": 658,
+        "output_tokens": 3151,
+        "output_tokens_details": {
+          "thinking_tokens": 890
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3811,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 3151,
+            "cache_read_input_tokens": 658,
+            "cache_creation_input_tokens": 3811,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 3811
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:35:35+00:00",
+      "finished": "2026-11-24T06:36:11+00:00"
+    },
+    "search.plain": {
+      "question_id": "search",
+      "arm": "plain",
+      "model": "claude-opus-5-5",
+      "models_reported": [
+        "claude-opus-5-5"
+      ],
+      "skill_sha256": null,
+      "prompt": "We run an online shop with 200,000 products and plan search with typo tolerance, filters by category, price and brand, and results in under 100 ms. Product data lives in PostgreSQL. Team of three developers, no dedicated ops person, a tight budget, and about 50,000 searches a day. Should we use PostgreSQL full-text search, self-hosted OpenSearch (or Elasticsearch), or a hosted service such as Algolia?",
+      "answer": "# Recommendation: skip self-hosted OpenSearch, and consider a fourth option\n\n**Self-hosted OpenSearch or Elasticsearch is the wrong fit.** It needs JVM tuning, cluster health monitoring, upgrades, snapshots, and enough RAM to run well. That is a part-time ops job you don't have anyone for. Your scale (200k documents, about 0.6 queries per second on average, maybe 5–10 at peak) is far below the point where its power pays off.\n\nThat leaves three realistic paths:\n\n| | PostgreSQL FTS | Typesense / Meilisearch | Algolia |\n|---|---|---|---|\n| Typo tolerance | Hand-built (pg_trgm) | Built in, good | Built in, excellent |\n| Facets (category/brand/price) | SQL `GROUP BY`, fine at 200k | Built in | Built in |\n| Under 100 ms | Achievable with tuning | Easy (often <20 ms) | Easy |\n| Ops burden | None new | Low (one binary, or their cloud) | None |\n| Cost | ~$0 extra | ~$30–150/mo hosted, or a small VM | Scales per request; can get expensive |\n| Data sync | None needed | Needed | Needed |\n| Relevance tuning effort | High | Low | Lowest |\n\n## What I'd pick: Typesense or Meilisearch (hosted)\n\nThese were built for exactly your case: product catalogs with typo-tolerant, faceted, instant search, without Elasticsearch's complexity.\n\n- 200k products fits in well under 1 GB of RAM, so you'd be on a small, cheap plan.\n- Typo tolerance, faceting, numeric price ranges, synonyms and relevance ranking work out of the box.\n- Their managed clouds (Typesense Cloud, Meilisearch Cloud) cost a fraction of Algolia at your volume. If money is very tight, either one runs as a single binary on a ~$10–20/month VM. That path does make you responsible for backups and restarts, though.\n- Both have good frontend libraries, including InstantSearch adapters.\n\n**Sync from PostgreSQL** is the one real cost of this option. At your size it's easy:\n1. On every product create, update or delete, push the change to the index. Do this from application code, or through an outbox table processed by a worker.\n2. Run a nightly full reindex as a safety net. 200k documents take a minute or two, and you can swap in the new index under an alias with no downtime.\n\n## When PostgreSQL alone is the right call\n\nChoose Postgres if you want zero new infrastructure and can accept \"good enough\" search:\n\n- A `tsvector` column with a GIN index handles word matching and ranking (`ts_rank`).\n- A `pg_trgm` GIN index on the name and brand columns provides fuzzy matching. A common pattern is to correct each query term against a table of known words using `similarity()`, then run the full-text query.\n- Facets are just `COUNT(*) ... GROUP BY category_id / brand_id` over the filtered set, which is fast at 200k rows.\n- The ParadeDB `pg_search` extension (BM25 ranking inside Postgres) is worth a look if your host supports it. Many managed Postgres providers don't.\n\nThe catch is relevance. Getting ranking, typo handling, prefix matching for search-as-you-type, and facets to all feel good together takes real developer time. That time is arguably your scarcest resource.\n\n## When Algolia is worth it\n\nAlgolia gives the best developer experience and has merchandising tools that non-developers can use. Check the pricing carefully against your actual traffic. Search-as-you-type sends a request per keystroke, so 50,000 searches can become several hundred thousand billable requests a day. At that volume the monthly bill can easily be 5–20× what Typesense or Meilisearch would cost. Run their calculator with realistic numbers before committing.\n\n## Bottom line\n\n1. **Default: Typesense Cloud or Meilisearch Cloud.** It's cheap, needs almost no ops, and meets every requirement without custom work.\n2. **If you refuse to add any new service:** use PostgreSQL with `tsvector` and `pg_trgm`, and budget time for relevance tuning.\n3. **If budget loosens and merchandising matters:** Algolia.\n\nA practical way to decide is to spend one day loading your 200k products into Typesense or Meilisearch (both have free tiers or Docker images) and test it with real queries, especially misspelled brand names. You'll know quickly whether it's good enough, and the indexing script carries straight over to production.",
+      "cost_usd": 0.0657018,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 2478,
+        "cache_read_input_tokens": 649,
+        "output_tokens": 2287,
+        "output_tokens_details": {
+          "thinking_tokens": 754
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2478,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 2287,
+            "cache_read_input_tokens": 649,
+            "cache_creation_input_tokens": 2478,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2478
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "started": "2026-11-24T06:37:05+00:00",
+      "finished": "2026-11-24T06:37:36+00:00"
+    }
+  },
+  "judgments": {
+    "database.first": {
+      "question_id": "database",
+      "order": "first",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "7a8c6b09497942641745edba93a59e743b85e12c52eaefddfc8e09851fad8d2d",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:31:03+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares situation-specific criteria with checkable features, prioritizes relational integrity and existing PostgreSQL experience, and gives explicit conditions for choosing alternatives. However, MySQL experience is unknown, not absent as the verdict asserts, and calling MongoDB ruled out by a hard constraint overstates the stated requirements.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 0,\n    \"C6\": 1,\n    \"notes\": \"Gives a clear, well-supported PostgreSQL recommendation using concrete differences in integrity, JSON indexing and tenant isolation. It does not identify when MySQL or MongoDB would become preferable, and its categorical claims about future sharding needs and EAV performance exceed what the supplied facts establish.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A better equips someone to defend the decision by distinguishing decisive criteria from non-differentiators and explaining when another candidate would win. B supports the same sensible choice but omits those decision boundaries.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares situation-specific criteria with checkable features, prioritizes relational integrity and existing PostgreSQL experience, and gives explicit conditions for choosing alternatives. However, MySQL experience is unknown, not absent as the verdict asserts, and calling MongoDB ruled out by a hard constraint overstates the stated requirements."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 0,
+          "C6": 1,
+          "notes": "Gives a clear, well-supported PostgreSQL recommendation using concrete differences in integrity, JSON indexing and tenant isolation. It does not identify when MySQL or MongoDB would become preferable, and its categorical claims about future sharding needs and EAV performance exceed what the supplied facts establish."
+        },
+        "preference": "A",
+        "reason": "A better equips someone to defend the decision by distinguishing decisive criteria from non-differentiators and explaining when another candidate would win. B supports the same sensible choice but omits those decision boundaries."
+      }
+    },
+    "database.second": {
+      "question_id": "database",
+      "order": "second",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "562cf60a04cced9c8a71d512eb54c296dbe2e656befd404675c13fcb545e51e5",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:31:41+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 0,\n    \"C6\": 1,\n    \"notes\": \"Connects relational integrity, JSONB, tenant isolation and existing PostgreSQL experience to a concrete recommendation. It does not identify when another database would become preferable, and its assurance that data volume alone makes sharding unnecessary is too categorical.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"Provides situation-specific criteria, checkable comparisons and explicit conditions for choosing another candidate. However, treating relational financial data as a hard constraint that rules out MongoDB is materially misleading given its transaction support, and the verdict incorrectly treats the team's unspecified MySQL experience as absent.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B narrowly provides more help defending the choice because it explains the priorities and identifies circumstances that would reverse the recommendation. Its PostgreSQL recommendation remains well supported, but the categorical MongoDB exclusion and unsupported MySQL-experience claim should not be repeated to the team.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 0,
+          "C6": 1,
+          "notes": "Connects relational integrity, JSONB, tenant isolation and existing PostgreSQL experience to a concrete recommendation. It does not identify when another database would become preferable, and its assurance that data volume alone makes sharding unnecessary is too categorical."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "Provides situation-specific criteria, checkable comparisons and explicit conditions for choosing another candidate. However, treating relational financial data as a hard constraint that rules out MongoDB is materially misleading given its transaction support, and the verdict incorrectly treats the team's unspecified MySQL experience as absent."
+        },
+        "preference": "B",
+        "reason": "B narrowly provides more help defending the choice because it explains the priorities and identifies circumstances that would reverse the recommendation. Its PostgreSQL recommendation remains well supported, but the categorical MongoDB exclusion and unsupported MySQL-experience claim should not be repeated to the team."
+      }
+    },
+    "api-style.first": {
+      "question_id": "api-style",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "5b65e414d376ccce502a7be469e90f47f57b9b8ccdf7acd9c89de64f738aba73",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:37:36+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares network efficiency, team familiarity, client compatibility and operational burden, with concrete implementation steps and clear switching conditions. However, it assumes the cause of slowness, incorrectly suggests JSON:API conventions implement payload controls for free, and overstates the proxy requirement for Connect.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Provides concrete, situation-specific comparisons, explicitly questions the latency diagnosis and gives actionable conditions for choosing alternatives. However, persisted queries do not automatically enforce an allowlist or use GET, the weeks-long ramp-up is speculative, and calling REST aggregation a worse GraphQL overstates its disadvantages.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A offers the more defensible default for six REST-only developers: address multi-resource screens through aggregation, measure the result and introduce another paradigm only when demonstrated needs justify it. B provides strong comparative coverage, but its recommendation rests more heavily on unestablished assumptions about aggregation sprawl and affordable learning and operational costs.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares network efficiency, team familiarity, client compatibility and operational burden, with concrete implementation steps and clear switching conditions. However, it assumes the cause of slowness, incorrectly suggests JSON:API conventions implement payload controls for free, and overstates the proxy requirement for Connect."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Provides concrete, situation-specific comparisons, explicitly questions the latency diagnosis and gives actionable conditions for choosing alternatives. However, persisted queries do not automatically enforce an allowlist or use GET, the weeks-long ramp-up is speculative, and calling REST aggregation a worse GraphQL overstates its disadvantages."
+        },
+        "preference": "A",
+        "reason": "A offers the more defensible default for six REST-only developers: address multi-resource screens through aggregation, measure the result and introduce another paradigm only when demonstrated needs justify it. B provides strong comparative coverage, but its recommendation rests more heavily on unestablished assumptions about aggregation sprawl and affordable learning and operational costs."
+      }
+    },
+    "api-style.second": {
+      "question_id": "api-style",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "7742f915b39ee67758e18009139a6cb7f5a16e1ef8fed9f0707e9878fb536b72",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:38:36+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares situation-specific criteria with concrete implementation differences and gives a conditional, actionable recommendation. However, persisted queries do not inherently block arbitrary queries without allowlist enforcement, and calling REST aggregation a worse reinvention of GraphQL unfairly dismisses a viable alternative.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Makes a concrete case around network round trips, team experience, browser compatibility, and operational workload, with useful triggers for adopting GraphQL or internal gRPC. It assumes the latency cause before measurement, overstates JSON:API features as free, and incorrectly implies Connect necessarily requires a proxy.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B offers a lower-complexity default that directly addresses multi-resource screens while respecting the six-person team's existing skills. Its measurement step and explicit migration triggers provide a defensible path without assuming GraphQL is necessary to obtain one-request screen loading.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares situation-specific criteria with concrete implementation differences and gives a conditional, actionable recommendation. However, persisted queries do not inherently block arbitrary queries without allowlist enforcement, and calling REST aggregation a worse reinvention of GraphQL unfairly dismisses a viable alternative."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Makes a concrete case around network round trips, team experience, browser compatibility, and operational workload, with useful triggers for adopting GraphQL or internal gRPC. It assumes the latency cause before measurement, overstates JSON:API features as free, and incorrectly implies Connect necessarily requires a proxy."
+        },
+        "preference": "B",
+        "reason": "B offers a lower-complexity default that directly addresses multi-resource screens while respecting the six-person team's existing skills. Its measurement step and explicit migration triggers provide a defensible path without assuming GraphQL is necessary to obtain one-request screen loading."
+      }
+    },
+    "repo-layout.first": {
+      "question_id": "repo-layout",
+      "order": "first",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "d9fb202d45d97f90319ff368caf3bbda6e9ee75dbf378cd48551d3249a596917",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:40:38+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares concrete options against the stated rollout bottleneck and recommends a targeted TS monorepo, with explicit conditions for including Go or retaining polyrepos. However, the promised hours-long automated rollout and roughly one-day bot setup are unsupported estimates, and affected-build tooling is presented as more mandatory than it is.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Gives an actionable monorepo recommendation with concrete workspace, CI, deployment, and access-control considerations. It overstates certainty that scaling problems only arise at hundreds of engineers and that including independent Go services costs almost nothing; frequent library changes are also assumed rather than established.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A better separates the demonstrated benefit—coordinating TypeScript library changes—from the unproven benefit of relocating the Go services. Its conditional recommendation gives the team a more defensible migration boundary, although B usefully identifies repository-level access restrictions.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares concrete options against the stated rollout bottleneck and recommends a targeted TS monorepo, with explicit conditions for including Go or retaining polyrepos. However, the promised hours-long automated rollout and roughly one-day bot setup are unsupported estimates, and affected-build tooling is presented as more mandatory than it is."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Gives an actionable monorepo recommendation with concrete workspace, CI, deployment, and access-control considerations. It overstates certainty that scaling problems only arise at hundreds of engineers and that including independent Go services costs almost nothing; frequent library changes are also assumed rather than established."
+        },
+        "preference": "A",
+        "reason": "A better separates the demonstrated benefit—coordinating TypeScript library changes—from the unproven benefit of relocating the Go services. Its conditional recommendation gives the team a more defensible migration boundary, although B usefully identifies repository-level access restrictions."
+      }
+    },
+    "repo-layout.second": {
+      "question_id": "repo-layout",
+      "order": "second",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "b7c914ec4da5d3c2210af80966f484440275291fc2c1d3ac0a387fcbdc6929f0",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:41:27+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Connects workspace dependencies, atomic changes, CI work, and access restrictions to the team's problem and gives an actionable recommendation with alternatives. However, it unjustifiably guarantees that scaling problems will not matter until hundreds of engineers, assumes frequent library changes, and presents migration and propagation timelines too confidently.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares actionable alternatives on situation-specific criteria and recommends a smaller migration, explicitly identifying when Go should join. Its hours-to-propagate and one-day automation estimates are unsupported, and CODEOWNERS does not make ownership boundaries equivalent where repository-level access restrictions matter.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B better separates solving the TypeScript dependency problem from moving unrelated Go services, making its recommendation easier to defend without assuming benefits that were not established. It also clearly explains when a full monorepo or automated polyrepo updates would be preferable.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Connects workspace dependencies, atomic changes, CI work, and access restrictions to the team's problem and gives an actionable recommendation with alternatives. However, it unjustifiably guarantees that scaling problems will not matter until hundreds of engineers, assumes frequent library changes, and presents migration and propagation timelines too confidently."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares actionable alternatives on situation-specific criteria and recommends a smaller migration, explicitly identifying when Go should join. Its hours-to-propagate and one-day automation estimates are unsupported, and CODEOWNERS does not make ownership boundaries equivalent where repository-level access restrictions matter."
+        },
+        "preference": "B",
+        "reason": "B better separates solving the TypeScript dependency problem from moving unrelated Go services, making its recommendation easier to defend without assuming benefits that were not established. It also clearly explains when a full monorepo or automated polyrepo updates would be preferable."
+      }
+    },
+    "message-queue.first": {
+      "question_id": "message-queue",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "e8883b8f6e8391a3e40fa831ae7972dadb4f642120f37a82cf6270d3a673d623",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:32:44+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 2,\n    \"notes\": \"Centers the choice on replay, independent consumers, and operational burden, with concrete mechanisms and a clear Kinesis recommendation plus MSK fallback. It distinguishes RabbitMQ Streams and SNS FIFO archive/replay from ordinary queue behavior and flags relevant uncertainties.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Provides actionable comparisons, a clear recommendation, and explicit conditions for switching candidates. However, its monthly traffic estimates silently assume sustained peak throughput, its cost ranking lacks sufficient assumptions about consumer count and utilization, and attaching Lambda does not eliminate writing event-processing code.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"Both support a defensible selection, but A reaches the recommendation with fewer unsupported claims. B's extra cost analysis risks misleading the team because the question supplies peak traffic, not average utilization or a precise consumer count.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 2,
+          "notes": "Centers the choice on replay, independent consumers, and operational burden, with concrete mechanisms and a clear Kinesis recommendation plus MSK fallback. It distinguishes RabbitMQ Streams and SNS FIFO archive/replay from ordinary queue behavior and flags relevant uncertainties."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Provides actionable comparisons, a clear recommendation, and explicit conditions for switching candidates. However, its monthly traffic estimates silently assume sustained peak throughput, its cost ranking lacks sufficient assumptions about consumer count and utilization, and attaching Lambda does not eliminate writing event-processing code."
+        },
+        "preference": "A",
+        "reason": "Both support a defensible selection, but A reaches the recommendation with fewer unsupported claims. B's extra cost analysis risks misleading the team because the question supplies peak traffic, not average utilization or a precise consumer count."
+      }
+    },
+    "message-queue.second": {
+      "question_id": "message-queue",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "151bb6733dee396003984285ce97aa58b7c8dc23f0c0a6408f41ae7d32e36058",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:33:21+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Defines relevant priorities, compares concrete capabilities, and gives both a recommendation and an explicit fallback within the original candidates. However, its monthly volume assumes continuous peak traffic without saying so, its cost ranking is insufficiently grounded, and its verdict overlooks the native SNS FIFO archive/replay option acknowledged earlier.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Uses replay, independent consumption, throughput, and limited operational capacity to support an actionable recommendation with concrete technical details and switching conditions. Its final restriction of SNS/SQS to a custom S3 replay process is too strong given the native SNS FIFO archive/replay capability it correctly mentions.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B provides a slightly more defensible explanation of the operational and replay trade-offs without relying on A's speculative cost ranking or treating peak traffic as established monthly volume. Both should evaluate SNS FIFO's native replay more seriously before dismissing that candidate.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Defines relevant priorities, compares concrete capabilities, and gives both a recommendation and an explicit fallback within the original candidates. However, its monthly volume assumes continuous peak traffic without saying so, its cost ranking is insufficiently grounded, and its verdict overlooks the native SNS FIFO archive/replay option acknowledged earlier."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Uses replay, independent consumption, throughput, and limited operational capacity to support an actionable recommendation with concrete technical details and switching conditions. Its final restriction of SNS/SQS to a custom S3 replay process is too strong given the native SNS FIFO archive/replay capability it correctly mentions."
+        },
+        "preference": "B",
+        "reason": "B provides a slightly more defensible explanation of the operational and replay trade-offs without relying on A's speculative cost ranking or treating peak traffic as established monthly volume. Both should evaluate SNS FIFO's native replay more seriously before dismissing that candidate."
+      }
+    },
+    "frontend-framework.first": {
+      "question_id": "frontend-framework",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "fc09dd692dbbfede470bf993a7539076b7813636167638e1315fc567fff73c19",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:42:40+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 1,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Connects the recommendation to existing React exposure and five-year maintenance, with actionable implementation advice and meaningful alternatives. However, its component-ecosystem comparison is mostly a React inventory, and it assumes turnover and easier React hiring without establishing the team's circumstances.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares concrete features and component options on both sides, distinguishes limited React exposure from established expertise, and makes the recommendation conditional on ownership and stack discipline. Its claims that the learning difference amounts to only a few weeks and that React offers stronger AI code generation are not adequately qualified or supported.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B better equips the team to defend the choice by explaining Vue's specific advantages alongside React's and identifying the organizational conditions needed for React to succeed. Its advantage is the substantive two-sided comparison, not its tables or greater length.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 1,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Connects the recommendation to existing React exposure and five-year maintenance, with actionable implementation advice and meaningful alternatives. However, its component-ecosystem comparison is mostly a React inventory, and it assumes turnover and easier React hiring without establishing the team's circumstances."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares concrete features and component options on both sides, distinguishes limited React exposure from established expertise, and makes the recommendation conditional on ownership and stack discipline. Its claims that the learning difference amounts to only a few weeks and that React offers stronger AI code generation are not adequately qualified or supported."
+        },
+        "preference": "B",
+        "reason": "B better equips the team to defend the choice by explaining Vue's specific advantages alongside React's and identifying the organizational conditions needed for React to succeed. Its advantage is the substantive two-sided comparison, not its tables or greater length."
+      }
+    },
+    "frontend-framework.second": {
+      "question_id": "frontend-framework",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "773c936176910814d466f2c0c5df22b44c6ac8dadc3d63c8f5cd243725e19484",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:44:00+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares relevant criteria using specific features and libraries on both sides, and makes the React recommendation conditional on frontend leadership and stack discipline. However, stronger React AI code generation and a learning-curve difference measured in weeks are asserted without support; 200 users alone also does not rule out client-side performance concerns.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 1,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Uses the team's experience and maintenance horizon to make an actionable recommendation, with meaningful conditions favoring Vue. The comparison names mostly React tooling rather than checking equivalent Vue options, and it overstates hiring certainty and the interchangeability of admin-framework stacks: React-admin's standard UI uses MUI, whereas Refine supports multiple UI integrations.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A provides more checkable comparisons between both candidates and more clearly states what must hold for React to remain the better choice. That makes its recommendation easier to defend to the team, although its unsupported claims should not carry decisive weight.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares relevant criteria using specific features and libraries on both sides, and makes the React recommendation conditional on frontend leadership and stack discipline. However, stronger React AI code generation and a learning-curve difference measured in weeks are asserted without support; 200 users alone also does not rule out client-side performance concerns."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 1,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Uses the team's experience and maintenance horizon to make an actionable recommendation, with meaningful conditions favoring Vue. The comparison names mostly React tooling rather than checking equivalent Vue options, and it overstates hiring certainty and the interchangeability of admin-framework stacks: React-admin's standard UI uses MUI, whereas Refine supports multiple UI integrations."
+        },
+        "preference": "A",
+        "reason": "A provides more checkable comparisons between both candidates and more clearly states what must hold for React to remain the better choice. That makes its recommendation easier to defend to the team, although its unsupported claims should not carry decisive weight."
+      }
+    },
+    "container-platform.first": {
+      "question_id": "container-platform",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "ef35a049e26c819f6acf417451be6ad6ab0fc4aeb6eb3ad1f8f2a9da80c7a3e0",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:45:12+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Provides concrete operational and cost comparisons, an actionable ECS recommendation, and meaningful conditions for choosing a platform or EKS instead. However, it assumes AWS data-service dependencies not given in the question and overstates both the absence of Kubernetes benefits at this scale and the ease of migrating from ECS later.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Makes the decision depend explicitly on staffing, AWS dependencies, cost, and the two required capabilities, with a clear alternative recommendation when AWS dependencies are minimal. Its claim that external platforms require static AWS keys is false—federation or temporary credentials can be possible—and EKS is not necessarily the most expensive option without workload sizing.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B better distinguishes known constraints from assumed AWS dependencies and explains how those assumptions change the choice to Render. That makes its recommendation easier to defend without treating the existing AWS location alone as sufficient reason to stay.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Provides concrete operational and cost comparisons, an actionable ECS recommendation, and meaningful conditions for choosing a platform or EKS instead. However, it assumes AWS data-service dependencies not given in the question and overstates both the absence of Kubernetes benefits at this scale and the ease of migrating from ECS later."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Makes the decision depend explicitly on staffing, AWS dependencies, cost, and the two required capabilities, with a clear alternative recommendation when AWS dependencies are minimal. Its claim that external platforms require static AWS keys is false—federation or temporary credentials can be possible—and EKS is not necessarily the most expensive option without workload sizing."
+        },
+        "preference": "B",
+        "reason": "B better distinguishes known constraints from assumed AWS dependencies and explains how those assumptions change the choice to Render. That makes its recommendation easier to defend without treating the existing AWS location alone as sufficient reason to stay."
+      }
+    },
+    "container-platform.second": {
+      "question_id": "container-platform",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "a232547e350a49798e7582496275961581a4367f39da23cb186ac29feb72e952",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:46:22+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares situation-specific criteria, prioritizes limited operational capacity, and gives a clear recommendation with meaningful alternatives. However, external platforms do not necessarily require static AWS keys, and EKS is not categorically the most expensive option without workload sizing.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Provides concrete deployment, scaling, and cost details that make the ECS recommendation actionable and defensible for two part-time infrastructure developers. It overstates Kubernetes having no benefit at this scale and treats zero-downtime platform defaults and an easy future migration too categorically.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B better supports defending and implementing the recommendation through specific ECS deployment settings and operational responsibilities. A is well structured substantively, but its false claim that external platforms require static AWS credentials unfairly strengthens the case against them.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares situation-specific criteria, prioritizes limited operational capacity, and gives a clear recommendation with meaningful alternatives. However, external platforms do not necessarily require static AWS keys, and EKS is not categorically the most expensive option without workload sizing."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Provides concrete deployment, scaling, and cost details that make the ECS recommendation actionable and defensible for two part-time infrastructure developers. It overstates Kubernetes having no benefit at this scale and treats zero-downtime platform defaults and an easy future migration too categorically."
+        },
+        "preference": "B",
+        "reason": "B better supports defending and implementing the recommendation through specific ECS deployment settings and operational responsibilities. A is well structured substantively, but its false claim that external platforms require static AWS credentials unfairly strengthens the case against them."
+      }
+    },
+    "cache.first": {
+      "question_id": "cache",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "dadd96d389b6a1abc00003511b18ef81448f4ddf72fc0a544e545706b988240f",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:48:44+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"The comparison correctly makes session survival decisive and recommends isolating disposable caches. However, pipelines do not make INCR plus EXPIRE atomic, volatile-ttl can evict sessions, and asynchronous failover loss is not bounded to about one second.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"The recommendation is actionable, uses noeviction for sessions, recognizes Memcached's fixed-window capabilities, and explicitly marks workload assumptions. Its session-survival claim is too absolute: persistence and asynchronous replication can lose recent writes; Valkey compatibility also depends on the Redis version and features used.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B provides a safer session configuration and clearer conditions for adopting a hybrid without assuming that 12 app servers imply low traffic. A's atomicity error and eviction-policy advice undermine two of the requested workloads.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "The comparison correctly makes session survival decisive and recommends isolating disposable caches. However, pipelines do not make INCR plus EXPIRE atomic, volatile-ttl can evict sessions, and asynchronous failover loss is not bounded to about one second."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "The recommendation is actionable, uses noeviction for sessions, recognizes Memcached's fixed-window capabilities, and explicitly marks workload assumptions. Its session-survival claim is too absolute: persistence and asynchronous replication can lose recent writes; Valkey compatibility also depends on the Redis version and features used."
+        },
+        "preference": "B",
+        "reason": "B provides a safer session configuration and clearer conditions for adopting a hybrid without assuming that 12 app servers imply low traffic. A's atomicity error and eviction-policy advice undermine two of the requested workloads."
+      }
+    },
+    "cache.second": {
+      "question_id": "cache",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "4cd529995490d5424c3a137cce24f5ae4311e2ae2882491cfd8754c6d9b8c8af",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:49:20+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Defines relevant criteria, prioritizes session survival, and recommends separate Redis deployments to prevent cache pressure from evicting sessions. It overstates restart durability: RDB snapshots and every-second AOF can lose recent session writes, and asynchronous replication does not guarantee lossless failover.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"Gives a clear, situation-specific recommendation with concrete implementation guidance and alternatives. However, a pipeline does not make INCR plus EXPIRE atomic, and volatile-ttl can evict the session keys it recommends giving TTLs; these are consequential errors in the proposed setup.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A provides a more defensible comparison and a safer configuration by explicitly choosing noeviction for sessions and isolating the disposable cache. Both favor Redis appropriately, but B's atomicity and eviction-policy errors undermine its implementation advice.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Defines relevant criteria, prioritizes session survival, and recommends separate Redis deployments to prevent cache pressure from evicting sessions. It overstates restart durability: RDB snapshots and every-second AOF can lose recent session writes, and asynchronous replication does not guarantee lossless failover."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "Gives a clear, situation-specific recommendation with concrete implementation guidance and alternatives. However, a pipeline does not make INCR plus EXPIRE atomic, and volatile-ttl can evict the session keys it recommends giving TTLs; these are consequential errors in the proposed setup."
+        },
+        "preference": "A",
+        "reason": "A provides a more defensible comparison and a safer configuration by explicitly choosing noeviction for sessions and isolating the disposable cache. Both favor Redis appropriately, but B's atomicity and eviction-policy errors undermine its implementation advice."
+      }
+    },
+    "search.first": {
+      "question_id": "search",
+      "order": "first",
+      "labels": {
+        "B": "skill",
+        "A": "plain"
+      },
+      "skill_label": "B",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "50f1f7f42ec2e746948887e98e1e011d6d715e7e135dbd4eec5489b803260e0b",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:50:10+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Compares relevant operational, financial and search-quality tradeoffs and recommends managed Typesense/Meilisearch, with clear alternatives. However, the RAM requirement, hosting costs, reindex duration and latency claims are presented too confidently without product-document sizes, workload measurements or verified pricing.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 1,\n    \"notes\": \"Makes the team's priorities explicit and gives an actionable Postgres-first experiment with quality checks and switching conditions; it also labels pricing estimates as unverified. However, average traffic does not establish peak load, catalog size does not establish index memory, and declaring that every option meets 100 ms prematurely removes a stated requirement from the comparison.\"\n  },\n  \"preference\": \"B\",\n  \"reason\": \"B better equips the team to defend the decision by explicitly prioritizing constraints and making its recommendation conditional on measured search quality and filtered-query latency. Its unsupported performance assurances should be discarded, but the proposed spike provides a practical way to test them before committing.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Compares relevant operational, financial and search-quality tradeoffs and recommends managed Typesense/Meilisearch, with clear alternatives. However, the RAM requirement, hosting costs, reindex duration and latency claims are presented too confidently without product-document sizes, workload measurements or verified pricing."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 1,
+          "notes": "Makes the team's priorities explicit and gives an actionable Postgres-first experiment with quality checks and switching conditions; it also labels pricing estimates as unverified. However, average traffic does not establish peak load, catalog size does not establish index memory, and declaring that every option meets 100 ms prematurely removes a stated requirement from the comparison."
+        },
+        "preference": "B",
+        "reason": "B better equips the team to defend the decision by explicitly prioritizing constraints and making its recommendation conditional on measured search quality and filtered-query latency. Its unsupported performance assurances should be discarded, but the proposed spike provides a practical way to test them before committing."
+      }
+    },
+    "search.second": {
+      "question_id": "search",
+      "order": "second",
+      "labels": {
+        "A": "skill",
+        "B": "plain"
+      },
+      "skill_label": "A",
+      "judge": "openai/gpt-6.1-sol (variant high) via kilo run",
+      "seed": "1",
+      "prompt_sha256": "fdfcb91246ef07575c0cb41659347ede46d4a8784254af937f143d8c780956b8",
+      "attempts": [
+        {
+          "started": "2026-11-24T06:51:20+00:00",
+          "reply": "{\n  \"A\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"Defines situation-specific criteria, compares concrete implementation and operational differences, and recommends a bounded PostgreSQL trial with quality and latency checks. However, its blanket assurance that all options meet 100 ms—and consequent removal of latency as a deciding factor—is unjustified without product sizes, query patterns, hardware, and measured peak load.\"\n  },\n  \"B\": {\n    \"C1\": 2,\n    \"C2\": 2,\n    \"C3\": 2,\n    \"C4\": 2,\n    \"C5\": 2,\n    \"C6\": 0,\n    \"notes\": \"Makes a practical managed-search recommendation grounded in limited staffing and developer time, with concrete alternatives and switching conditions. Its assurances that 200,000 products fit well under 1 GB of RAM, qualify for a cheap plan, and reindex in a minute or two are unsupported and could materially change the budget decision.\"\n  },\n  \"preference\": \"A\",\n  \"reason\": \"A offers a more defensible initial choice among the requested candidates and explicitly tests both relevance and filtered p95 latency before committing. B's hosted recommendation depends more heavily on unverified sizing and cost assumptions, although both answers overstate performance certainty.\"\n}\n"
+        }
+      ],
+      "judgment": {
+        "A": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "Defines situation-specific criteria, compares concrete implementation and operational differences, and recommends a bounded PostgreSQL trial with quality and latency checks. However, its blanket assurance that all options meet 100 ms—and consequent removal of latency as a deciding factor—is unjustified without product sizes, query patterns, hardware, and measured peak load."
+        },
+        "B": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 2,
+          "C4": 2,
+          "C5": 2,
+          "C6": 0,
+          "notes": "Makes a practical managed-search recommendation grounded in limited staffing and developer time, with concrete alternatives and switching conditions. Its assurances that 200,000 products fit well under 1 GB of RAM, qualify for a cheap plan, and reindex in a minute or two are unsupported and could materially change the budget decision."
+        },
+        "preference": "A",
+        "reason": "A offers a more defensible initial choice among the requested candidates and explicitly tests both relevance and filtered p95 latency before committing. B's hosted recommendation depends more heavily on unverified sizing and cost assumptions, although both answers overstate performance certainty."
+      }
+    }
+  }
+}
