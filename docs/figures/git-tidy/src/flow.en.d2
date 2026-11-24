@@ -1,0 +1,12 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "a short linear flow with one loop back; a quiet style reads best", "surface": "repo-doc"}
+direction: down
+plan: "plan\nread-only: fetch, judge\neach item SAFE or KEEP" { class: box }
+list: "The list\nsafe count, kept items\ngrouped by reason" { class: store }
+you: "You or the user\ndecide whether to delete" { class: decision }
+apply: "apply\njudge again; delete only\nif still SAFE and unchanged" { class: new }
+record: "Restore record\na ready command per item" { class: store }
+plan -> list
+list -> you
+you -> apply: "delete" { class: hero }
+apply -> record
+apply -> plan: "check: run plan again"

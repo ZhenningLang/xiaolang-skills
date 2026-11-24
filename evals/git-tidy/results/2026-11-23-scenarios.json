@@ -1,0 +1,229 @@
+{
+  "date": "2026-11-23",
+  "git_version": "git version 2.55.0",
+  "python": "3.13.12",
+  "scenarios_total": 12,
+  "should_delete": 4,
+  "should_keep": 8,
+  "summary": {
+    "git_tidy": {
+      "deletes_what_should_stay": 0,
+      "keeps_what_could_go": 0,
+      "wrong_ids": [],
+      "missed_ids": []
+    },
+    "one_liner": {
+      "deletes_what_should_stay": 6,
+      "keeps_what_could_go": 2,
+      "wrong_ids": [
+        "worktree-uncommitted",
+        "worktree-untracked",
+        "worktree-ignored-env",
+        "protected-branch",
+        "remote-open-pr",
+        "local-main-only"
+      ],
+      "missed_ids": [
+        "squash-merge",
+        "rebase-merge"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": "merge-commit",
+      "what": "merged with a merge commit and pushed",
+      "kind": "local",
+      "item": "feat",
+      "truth": "delete",
+      "git_tidy": {
+        "verdict": "SAFE",
+        "deletes": true,
+        "codes": []
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "fast-forward",
+      "what": "fast-forwarded into main and pushed",
+      "kind": "local",
+      "item": "feat",
+      "truth": "delete",
+      "git_tidy": {
+        "verdict": "SAFE",
+        "deletes": true,
+        "codes": []
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "squash-merge",
+      "what": "two commits squashed into one on main",
+      "kind": "local",
+      "item": "feat",
+      "truth": "delete",
+      "git_tidy": {
+        "verdict": "SAFE",
+        "deletes": true,
+        "codes": []
+      },
+      "one_liner": {
+        "deletes": false
+      }
+    },
+    {
+      "id": "rebase-merge",
+      "what": "each commit replayed onto a newer main (new commit ids)",
+      "kind": "local",
+      "item": "feat",
+      "truth": "delete",
+      "git_tidy": {
+        "verdict": "SAFE",
+        "deletes": true,
+        "codes": []
+      },
+      "one_liner": {
+        "deletes": false
+      }
+    },
+    {
+      "id": "unmerged",
+      "what": "a commit that is not in main",
+      "kind": "local",
+      "item": "feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "unmerged"
+        ]
+      },
+      "one_liner": {
+        "deletes": false
+      }
+    },
+    {
+      "id": "merged-then-more",
+      "what": "merged, then one more commit on the branch",
+      "kind": "local",
+      "item": "feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "unmerged"
+        ]
+      },
+      "one_liner": {
+        "deletes": false
+      }
+    },
+    {
+      "id": "worktree-uncommitted",
+      "what": "merged branch, worktree has an uncommitted edit",
+      "kind": "worktree",
+      "item": "<tmp>/wt-feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "dirty"
+        ]
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "worktree-untracked",
+      "what": "merged branch, worktree has an untracked file",
+      "kind": "worktree",
+      "item": "<tmp>/wt-feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "dirty"
+        ]
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "worktree-ignored-env",
+      "what": "merged branch, worktree holds the only copy of an ignored .env",
+      "kind": "worktree",
+      "item": "<tmp>/wt-feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "ignored"
+        ]
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "protected-branch",
+      "what": "develop, a shared branch at the same commit as main",
+      "kind": "local",
+      "item": "develop",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "not listed",
+        "deletes": false,
+        "codes": []
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "remote-open-pr",
+      "what": "remote branch already in main but its pull request is still open",
+      "kind": "remote",
+      "item": "origin/feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "pr_open",
+          "other_author"
+        ]
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    },
+    {
+      "id": "local-main-only",
+      "what": "merged into local main, which was never pushed",
+      "kind": "local",
+      "item": "feat",
+      "truth": "keep",
+      "git_tidy": {
+        "verdict": "KEEP",
+        "deletes": false,
+        "codes": [
+          "unmerged"
+        ]
+      },
+      "one_liner": {
+        "deletes": true
+      }
+    }
+  ]
+}

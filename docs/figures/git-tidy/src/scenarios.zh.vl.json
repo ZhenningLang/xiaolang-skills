@@ -1,0 +1,207 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "cells read from the result file",
+      "surface": "repo-doc"
+    },
+    "source": "evals/git-tidy/results/2026-11-23-scenarios.json"
+  },
+  "title": "12 个清理场景：两种挑法各会删掉什么",
+  "data": {
+    "values": [
+      {
+        "scenario": "合并提交 (应删)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "合并提交 (应删)",
+        "tool": "git branch --merged",
+        "result": "判对"
+      },
+      {
+        "scenario": "快进合并 (应删)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "快进合并 (应删)",
+        "tool": "git branch --merged",
+        "result": "判对"
+      },
+      {
+        "scenario": "压缩合并 (应删)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "压缩合并 (应删)",
+        "tool": "git branch --merged",
+        "result": "留了能删的"
+      },
+      {
+        "scenario": "变基合并 (应删)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "变基合并 (应删)",
+        "tool": "git branch --merged",
+        "result": "留了能删的"
+      },
+      {
+        "scenario": "没合并 (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "没合并 (应留)",
+        "tool": "git branch --merged",
+        "result": "判对"
+      },
+      {
+        "scenario": "合并后又加了提交 (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "合并后又加了提交 (应留)",
+        "tool": "git branch --merged",
+        "result": "判对"
+      },
+      {
+        "scenario": "worktree：有未提交改动 (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "worktree：有未提交改动 (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      },
+      {
+        "scenario": "worktree：有未跟踪文件 (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "worktree：有未跟踪文件 (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      },
+      {
+        "scenario": "worktree：唯一一份 .env (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "worktree：唯一一份 .env (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      },
+      {
+        "scenario": "共享分支（develop） (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "共享分支（develop） (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      },
+      {
+        "scenario": "远端分支有开着的 PR (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "远端分支有开着的 PR (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      },
+      {
+        "scenario": "只合进了没推送的本地 main (应留)",
+        "tool": "git-tidy",
+        "result": "判对"
+      },
+      {
+        "scenario": "只合进了没推送的本地 main (应留)",
+        "tool": "git branch --merged",
+        "result": "删了该留的"
+      }
+    ]
+  },
+  "width": 260,
+  "height": {
+    "step": 26
+  },
+  "mark": {
+    "type": "rect",
+    "stroke": "white",
+    "strokeWidth": 2
+  },
+  "encoding": {
+    "x": {
+      "field": "tool",
+      "type": "nominal",
+      "title": "",
+      "sort": [
+        "git-tidy",
+        "git branch --merged"
+      ],
+      "axis": {
+        "orient": "top",
+        "labelAngle": 0
+      }
+    },
+    "y": {
+      "field": "scenario",
+      "type": "nominal",
+      "title": null,
+      "sort": [
+        "合并提交 (应删)",
+        "快进合并 (应删)",
+        "压缩合并 (应删)",
+        "变基合并 (应删)",
+        "没合并 (应留)",
+        "合并后又加了提交 (应留)",
+        "worktree：有未提交改动 (应留)",
+        "worktree：有未跟踪文件 (应留)",
+        "worktree：唯一一份 .env (应留)",
+        "共享分支（develop） (应留)",
+        "远端分支有开着的 PR (应留)",
+        "只合进了没推送的本地 main (应留)"
+      ],
+      "axis": {
+        "labelLimit": 400
+      }
+    },
+    "color": {
+      "field": "result",
+      "type": "nominal",
+      "title": "结果",
+      "scale": {
+        "domain": [
+          "判对",
+          "删了该留的",
+          "留了能删的"
+        ],
+        "range": [
+          "#9fd3b4",
+          "#e8776b",
+          "#f2c26b"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "labelLimit": 300
+      }
+    }
+  }
+}

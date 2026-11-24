@@ -13,7 +13,8 @@ patterns=(
   '\bdc\.py\b'
   'dotfiles-capsule'
   'dotfiles-memory'
-  '\b(think|guard|dev|write|readable|assist|fe)-[a-z][a-z-]+'
+  # not after '-' or a letter/digit, so git flags such as --write-tree are not private skill names
+  '(^|[^-[:alnum:]])(think|guard|dev|write|readable|assist|fe)-[a-z][a-z-]+'
   'cloud-workspace'
 )
 
