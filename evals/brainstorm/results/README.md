@@ -2,7 +2,7 @@
 
 Summaries of every measurement of the brainstorm skill. Each file holds counts and descriptions only, with one exception: `2026-11-16-cases.json` holds the full text of the ideas shown as cases. The raw runs are not in the repository.
 
-What the numbers mean, and their limits, is in [skills/brainstorm/README.md](../../../skills/brainstorm/README.md#4-experiments-and-findings). How to repeat a comparison is in [evals/README.md](../../README.md).
+What the numbers mean, and their limits, is in [skills/think-brainstorm/README.md](../../../skills/think-brainstorm/README.md#4-experiments-and-findings). How to repeat a comparison is in [evals/README.md](../../README.md).
 
 ## Files, oldest first
 

@@ -1,4 +1,4 @@
-"""Tests for the review step, the organise step and the reports. Run: python3 -m unittest discover -s skills/brainstorm/tests < /dev/null"""
+"""Tests for the review step, the organise step and the reports. Run: python3 -m unittest discover -s skills/think-brainstorm/tests < /dev/null"""
 
 import contextlib
 import http.client

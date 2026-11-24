@@ -25,7 +25,7 @@ Also here:
 - `brainstorm/BILLING.md`: the full contract of the spend ledger and the model backend.
 - `brainstorm/tests/`: the tests of both sets.
 
-What the results mean is in [skills/brainstorm/README.md](../skills/brainstorm/README.md#4-experiments-and-findings). This page is about how to run the tools.
+What the results mean is in [skills/think-brainstorm/README.md](../skills/think-brainstorm/README.md#4-experiments-and-findings). This page is about how to run the tools.
 
 ## Counting against plain asking
 

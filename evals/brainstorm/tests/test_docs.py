@@ -12,7 +12,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
 RESULTS = ROOT / "evals" / "brainstorm" / "results"
-SKILL = ROOT / "skills" / "brainstorm"
+SKILL = ROOT / "skills" / "think-brainstorm"
 PAGES = {"en": SKILL / "README.md", "zh": SKILL / "README.zh.md"}
 ROOT_PAGES = {"en": ROOT / "README.md", "zh": ROOT / "README.zh.md"}
 
@@ -256,8 +256,10 @@ class FigureTests(unittest.TestCase):
 
 class LinkTests(unittest.TestCase):
     def test_relative_links_resolve(self):
+        # docs/history is frozen (AGENTS.md): its links keep the paths of the time they were written
         pages = [path for path in ROOT.rglob("*.md")
-                 if ".git" not in path.parts and "runs" not in path.parts and "node_modules" not in path.parts]
+                 if ".git" not in path.parts and "runs" not in path.parts and "node_modules" not in path.parts
+                 and path.relative_to(ROOT).parts[:2] != ("docs", "history")]
         self.assertGreater(len(pages), 8)
         dead = []
         for page in pages:
