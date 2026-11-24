@@ -8,13 +8,15 @@
 
 仓库里堆了一堆做完的 worktree 和分支时用：「清理一下已合并的分支」「worktree 太多了」「远端分支清一清」。它管的是整体清理，不是删一个点名的分支。
 
+它是你自己运行的命令，不是技能：agent 不会自己启动它。自己运行 `git tidy plan` 和 `git tidy apply`；或者在 Claude Code 里敲 `/git-tidy`，让 agent 代跑、帮你判断那些只因被忽略的文件而留下的 worktree，并写一份汇总。
+
 特别适合让 coding agent 每个任务开一个 worktree 的仓库。这类 worktree 堆得快，里面常有 git 忽略的文件（工具状态、`.env`），合并又常用压缩合并，常见的 `git branch --merged` 看不出来。
 
 ## 2. 怎么工作
 
 ![plan、决定、apply、恢复记录](../../docs/figures/git-tidy/flow.zh.png)
 
-`plan` 只读。先 fetch，再把每个 worktree 和分支判成可删（SAFE）或保留（KEEP），写明原因。agent 把可删几项、保留的按原因分组告诉你。`apply` 重新 fetch、重新判，只删仍然可删、而且还指向同一个提交的项。每次删除都写进恢复记录，每项一条现成的恢复命令。
+`plan` 只读。先 fetch，再把每个 worktree 和分支判成可删（SAFE）或保留（KEEP），写明原因。它打印可删几项，保留的按原因分组。`apply` 重新 fetch、重新判，只删仍然可删、而且还指向同一个提交的项。每次删除都写进恢复记录，每项一条现成的恢复命令。
 
 一项要同时满足两件事才可删：代码已经在主干里（`origin/HEAD`，不是你本地的 main），删了不丢东西。
 
@@ -49,17 +51,19 @@
 - 对比的是「挑哪些删」。常见做法挑错的 6 个里，有 2 个 git 自己的 `git worktree remove` 不带 `--force` 也会拒绝（有未提交改动、有未跟踪文件）。唯一一份 `.env` 被忽略的那个 worktree 它不会拒绝：那个文件会被悄悄删掉。
 - 评测里关掉了「12 小时内有活动」这条，因为每个场景的仓库都是刚建的。
 - 判断「有进程在用这个 worktree」需要 `lsof` 或 `/proc`，两个都用不了时所有 worktree 一律保留。
-- 它是一个脚本加给 agent 的说明。删不删仍然取决于 agent 按步骤来：只有你要求清理时才 apply。
+- `/git-tidy` 是一个脚本加给 agent 的说明。用它时，删不删仍然取决于 agent 按步骤来：除非你说只看，它就会 apply。
 
 ## 5. 要求与安装
 
 Python 3.9 及以上，git 2.38 及以上（需要 `git merge-tree --write-tree`）。`gh` 可选；没有它时远端分支因为查不到拉取请求状态一律保留。
 
-安装方法见[仓库首页](../../README.zh.md)。不经过 agent 直接用脚本：
+安装方法见[仓库首页](../../README.zh.md)：`./install.sh git-tidy` 把程序链接到 `~/.local/bin`，git 就能以 `git tidy` 运行它。不经过 agent：
 
 ```bash
-python3 skills/git-tidy/scripts/git_tidy.py plan --repo <仓库>
-python3 skills/git-tidy/scripts/git_tidy.py apply --repo <仓库>
+git tidy plan --repo <仓库>     # 只读：清单和原因
+git tidy apply --repo <仓库>    # 删掉仍然可删的，写恢复记录
 ```
 
-测试：`python3 -m unittest discover -s skills/git-tidy/tests`。
+不安装时，用 `python3 tools/git-tidy/scripts/git_tidy.py` 代替 `git tidy`。
+
+测试：`python3 -m unittest discover -s tools/git-tidy/tests`。

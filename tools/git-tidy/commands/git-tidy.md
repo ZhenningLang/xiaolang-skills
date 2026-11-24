@@ -1,14 +1,17 @@
 ---
-name: git-tidy
-description: Use when a repository has piled up finished worktrees, local branches or remote branches to clean up. Judges by code whether each change is already in trunk (still recognised after rebase or squash merges change the commit ids), deletes only what cannot lose work, prints the list first, re-checks each item right before deleting it and writes a restore record.
+description: Clean up finished worktrees, local branches and remote branches with git tidy, deleting only what cannot lose work. Add "only list" to see the plan without deleting.
+argument-hint: "[repo path] [only list]"
 ---
 
 # Clean up worktrees and branches safely
 
-Script: `scripts/git_tidy.py` in this skill's folder. Run it with `python3 <skill folder>/scripts/git_tidy.py`; it needs only Python 3.9+ and git 2.38+ (`gh` is optional, for open pull requests). The script does all judging and deleting. Your job is to read the list, decide whether deletion is authorised, and report to the user.
+The user ran this command, so a cleanup is wanted. Arguments: $ARGUMENTS
 
-TRIGGER: "clean up merged branches", "too many worktrees, delete what can go", "tidy the remote branches", "remove the finished worktrees".
-DO NOT TRIGGER: "delete the feat/x branch" (one named branch: just do what the user said), "this worktree is broken, start over" (not a cleanup), "merge this PR" (not a cleanup).
+The work is done by the `git tidy` command (the script `tools/git-tidy/scripts/git_tidy.py` in the xiaolang-skills repository). It needs Python 3.9+ and git 2.38+; `gh` is optional, for open pull requests. If git answers that `tidy` is not a git command, stop and tell the user to install it from a clone of the repository with `./install.sh git-tidy`.
+
+The script does all judging and deleting. Your job is to read the list, apply it unless the user asked only to look, help with the worktrees kept only because of ignored files, and report.
+
+Use the repository the user named; otherwise the repository of the current directory.
 
 ## What counts as safe
 
@@ -30,7 +33,7 @@ Trunk is the remote branch `origin/HEAD` points to, not your local main. A branc
 1. Run plan (read-only; it fetches first):
 
    ```
-   python3 <skill folder>/scripts/git_tidy.py plan --repo <repo>
+   git tidy plan --repo <repo>
    ```
 
    Add `--local-only` when the user asked about local items only. The plan file goes to `<git-common-dir>/git-tidy/plan-latest.json` by default.
@@ -41,15 +44,14 @@ Trunk is the remote branch `origin/HEAD` points to, not your local main. A branc
 
    | Situation | What to do |
    |---|---|
-   | The user asked for a cleanup in this turn | Apply all SAFE items, remote included, without asking again |
-   | The user said only "look" or "list them" | Report the list; do not apply |
-   | You decided a cleanup is due; the user did not ask | Report the list and ask whether to apply |
+   | The arguments say only to list or look | Report the list; do not apply |
+   | Otherwise | Apply all SAFE items, remote included, without asking again |
    | The user names a KEEP item to delete | Tell them its keep reason as written; if they insist, handle it as a separate manual step and do not change the script's verdict |
 
 4. Apply:
 
    ```
-   python3 <skill folder>/scripts/git_tidy.py apply --repo <repo>
+   git tidy apply --repo <repo>
    ```
 
    Apply fetches and judges again, and deletes only items that are still SAFE with an unchanged commit. Remote deletion uses a lease, so a branch that received a new push in the meantime is not deleted. Apply reuses the plan file's options (threshold, `--include-others`, `--local-only`). To change a threshold, run plan again with the flag, and do not run a plain plan afterwards, which would overwrite the plan file. Apply may take the same flags, only as a check: when they differ from the plan file it refuses and deletes nothing. The output ends with a `== Summary ==` section: what was deleted, why items were skipped or failed, what is left grouped by reason, and where the restore record is.

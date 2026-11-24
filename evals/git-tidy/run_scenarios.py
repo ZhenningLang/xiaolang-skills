@@ -28,7 +28,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "skills" / "git-tidy" / "scripts" / "git_tidy.py"
+SCRIPT = ROOT / "tools" / "git-tidy" / "scripts" / "git_tidy.py"
 RESULTS = Path(__file__).resolve().parent / "results"
 ENV = {**{k: v for k, v in os.environ.items() if not k.startswith("GIT_")},
        "GIT_AUTHOR_NAME": "me", "GIT_AUTHOR_EMAIL": "me@x", "GIT_COMMITTER_NAME": "me", "GIT_COMMITTER_EMAIL": "me@x",
