@@ -1,0 +1,159 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "usermeta": {
+    "fig": {
+      "content": "data",
+      "style": "cool-clean",
+      "candidates": [
+        "cool-clean"
+      ],
+      "why": "cells and bars read from the result file",
+      "surface": "repo-doc"
+    },
+    "source": "evals/compare/results/2026-11-24-eight-questions.json"
+  },
+  "title": "Which answer the judge preferred, per question and order",
+  "data": {
+    "values": [
+      {
+        "question": "database",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "database",
+        "order": "labels swapped",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "api-style",
+        "order": "first order",
+        "preferred": "plain asking"
+      },
+      {
+        "question": "api-style",
+        "order": "labels swapped",
+        "preferred": "plain asking"
+      },
+      {
+        "question": "repo-layout",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "repo-layout",
+        "order": "labels swapped",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "message-queue",
+        "order": "first order",
+        "preferred": "plain asking"
+      },
+      {
+        "question": "message-queue",
+        "order": "labels swapped",
+        "preferred": "plain asking"
+      },
+      {
+        "question": "frontend-framework",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "frontend-framework",
+        "order": "labels swapped",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "container-platform",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "container-platform",
+        "order": "labels swapped",
+        "preferred": "plain asking"
+      },
+      {
+        "question": "cache",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "cache",
+        "order": "labels swapped",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "search",
+        "order": "first order",
+        "preferred": "with the skill"
+      },
+      {
+        "question": "search",
+        "order": "labels swapped",
+        "preferred": "with the skill"
+      }
+    ]
+  },
+  "width": 240,
+  "height": {
+    "step": 28
+  },
+  "mark": {
+    "type": "rect",
+    "stroke": "white",
+    "strokeWidth": 2
+  },
+  "encoding": {
+    "x": {
+      "field": "order",
+      "type": "nominal",
+      "title": null,
+      "sort": [
+        "first order",
+        "labels swapped"
+      ],
+      "axis": {
+        "orient": "top",
+        "labelAngle": 0
+      }
+    },
+    "y": {
+      "field": "question",
+      "type": "nominal",
+      "title": null,
+      "sort": [
+        "database",
+        "api-style",
+        "repo-layout",
+        "message-queue",
+        "frontend-framework",
+        "container-platform",
+        "cache",
+        "search"
+      ]
+    },
+    "color": {
+      "field": "preferred",
+      "type": "nominal",
+      "title": "Preferred",
+      "scale": {
+        "domain": [
+          "with the skill",
+          "plain asking",
+          "tie"
+        ],
+        "range": [
+          "#5b8def",
+          "#f2a65a",
+          "#c9c9c9"
+        ]
+      },
+      "legend": {
+        "orient": "bottom"
+      }
+    }
+  }
+}

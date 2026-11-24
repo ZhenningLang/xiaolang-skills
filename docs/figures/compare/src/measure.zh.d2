@@ -1,0 +1,12 @@
+# fig: {"content": "flow", "style": "d2-neutral", "candidates": ["d2-neutral", "d2-sketch", "im-marker"], "why": "two arms joining at one blind judge; a quiet style reads best", "surface": "repo-doc"}
+direction: right
+q: "8 道常见的\n技术选型题" { class: store }
+skill: "Claude 用技能\nSKILL.md 放进系统提示" { class: new }
+plain: "Claude 直接问\n只发题目" { class: box }
+judge: "另一家公司的评委\n只看到 A、B 两个标签，\n每对正反两种顺序各判一次" { class: decision }
+counts: "结果文件\n分数、偏好、\n每份回答和评委原话" { class: hero }
+q -> skill
+q -> plain
+skill -> judge
+plain -> judge
+judge -> counts

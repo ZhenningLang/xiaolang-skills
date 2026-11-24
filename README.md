@@ -9,6 +9,7 @@ Agent skills I use every day and think are worth sharing. I write as 小郎碎�
 | Skill | What it does | Status |
 |:---|:---|:---|
 | [think-brainstorm](skills/think-brainstorm/README.md) | Brainstorming that spreads ideas wide before judging any of them | v1. Scored by a person on one question only. Counted against plain repeated asking on eight questions; on six new real-world questions it reached another 67 to 118 mechanisms. On the first two: it reaches mechanisms plain asking does not, 46 to 62 more on the question measured with care (Chinese method texts; the English texts shipped now reached 33 to 39 in one run). See [what the skill adds](skills/think-brainstorm/README.md#2-what-the-skill-adds) |
+| [think-compare](skills/think-compare/README.md) | Choose between options you already have: dimensions first, a winner per dimension, then one verdict with its conditions | v1. Against plain asking on eight technology-selection questions, judged blind in both orders by a model from another company: preferred in 11 of 16 judgments, in both orders on 5 of 8 questions (plain asking on 2). Mean score 10.875 against 10.5 of 12, mostly from stating conditions and checkable differences. See [evidence](skills/think-compare/README.md#3-evidence) |
 
 ## Tools
 
@@ -39,6 +40,7 @@ Each skill and tool has its own README in its folder: what it does, when to use 
 ```bash
 claude plugin marketplace add ZhenningLang/xiaolang-skills
 claude plugin install think-brainstorm@xiaolang-skills
+claude plugin install think-compare@xiaolang-skills
 claude plugin install git-tidy@xiaolang-skills   # the /git-tidy command; the git tidy program comes from install.sh below
 ```
 

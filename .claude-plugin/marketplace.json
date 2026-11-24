@@ -17,6 +17,15 @@
       ]
     },
     {
+      "name": "think-compare",
+      "description": "Choose between known options: dimensions first, a winner per dimension, then one verdict with its conditions (v1; against plain asking on eight technology-selection questions, preferred in 11 of 16 blind judgments).",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/think-compare"
+      ]
+    },
+    {
       "name": "git-tidy",
       "description": "The /git-tidy command: clean up finished worktrees and branches with git tidy, deleting only what cannot lose work; recognises squash and rebase merges (v1; checked on 12 built scenarios). The git tidy command itself comes from install.sh.",
       "source": "./",
