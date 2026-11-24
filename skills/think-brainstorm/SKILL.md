@@ -1,6 +1,9 @@
 ---
 name: think-brainstorm
 description: Use when the user wants many genuinely different ideas for an open question (brainstorm, ideation, "what else could we try", "give me options I haven't thought of") and is willing to spend many sub-agent calls on it. Shows the user a local review page to confirm the question, hard constraints, cards, thinking methods and models first; then runs isolated parallel sub-agents through a baseline, two rounds and up to three pressure levels, groups the ideas by mechanism, sorts them into themes with short titles, and hands back every distinct mechanism as a readable page, with those the plain baseline already produced folded at the end. It only diverges; it never scores, ranks or deletes ideas. Not for choosing between known options, fixing a bug, or a quick list of a few ideas.
+license: MIT
+metadata:
+  version: "1.0"
 ---
 
 # Brainstorm

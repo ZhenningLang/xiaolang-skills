@@ -1,6 +1,6 @@
 # Figures of the git-tidy README
 
-The pictures in [skills/git-tidy/README.md](../../../skills/git-tidy/README.md) and its Chinese page. Each one has an English and a Chinese file.
+The pictures in [tools/git-tidy/README.md](../../../tools/git-tidy/README.md) and its Chinese page. Each one has an English and a Chinese file.
 
 | Figure | What it shows | Definition in `src/` |
 |:---|:---|:---|

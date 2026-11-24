@@ -8,13 +8,15 @@ Cleans up finished worktrees, local branches and remote branches, and deletes on
 
 Use it when a repository has piled up worktrees and branches from finished work: "clean up merged branches", "too many worktrees", "tidy the remote branches". It is for a whole cleanup, not for deleting one named branch.
 
+It is a command you run, not a skill: no agent starts it on its own. Run `git tidy plan` and `git tidy apply` yourself, or type `/git-tidy` in Claude Code to have the agent run it, help decide about worktrees kept only because of ignored files, and write a summary.
+
 It suits repositories where coding agents open a worktree per task. Those pile up fast, often hold files git ignores (tool state, a `.env`), and are often merged by squash, which the usual `git branch --merged` does not see.
 
 ## 2. How it works
 
 ![plan, decide, apply, restore record](../../docs/figures/git-tidy/flow.en.png)
 
-`plan` is read-only. It fetches, then judges every worktree and branch SAFE or KEEP and writes the reason. The agent shows you the counts and the kept items grouped by reason. `apply` fetches and judges again, and deletes an item only if it is still SAFE and still points at the same commit. Every deletion goes into a restore record with a ready command to bring it back.
+`plan` is read-only. It fetches, then judges every worktree and branch SAFE or KEEP and writes the reason. It prints the counts and the kept items grouped by reason. `apply` fetches and judges again, and deletes an item only if it is still SAFE and still points at the same commit. Every deletion goes into a restore record with a ready command to bring it back.
 
 An item is SAFE only when its code is already in trunk (`origin/HEAD`, not your local main) and deleting it loses nothing:
 
@@ -49,17 +51,19 @@ Result file: [`evals/git-tidy/results/2026-11-23-scenarios.json`](../../evals/gi
 - The comparison is about choosing what to delete. Of the six items the usual way picks wrongly, git's own `git worktree remove` would still refuse two without `--force` (the uncommitted edit and the untracked file). It would not refuse the worktree whose only copy of `.env` is ignored: that file would be deleted silently.
 - The scenarios switch off the 12-hour activity rule, since every repository in them was just created.
 - Detecting "a process uses this worktree" needs `lsof` or `/proc`. When neither works, every worktree is kept.
-- It is a script plus instructions for the agent. Deletion still depends on the agent following the steps: apply only when you asked for a cleanup.
+- `/git-tidy` is a script plus instructions for the agent. With it, deletion still depends on the agent following the steps: it applies unless you asked only to list.
 
 ## 5. Requirements and install
 
 Python 3.9 or newer and git 2.38 or newer (for `git merge-tree --write-tree`). `gh` is optional; without it, remote branches are kept because pull request state is unknown.
 
-Install from the [repository root](../../README.md#install). To use the script without an agent:
+Install from the [repository root](../../README.md#install): `./install.sh git-tidy` links the program into `~/.local/bin`, and git runs it as `git tidy`. Without an agent:
 
 ```bash
-python3 skills/git-tidy/scripts/git_tidy.py plan --repo <repo>
-python3 skills/git-tidy/scripts/git_tidy.py apply --repo <repo>
+git tidy plan --repo <repo>     # read-only: the list and the reasons
+git tidy apply --repo <repo>    # delete what is still SAFE, write a restore record
 ```
 
-Tests: `python3 -m unittest discover -s skills/git-tidy/tests`.
+Without installing it, run `python3 tools/git-tidy/scripts/git_tidy.py` in its place.
+
+Tests: `python3 -m unittest discover -s tools/git-tidy/tests`.
